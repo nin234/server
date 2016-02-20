@@ -65,6 +65,10 @@
 
 #define GET_EASYGROC_LIST_MSG 40
 
+#define GET_OPENHOUSES_ITEMS 60
+
+
+#define GET_AUTOSPREE_ITEMS 80
 
 #define MAX_MSG_ID 23
 
