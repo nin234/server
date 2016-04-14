@@ -10,7 +10,7 @@
 #include <iostream>
 #include <ShareIdArchvr.h>
 #include <FrndLstArchvr.h>
-#include <EasyGrocArchvr.h>
+#include <CommonArchvr.h>
 #include <Constants.h>
 #include <string.h>
 
@@ -28,8 +28,8 @@ ArchiveMgr::ArchiveMgr()
 	pArchvrs[ARCHIVE_SHARE_ID_MSG] = std::make_shared<ShareIdArchvr>();
 	pArchvrs[ARCHIVE_SHARE_TRN_ID_MSG] = std::make_shared<ShareIdArchvr>();
 	pArchvrs[ARCHIVE_FRND_LST_MSG] = std::make_shared<FrndLstArchvr>();
-	pArchvrs[ARCHIVE_STORE_TEMPL_LST_MSG] = std::make_shared<EasyGrocArchvr>();
-	pArchvrs[ARCHIVE_EASYGROC_DEV_TKN_MSG] = std::make_shared<EasyGrocArchvr>();
+	pArchvrs[ARCHIVE_ARCHIVE_ITEM_MSG] = std::make_shared<CommonArchvr>();
+	pArchvrs[ARCHIVE_DEVICE_TKN_MSG] = std::make_shared<CommonArchvr>();
 	
 }
 
@@ -178,15 +178,15 @@ ArchiveMgr::getFrndLstArchvr(int frndLstMsgTyp)
 
 }
 
-std::shared_ptr<EasyGrocArchvr>
-ArchiveMgr::getEasyGrocArchvr()
+std::shared_ptr<CommonArchvr>
+ArchiveMgr::getCommonArchvr()
 {
 
 	auto pItr = pArchvrs.find(ARCHIVE_STORE_TEMPL_LST_MSG);
 
 	if (pItr != pArchvrs.end())
-		return std::dynamic_pointer_cast<EasyGrocArchvr>(pItr->second);
-	return std::shared_ptr<EasyGrocArchvr>();
+		return std::dynamic_pointer_cast<CommonArchvr>(pItr->second);
+	return std::shared_ptr<CommonArchvr>();
 }
 
 

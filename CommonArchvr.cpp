@@ -1,4 +1,4 @@
-#include <EasyGrocArchvr.h>
+#include <CommonArchvr.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -19,7 +19,7 @@ IndxKey::operator < (const IndxKey& rhs) const
 	return false;
 }
 
-EasyGrocArchvr::EasyGrocArchvr()
+CommonArchvr::CommonArchvr()
 {
 	tmplFd = open("/home/ninan/data/tmplLst", O_RDWR|O_CREAT);
 	if (tmplFd == -1)
@@ -36,7 +36,7 @@ EasyGrocArchvr::EasyGrocArchvr()
 
 }
 
-EasyGrocArchvr::~EasyGrocArchvr()
+CommonArchvr::~CommonArchvr()
 {
 	close(tmplFd);
 	close(lstFd);
@@ -45,7 +45,7 @@ EasyGrocArchvr::~EasyGrocArchvr()
 }
 
 bool
-EasyGrocArchvr::populateDeviceTknImpl(long& shareId, std::string& devId, std::string& devTkn)
+CommonArchvr::populateDeviceTknImpl(long& shareId, std::string& devId, std::string& devTkn)
 {
 	int size;
 	int numread = read(deviceFd, &size, sizeof(int));
@@ -64,7 +64,7 @@ EasyGrocArchvr::populateDeviceTknImpl(long& shareId, std::string& devId, std::st
 }
 
 bool
-EasyGrocArchvr::populateLstImpl(int lstFd, long& shareId, std::string& name, std::string& lst)
+CommonArchvr::populateItemImpl(int lstFd, long& shareId, std::string& name, std::string& lst)
 {
 	long offset = lseek(lstFd, 0, SEEK_CUR);
 	while (true)
@@ -111,7 +111,7 @@ EasyGrocArchvr::populateLstImpl(int lstFd, long& shareId, std::string& name, std
 }
 
 bool
-EasyGrocArchvr::populateTemplLstImpl(long& shareId, std::string& name, std::string& templLst)
+CommonArchvr::populateArchvItemsImpl(long& shareId, std::string& name, std::string& templLst)
 {
 	long offset = lseek(tmplFd, 0, SEEK_CUR);
 	while (true)
@@ -160,7 +160,7 @@ EasyGrocArchvr::populateTemplLstImpl(long& shareId, std::string& name, std::stri
 
 
 bool
-EasyGrocArchvr::archiveMsg(const char *buf, int len)
+CommonArchvr::archiveMsg(const char *buf, int len)
 {
 	int msgTyp;
 	memcpy (&msgTyp, buf, sizeof(int));
@@ -168,15 +168,15 @@ EasyGrocArchvr::archiveMsg(const char *buf, int len)
 	switch(msgTyp)
 	{
 
-		case ARCHIVE_STORE_TEMPL_LST_MSG:
-			return archiveTemplLst(buf+sizeof(int), len-sizeof(int));
+		case ARCHIVE_ARCHIVE_ITEM_MSG:
+			return archiveArchvItems(buf+sizeof(int), len-sizeof(int));
 		break;
 
 		case ARCHIVE_FRND_LST_MSG:
 			return archiveShareLst(buf+sizeof(int), len-sizeof(int));
 		break;
 
-		case ARCHIVE_EASYGROC_DEV_TKN_MSG:
+		case ARCHIVE_DEVICE_TKN_MSG:
 			return archiveDeviceTkn(buf+sizeof(int), len-sizeof(int));
 
 		break;
@@ -186,7 +186,7 @@ EasyGrocArchvr::archiveMsg(const char *buf, int len)
 		break;
 
 		default:
-			std::cout << "Invalid msgTyp " << msgTyp << " received in EasyGrocArchvr::archiveMsg " << std::endl;
+			std::cout << "Invalid msgTyp " << msgTyp << " received in CommonArchvr::archiveMsg " << std::endl;
 			return false;	
 		break;
 	}
@@ -194,7 +194,7 @@ EasyGrocArchvr::archiveMsg(const char *buf, int len)
 }
 
 bool
-EasyGrocArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
+CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
 {
 		long offset = lseek(lstFd, 0, SEEK_END);
 		int size= len*2 + 2*sizeof(int);
@@ -229,11 +229,11 @@ EasyGrocArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
 }
 
 bool
-EasyGrocArchvr::archiveShareLstInfo(const char *buf, int len)
+CommonArchvr::archiveShareLstInfo(const char *buf, int len)
 {
 	if (len <=0 )
 	{
-		std::cout << "Invalid length " << len << " EasyGrocArchvr::archiveShareLstInfo message " << std::endl;
+		std::cout << "Invalid length " << len << " CommonArchvr::archiveShareLstInfo message " << std::endl;
 		return false;
 	}
 
@@ -255,7 +255,7 @@ EasyGrocArchvr::archiveShareLstInfo(const char *buf, int len)
 }
 
 bool
-EasyGrocArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd, long indx)
+CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd, long indx)
 {
 	lseek(lstFd, indx, SEEK_SET);
 	int size;
@@ -284,11 +284,11 @@ EasyGrocArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lst
 }
 
 bool
-EasyGrocArchvr::archiveShareLst(const char *buf, int len)
+CommonArchvr::archiveShareLst(const char *buf, int len)
 {
 	if (len <=0 )
 	{
-		std::cout << "Invalid length " << len << " EasyGrocArchvr::archiveShareLst message " << std::endl;
+		std::cout << "Invalid length " << len << " CommonArchvr::archiveShareLst message " << std::endl;
 		return false;
 	}
 
@@ -311,11 +311,11 @@ EasyGrocArchvr::archiveShareLst(const char *buf, int len)
 }
 
 bool
-EasyGrocArchvr::archiveDeviceTkn(const char *buf, int len)
+CommonArchvr::archiveDeviceTkn(const char *buf, int len)
 {
 	if (len <=0 )
 	{
-		std::cout << "Invalid length " << len << " EasyGrocArchvr::archiveDeviceTkn message " << std::endl;
+		std::cout << "Invalid length " << len << " CommonArchvr::archiveDeviceTkn message " << std::endl;
 		return false;
 	}
 	
@@ -334,11 +334,11 @@ EasyGrocArchvr::archiveDeviceTkn(const char *buf, int len)
 }
 
 bool
-EasyGrocArchvr::archiveTemplLst(const char *buf, int len)
+CommonArchvr::archiveArchvItems(const char *buf, int len)
 {
 	if (len <=0 )
 	{
-		std::cout << "Invalid length " << len << " EasyGrocArchvr::archiveTemplLst message " << std::endl;
+		std::cout << "Invalid length " << len << " CommonArchvr::archiveArchvItems message " << std::endl;
 		return false;
 	}
 

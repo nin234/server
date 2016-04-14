@@ -29,7 +29,7 @@ bool
 ArchiveMsgCreator::createEasyGrocDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn)
 {
 
-	constexpr int msgId = ARCHIVE_EASYGROC_DEV_TKN_MSG;
+	constexpr int msgId = ARCHIVE_DEVICE_TKN_MSG;
 	memcpy(pMsg, &msgId, sizeof(int));
 	//reusing (hijacking) shrdIdTemplSize
 	shrdIdTemplSize devLens;
@@ -81,7 +81,7 @@ ArchiveMsgCreator::createFrndLstMsg(char *pMsgStatic, int& len, long shareId, co
 std::unique_ptr<char>
 ArchiveMsgCreator::createTemplLstMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& templList, int buflen)
 {
-	constexpr int msgId = ARCHIVE_STORE_TEMPL_LST_MSG;
+	constexpr int msgId = ARCHIVE_ARCHIVE_ITEM_MSG;
 	shrdIdTemplSize templSize;
 	templSize.shrId = shareId;
 	templSize.name_len = name.size() + 1;
@@ -116,7 +116,7 @@ std::unique_ptr<char>
 ArchiveMsgCreator::createLstMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& list, int buflen)
 {
 
-	constexpr int msgId = ARCHIVE_LST_MSG;
+	constexpr int msgId = ARCHIVE_ITM_MSG;
 	shrdIdTemplSize templSize;
 	templSize.shrId = shareId;
 	templSize.name_len = name.size()+1;

@@ -6,13 +6,13 @@
 
 EasyGrocDataMgr::EasyGrocDataMgr()
 {
-	std::shared_ptr<EasyGrocArchvr> pEasyGrocArch = ArchiveMgr::Instance().getEasyGrocArchvr();
-	if (pEasyGrocArch)
+	std::shared_ptr<CommonArchvr> pCommonArch = ArchiveMgr::Instance().getCommonArchvr();
+	if (pCommonArch)
 	{
-		pEasyGrocArch->populateTemplLst([&](long shareId, const std::string& name, const std::string& templList){storeTemplList(shareId, name, templList);});
-		pEasyGrocArch->populateLst([&](long shareId, const std::string& name, const std::string& list){storeList(shareId, name, list);});
-		pEasyGrocArch->populateShareLst([&](long shareId, const std::string& name, const std::string& list){storeLstShareInfo(shareId, name, list);});
-		pEasyGrocArch->populateDeviceTkn([&](long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(shareId, devId, devTkn);});
+		pCommonArch->populateArchvItems([&](long shareId, const std::string& name, const std::string& templList){storeTemplList(shareId, name, templList);});
+		pCommonArch->populateItem([&](long shareId, const std::string& name, const std::string& list){storeList(shareId, name, list);});
+		pCommonArch->populateShareLst([&](long shareId, const std::string& name, const std::string& list){storeLstShareInfo(shareId, name, list);});
+		pCommonArch->populateDeviceTkn([&](long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(shareId, devId, devTkn);});
 	}
 }
 

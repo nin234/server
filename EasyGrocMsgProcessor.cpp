@@ -59,9 +59,6 @@ EasyGrocMsgProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in EasyGrocMsgProcessor::processGetItemMsg " << std::endl;
 		return;
 	}
-	EasyGrocTranslator *m_pTranslEasy = dynamic_cast<EasyGrocTranslator*>(m_pTrnsl);
-	if (!m_pTranslEasy)
-		return;
 	std::map<std::string, std::string> lstNameMp;
 	dataStore.getShareLists(pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), lstNameMp);
 	std::unique_ptr<char> pArchMsg;
@@ -69,7 +66,7 @@ EasyGrocMsgProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	int archlen = 0;
 	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
 	{
-		pArchMsg = m_pTranslEasy->getListMsg(archbuf, &archlen, 32768, pItr->first, pItr->second);	
+		pArchMsg = m_pTransl->getListMsg(archbuf, &archlen, 32768, pItr->first, pItr->second);	
 		if (sendMsg(pArchMsg == nullptr? archbuf:pArchMsg.get(), archlen, pGetItemObj->getFd()))
 		{
 			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
@@ -84,9 +81,6 @@ EasyGrocMsgProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 void
 EasyGrocMsgProcessor::processLstMsg(const std::unique_ptr<MsgObj>& pMsg)
 {
-	EasyGrocTranslator *m_pTranslEasy = dynamic_cast<EasyGrocTranslator*>(m_pTrnsl);
-	if (!m_pTranslEasy)
-		return;
 	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
 	if (!pLstObj)
 	{
@@ -104,7 +98,7 @@ EasyGrocMsgProcessor::processLstMsg(const std::unique_ptr<MsgObj>& pMsg)
 	sendArchiveMsg(pArchMsg == nullptr?archbuf : pArchMsg.get(), archlen, 10);	
 
 	std::vector<std::string>  shareIds;
-	if (m_pTranslEasy->getShareIds(pLstObj->getList(), shareIds))
+	if (m_pTransl->getShareIds(pLstObj->getList(), shareIds))
 	{
 		dataStore.storeLstShareInfo(shareIds, pLstObj->getName());
 		struct timeval tv;

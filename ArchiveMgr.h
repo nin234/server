@@ -8,7 +8,7 @@
 #include <Archvr.h>
 #include <ShareIdArchvr.h>
 #include <FrndLstArchvr.h>
-#include <EasyGrocArchvr.h>
+#include <CommonArchvr.h>
 #include <memory>
 
 class ArchiveMgr
@@ -31,7 +31,7 @@ class ArchiveMgr
 		bool registerFd(mqd_t fd);
 		std::shared_ptr<ShareIdArchvr> getShareIdArchvr(int shidMsgTyp); 
 		std::shared_ptr<FrndLstArchvr> getFrndLstArchvr(int frndLstMsgTyp); 
-		std::shared_ptr<EasyGrocArchvr> getEasyGrocArchvr();
+		std::shared_ptr<CommonArchvr> getCommonArchvr();
 };
 
 

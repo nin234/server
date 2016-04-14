@@ -10,5 +10,6 @@ class OpenHousesDecoder : public MessageDecoder
 		OpenHousesDecoder();
 		virtual ~OpenHousesDecoder();
 		bool decodeMsg(char *buffer, ssize_t mlen, int fd);
+		int getAppId() {return 1;}
 };
 #endif

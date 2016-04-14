@@ -1,5 +1,5 @@
-#ifndef _EASY_GROC_ARCHVR_H_
-#define _EASY_GROC_ARCHVR_H_
+#ifndef _COMMON_ARCHVR_H_
+#define _COMMON_ARCHVR_H_
 
 #include <Archvr.h>
 #include <string>
@@ -17,15 +17,15 @@ struct IndxKey
 	
 };
 
-class EasyGrocArchvr : public Archvr
+class CommonArchvr : public Archvr
 {
 
 		int tmplFd;
 		int lstFd;
 		int shrLstFd;
 		int deviceFd;
-		bool populateTemplLstImpl(long& shareId, std::string& name, std::string& tmplLst);
-		bool populateLstImpl(int fd, long& shareId, std::string& name, std::string& lst);
+		bool populateArchvItemsImpl(long& shareId, std::string& name, std::string& tmplLst);
+		bool populateItemImpl(int fd, long& shareId, std::string& name, std::string& lst);
 		bool populateDeviceTknImpl(long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
@@ -35,14 +35,14 @@ class EasyGrocArchvr : public Archvr
 		bool updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx);
 
 	public:
-		EasyGrocArchvr();
-		~EasyGrocArchvr();
+		CommonArchvr();
+		~CommonArchvr();
 		bool archiveMsg(const char *buf, int len);
-		bool archiveTemplLst(const char *buf, int len);
+		bool archiveArchvItems(const char *buf, int len);
 		bool archiveShareLst(const char *buf, int len);
 		bool archiveShareLstInfo(const char *buf, int len);
 		bool archiveDeviceTkn(const char *buf, int len);
-		template<class Op> void populateTemplLst(Op op)
+		template<class Op> void populateArchvItems(Op op)
 		{
 			if(lseek(tmplFd, 0, SEEK_SET) == -1)
 			{
@@ -53,13 +53,13 @@ class EasyGrocArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, tmplLst;
-				if (!populateTemplLstImpl(shareId, name, tmplLst))
+				if (!populateArchvItemsImpl(shareId, name, tmplLst))
 					break;
 				op(shareId, name, tmplLst);
 			}
 		}
 
-		template<class Op> void populateLst(Op op)
+		template<class Op> void populateItem(Op op)
 		{
 			if(lseek(lstFd, 0, SEEK_SET) == -1)
 			{
@@ -70,7 +70,7 @@ class EasyGrocArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, lst;
-				if (!populateLstImpl(lstFd, shareId, name, lst))
+				if (!populateItemImpl(lstFd, shareId, name, lst))
 					break;
 				op(shareId, name, lst);
 			}
@@ -87,7 +87,7 @@ class EasyGrocArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, lst;
-				if (!populateLstImpl(shrLstFd, shareId, name, lst))
+				if (!populateItemImpl(shrLstFd, shareId, name, lst))
 					break;
 				op(shareId, name, lst);
 			}

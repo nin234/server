@@ -7,12 +7,15 @@ class MsgObj
 {
 	int msgTyp;
 	int fd;
+	int appId;
 	public:
 	virtual ~MsgObj(){}
 	 int getMsgTyp()const {return msgTyp;}
 	void setMsgTyp(int mtyp) {msgTyp = mtyp;}
 	int getFd() const {return fd;}
 	void setFd(int fdes) {fd = fdes;}
+	int getAppId() const {return appId;}
+	void setAppId() (int appid) {appId = appid;}
 
 };
 
