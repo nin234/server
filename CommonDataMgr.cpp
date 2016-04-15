@@ -1,10 +1,10 @@
-#include <EasyGrocDataMgr.h>
+#include <CommonDataMgr.h>
 #include <ArchiveMgr.h>
 #include <string>
 #include <sstream>
 #include <sys/time.h>
 
-EasyGrocDataMgr::EasyGrocDataMgr()
+CommonDataMgr::CommonDataMgr()
 {
 	std::shared_ptr<CommonArchvr> pCommonArch = ArchiveMgr::Instance().getCommonArchvr();
 	if (pCommonArch)
@@ -16,13 +16,13 @@ EasyGrocDataMgr::EasyGrocDataMgr()
 	}
 }
 
-EasyGrocDataMgr::~EasyGrocDataMgr()
+CommonDataMgr::~CommonDataMgr()
 {
 
 }
 
 void
-EasyGrocDataMgr::storeTemplList(long shareId, const std::string& name, const std::string& templList)
+CommonDataMgr::storeTemplList(long shareId, const std::string& name, const std::string& templList)
 {
   EasyGrocElem& elem = grocListElems[shareId];
   elem.templLists.insert(name, templList);
@@ -30,7 +30,7 @@ EasyGrocDataMgr::storeTemplList(long shareId, const std::string& name, const std
 }                                              
 
 void
-EasyGrocDataMgr::storeList(long shareId, const std::string& name, const std::string& list)
+CommonDataMgr::storeList(long shareId, const std::string& name, const std::string& list)
 {
   	EasyGrocElem& elem = grocListElems[shareId];
   	elem.lists.insert(name, list);
@@ -38,7 +38,7 @@ EasyGrocDataMgr::storeList(long shareId, const std::string& name, const std::str
 }
 
 void
-EasyGrocDataMgr::storeLstShareInfo(long shareId, const std::string& name, const std::string& list)
+CommonDataMgr::storeLstShareInfo(long shareId, const std::string& name, const std::string& list)
 {
   	EasyGrocElem& elem = grocListElems[shareId];
   	elem.lstShareInfo.insert(name, list);
@@ -47,7 +47,7 @@ EasyGrocDataMgr::storeLstShareInfo(long shareId, const std::string& name, const 
 
 
 void
-EasyGrocDataMgr::storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn)
+CommonDataMgr::storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn)
 {
   	EasyGrocElem& elem = grocListElems[shareId];
   	elem.deviceTokens.insert(devId, devTkn);
@@ -55,7 +55,7 @@ EasyGrocDataMgr::storeDeviceTkn(long shareId, const std::string& devId, const st
 }
 
 void
-EasyGrocDataMgr::storeLstShareInfo(const std::vector<std::string>& shareIds, const std::string& name)
+CommonDataMgr::storeLstShareInfo(const std::vector<std::string>& shareIds, const std::string& name)
 {
 	for (const std::string& shareId : shareIds)
 	{
@@ -71,15 +71,15 @@ EasyGrocDataMgr::storeLstShareInfo(const std::vector<std::string>& shareIds, con
 
 
 
-EasyGrocDataMgr&
-EasyGrocDataMgr::Instance()
+CommonDataMgr&
+CommonDataMgr::Instance()
 {
-	static EasyGrocDataMgr instance;
+	static CommonDataMgr instance;
 	return instance;
 }
 
 void
-EasyGrocDataMgr::getDeviceTkns(const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
+CommonDataMgr::getDeviceTkns(const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
 	for (const std::string& shareId : shareIds)
 	{
@@ -90,7 +90,7 @@ EasyGrocDataMgr::getDeviceTkns(const std::vector<std::string>& shareIds, std::ve
 }
 
 std::string
-EasyGrocDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const std::string& name)
+CommonDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const std::string& name)
 {
 		
 	EasyGrocElem& elem = grocListElems[shareId];
@@ -103,7 +103,7 @@ EasyGrocDataMgr::updateLstShareInfo(long shareId, const std::string& devId, cons
 }
 
 void
-EasyGrocDataMgr::getShareLists(long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
+CommonDataMgr::getShareLists(long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
 {
 	EasyGrocElem& elem = grocListElems[shareId];
 	std::map<std::string, std::string> names;
