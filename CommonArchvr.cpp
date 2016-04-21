@@ -21,13 +21,13 @@ IndxKey::operator < (const IndxKey& rhs) const
 
 CommonArchvr::CommonArchvr()
 {
-	tmplFd = open("/home/ninan/data/tmplLst", O_RDWR|O_CREAT);
+	tmplFd = open("/home/ninan/data/archiveItems", O_RDWR|O_CREAT);
 	if (tmplFd == -1)
 		throw std::system_error(errno, std::system_category());
-	lstFd = open("/home/ninan/data/shareLst", O_RDWR|O_CREAT);
+	lstFd = open("/home/ninan/data/shareItems", O_RDWR|O_CREAT);
 	if (lstFd == -1)
 		throw std::system_error(errno, std::system_category());
-	deviceFd = open("/home/ninan/data/easyGrocDeviceTkns", O_RDWR|O_CREAT);
+	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT);
 	if (deviceFd == -1)
 		throw std::system_error(errno, std::system_category());
 	shrLstFd = open("/home/ninan/data/shareLstInfo", O_RDWR|O_CREAT);

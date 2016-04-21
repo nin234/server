@@ -9,8 +9,8 @@ CommonDataMgr::CommonDataMgr()
 	std::shared_ptr<CommonArchvr> pCommonArch = ArchiveMgr::Instance().getCommonArchvr();
 	if (pCommonArch)
 	{
-		pCommonArch->populateArchvItems([&](long shareId, const std::string& name, const std::string& templList){storeTemplList(shareId, name, templList);});
-		pCommonArch->populateItem([&](long shareId, const std::string& name, const std::string& list){storeList(shareId, name, list);});
+		pCommonArch->populateArchvItems([&](long shareId, const std::string& name, const std::string& templList){storeArchiveItem(shareId, name, templList);});
+		pCommonArch->populateItem([&](long shareId, const std::string& name, const std::string& list){storeItem(shareId, name, list);});
 		pCommonArch->populateShareLst([&](long shareId, const std::string& name, const std::string& list){storeLstShareInfo(shareId, name, list);});
 		pCommonArch->populateDeviceTkn([&](long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(shareId, devId, devTkn);});
 	}
@@ -22,25 +22,25 @@ CommonDataMgr::~CommonDataMgr()
 }
 
 void
-CommonDataMgr::storeTemplList(long shareId, const std::string& name, const std::string& templList)
+CommonDataMgr::storeArchiveItem(long shareId, const std::string& name, const std::string& templList)
 {
-  EasyGrocElem& elem = grocListElems[shareId];
-  elem.templLists.insert(name, templList);
+  CommonElem& elem = commonElems[shareId];
+  elem.archvItems.insert(name, templList);
   return;                                
 }                                              
 
 void
-CommonDataMgr::storeList(long shareId, const std::string& name, const std::string& list)
+CommonDataMgr::storeItem(long shareId, const std::string& name, const std::string& list)
 {
-  	EasyGrocElem& elem = grocListElems[shareId];
-  	elem.lists.insert(name, list);
+  	CommonElem& elem = commonElems[shareId];
+  	elem.items.insert(name, list);
 	return;
 }
 
 void
 CommonDataMgr::storeLstShareInfo(long shareId, const std::string& name, const std::string& list)
 {
-  	EasyGrocElem& elem = grocListElems[shareId];
+  	CommonElem& elem = commonElems[shareId];
   	elem.lstShareInfo.insert(name, list);
 	return;
 }
@@ -49,7 +49,7 @@ CommonDataMgr::storeLstShareInfo(long shareId, const std::string& name, const st
 void
 CommonDataMgr::storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn)
 {
-  	EasyGrocElem& elem = grocListElems[shareId];
+  	CommonElem& elem = commonElems[shareId];
   	elem.deviceTokens.insert(devId, devTkn);
 	return;
 }
@@ -59,7 +59,7 @@ CommonDataMgr::storeLstShareInfo(const std::vector<std::string>& shareIds, const
 {
 	for (const std::string& shareId : shareIds)
 	{
-  		EasyGrocElem& elem = grocListElems[std::stol(shareId)];	
+  		CommonElem& elem = commonElems[std::stol(shareId)];	
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
@@ -83,7 +83,7 @@ CommonDataMgr::getDeviceTkns(const std::vector<std::string>& shareIds, std::vect
 {
 	for (const std::string& shareId : shareIds)
 	{
-  		EasyGrocElem& elem = grocListElems[std::stol(shareId)];
+  		CommonElem& elem = commonElems[std::stol(shareId)];
 		elem.deviceTokens.getVals(tokens);		
 	}
 	return;
@@ -93,7 +93,7 @@ std::string
 CommonDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const std::string& name)
 {
 		
-	EasyGrocElem& elem = grocListElems[shareId];
+	CommonElem& elem = commonElems[shareId];
 	std::string val;
 	elem.lstShareInfo.getVal(name, val);
 	val += devId;
@@ -105,7 +105,7 @@ CommonDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const 
 void
 CommonDataMgr::getShareLists(long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
 {
-	EasyGrocElem& elem = grocListElems[shareId];
+	CommonElem& elem = commonElems[shareId];
 	std::map<std::string, std::string> names;
 	elem.lstShareInfo.getKeyVals(names);
 	for (auto pItr = names.begin(); pItr != names.end(); ++pItr)
@@ -113,7 +113,7 @@ CommonDataMgr::getShareLists(long shareId, const std::string& devId, std::map<st
 		if (pItr->second.find(devId) != std::string::npos)
 			continue;
 		std::string list;
-		if (elem.lists.getVal(pItr->first, list))
+		if (elem.items.getVal(pItr->first, list))
 			lstNameMp[pItr->first] = list;
 	}
 	return;

@@ -79,7 +79,7 @@ ArchiveMsgCreator::createFrndLstMsg(char *pMsgStatic, int& len, long shareId, co
 }
 
 std::unique_ptr<char>
-ArchiveMsgCreator::createTemplLstMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& templList, int buflen)
+ArchiveMsgCreator::createArchvItmMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& templList, int buflen)
 {
 	constexpr int msgId = ARCHIVE_ARCHIVE_ITEM_MSG;
 	shrdIdTemplSize templSize;
@@ -99,7 +99,7 @@ ArchiveMsgCreator::createTemplLstMsg(char *pMsgStatic, int& len, long shareId, c
 		std::unique_ptr<char> tmp{new char[msglen]};
 		pMsgDynamic = std::move(tmp);
 		pMsg = pMsgDynamic.get();	
-		std::cout << "Dyanamic allocation in createTemplLstMsg shareId=" << shareId << " name="  << name << " templList=" << templList << std::endl;
+		std::cout << "Dyanamic allocation in createArchvItmMsg shareId=" << shareId << " name="  << name << " templList=" << templList << std::endl;
 	}
 	memcpy(pMsg, &msgId, sizeof(int));
 	memcpy(pMsg+sizeof(int), &templSize, sizeof(shrdIdTemplSize));
@@ -113,7 +113,7 @@ ArchiveMsgCreator::createTemplLstMsg(char *pMsgStatic, int& len, long shareId, c
 
 
 std::unique_ptr<char>
-ArchiveMsgCreator::createLstMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& list, int buflen)
+ArchiveMsgCreator::createItemMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& list, int buflen)
 {
 
 	constexpr int msgId = ARCHIVE_ITM_MSG;
@@ -134,7 +134,7 @@ ArchiveMsgCreator::createLstMsg(char *pMsgStatic, int& len, long shareId, const 
 		std::unique_ptr<char> tmp{new char[msglen]};
 		pMsgDynamic = std::move(tmp);
 		pMsg = pMsgDynamic.get();	
-		std::cout << "Dyanamic allocation in createTemplLstMsg shareId=" << shareId << " name="  << name << " list=" << list << std::endl;
+		std::cout << "Dyanamic allocation in createArchvItmMsg shareId=" << shareId << " name="  << name << " list=" << list << std::endl;
 	}
 	memcpy(pMsg, &msgId, sizeof(int));
 	memcpy(pMsg+sizeof(int), &templSize, sizeof(shrdIdTemplSize));

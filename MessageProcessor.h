@@ -8,6 +8,7 @@
 #include <array>
 #include <Constants.h>
 #include <ApplePush.h>
+#include <CommonDataMgr.h>
 
 class MessageProcessor
 {
@@ -23,6 +24,13 @@ class MessageProcessor
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		MessageTranslator *m_pTrnsl;
 		bool sendMsg(char *buf, int mlen, int fd);
+		void processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processItemMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg);
+		CommonDataMgr& dataStore;
+
 
 	public:
 		MessageProcessor();

@@ -16,6 +16,7 @@ MessageDecoder::MessageDecoder()
 	msgTypPrcsrs[SHARE_ITEM_MSG] = 4;
 	msgTypPrcsrs[STORE_DEVICE_TKN_MSG] = 5;
 	msgTypPrcsrs[GET_ITEMS] = 6;
+	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
 }
 
 MessageDecoder::~MessageDecoder()
@@ -39,6 +40,7 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
     std::bind(std::mem_fn(&MessageDecoder::createLstObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createDeviceTknObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3)};
+    std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3)};
 }; 
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
@@ -48,6 +50,34 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 	auto itr = processors.begin();
 	return itr[pindx](buffer, mlen, fd);
     
+}
+
+bool
+MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
+{
+	std::unique_ptr<PicMetaDataObj> pMsg{new PicMetaDataObj()};
+	pMsg->setMsgTyp(PIC_METADATA_MSG);
+	pMsg->setFd(fd);
+	pMsg->setAppId(getAppId());
+	constexpr int offset = 2*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	int nameLen;
+	constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+	memcpy(&nameLen, buffer + namelenoffset, sizeof(int));
+	int nameoffset = namelenoffset + sizeof(int);
+	pMsg->setName(buffer + nameoffset, nameLen);	
+	int piclenoffset = nameoffset + nameLen;
+	int picLen;
+	memcpy(&picLen, buffer + piclenoffset, sizeof(int));
+	pMsg->setPicLen(picLen);
+	int metastrlenoffset = piclenoffset + sizeof(int);
+	int metaStrLen;
+	memcpy(&metaStrLen, buffer + metastrlenoffset, sizeof(int));
+	int metastroffset = metastrlenoffset + sizeof(int);
+	pMsg->setFrndLstStr(buffer+metastroffset, metaStrLen);
+	return true;
 }
 
 bool

@@ -2,6 +2,7 @@
 #define _MESSAGE_OBJS_H_
 
 #include <string>
+#include <vector>
 
 class MsgObj
 {
@@ -17,6 +18,28 @@ class MsgObj
 	int getAppId() const {return appId;}
 	void setAppId() (int appid) {appId = appid;}
 
+};
+
+class PicMetaDataObj : public MsgObj
+{
+		std::string name;
+		std::vector<std::string> frndLst;
+		std::string frndLstStr;
+		long shrId;
+		int picLen;
+	public:
+		virtual ~PicMetaDataObj(){}
+		PicMetaDataObj(){}
+		long  getShrId() {return shrId;}
+		void setShrId(long sid) {shrId = sid;}
+		std::string getName(){return name;}
+		void setName(const char *pName, int len);
+		std::vector<std::string> getFrndLst(){return frndLst;}
+		void setFrndLst(const std::vector<std::string>& fl){frndLst = fl;}
+		int getPicLen() {return picLen;}
+		void setPicLen(int len){picLen = len;}
+		std::string getFrnLstStr() {return frndLstStr;}
+		void setFrndLstStr(const char *pFlist, int len); 
 };
 
 class ShareIdObj : public MsgObj

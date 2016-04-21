@@ -1,6 +1,29 @@
 #include <MessageObjs.h>
 #include <string.h>
 
+void
+PicMetaDataObj::setName(const char *pName, int len)
+{
+	name.resize(len);
+	memcpy(&name[0], pName, len);
+	return;
+}
+
+void
+PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
+{
+	frndLstStr.resize(len);
+	memcpy(&frndLstStr[0], pFlist, len);
+	std::istringstream ifs(frndLstStr);		
+	std::string s;
+	while(std::getline(ifs, s, ';'))
+	{
+		std::cout << s << std::endl;
+		frndLst.push_back(s);
+	}
+	return;
+}
+
 
 void
 TemplLstObj::setName(const char *pName, int len)

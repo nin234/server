@@ -5,18 +5,18 @@
 #include <map>
 #include <HashMapStr.h>
 
-//create a lock free list/map of template lists and ordinary lists
+//create a lock free list/map of template lists and ordinary items
 
-  struct EasyGrocElem
+  struct CommonElem
   {       
-          HashMapStr templLists;
-          HashMapStr lists;
+          HashMapStr archvItems;
+          HashMapStr items;
           HashMapStr deviceTokens;
 	  LckFreeLstSS lstShareInfo;
   };
   
 
-//Template lists updated when a user updates (add, modify , delete ) list
+//Template items updated when a user updates (add, modify , delete ) list
 //need a lock free data structure that will store list in sort of time order at the same time maintaining a key of names
 // [1, 2, 3, 4,     ]
 // [WF, BJ, IS, WF]

@@ -12,13 +12,13 @@
     
   class CommonDataMgr
   {               
-                  HashMap<long, EasyGrocElem> grocListElems;
+                  HashMap<long, CommonElem> commonElems;
           
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();
-                  void storeTemplList(long shareId, const std::string& name, const std::string& templList);
-                  void storeList(long shareId, const std::string& name, const std::string& list);
+                  void storeArchiveItem(long shareId, const std::string& name, const std::string& templList);
+                  void storeItem(long shareId, const std::string& name, const std::string& list);
                   void storeLstShareInfo(long shareId, const std::string& name, const std::string& list);
                   void storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn);
 		  void storeLstShareInfo(const std::vector<std::string>& shareIds, const std::string& name);
