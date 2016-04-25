@@ -20,7 +20,7 @@ class NtwIntf
 	int epfd;
 	std::shared_ptr<Decoder> dcd;
 	bool processFreshMessage(char *buffer, ssize_t mlen, int fd);
-	bool processFragmentedMessage(char *buffer, ssize_t mlen, int remaining, int len,  int fd);
+	bool processFragmentedMessage(char *buffer, ssize_t mlen, int& remaining, int len,  int fd);
 	bool bufferOverFlowCheck(ssize_t remaining, int fd);
 	bool processMessage(char *buffer, ssize_t mlen, int fd);
 	bool aggrbufinit(int fd);	

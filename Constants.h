@@ -20,6 +20,7 @@
 #define MAX_FD 100
 
 #define MAX_BUF 16384
+#define TMP_BUF 32768
 #define MAX_EVENTS 5
 #define MSG_AGGR_BUF_LEN 16384
 #define RCV_BUF_LEN 4096

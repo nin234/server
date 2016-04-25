@@ -32,6 +32,7 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
     bool start = false;
     if (pItr == pAggrbufs.end())
 	start = true;
+	
     if(start)
     {
         bMore = processFreshMessage(buffer, mlen, fd);
@@ -45,6 +46,8 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
            
            ssize_t remaining = mlen;
            bMore = processFragmentedMessage(buffer, mlen, remaining, len, fd);
+	  if (remaining != mlen)
+		processFreshMessage(buffer+mlen-remaining, remaining, fd); 
         }
         else
         {
@@ -62,7 +65,10 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
                 remaining -= lenRmng;
                 pItr->second.bufIndx += lenRmng;
                 memcpy(&len, pItr->second.aggrbuf, sizeof(int));
+		int origrem = remaining;
                  bMore = processFragmentedMessage(buffer, mlen, remaining, len, fd);
+		if (origrem != remaining)
+			processFreshMessage(buffer+mlen-remaining, remaining, fd); 
             }
 
         }
@@ -79,7 +85,9 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
     bool next =true;
     ssize_t remaining = mlen;
     bool bufinit = false;	
-    std::unordered_map<int, buf>::iterator pItr;
+    auto pItr = pAggrbufs.find(fd);
+    if (pItr != pAggrbufs.end())
+	bufinit = true;
     while (next)
     {
         if (remaining < sizeof(int))
@@ -89,8 +97,6 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
 	  		 bufinit = aggrbufinit(fd);
     			 pItr = pAggrbufs.find(fd);
 		}
-            if(bufferOverFlowCheck(remaining, fd))
-                break;
             memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
             pItr->second.bufIndx += remaining;
             bMore = true;
@@ -111,7 +117,14 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
     			 pItr = pAggrbufs.find(fd);
 		}
             if(bufferOverFlowCheck(remaining, fd))
+	    {
+		memcpy(pItr->second.aggrbuf, buffer+mlen-remaining, 2*sizeof(int));
+            	(*dcd)(buffer+mlen-remaining, remaining, fd);
+		int remlen = (len-remaining) + 2*sizeof(int);
+		memcpy(pItr->second.aggrbuf, &remlen, sizeof(int));
+		pItr->second.bufIndx = 2*sizeof(int);
                 break;
+	    }
             memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
             pItr->second.bufIndx += remaining;
             bMore = true;
@@ -151,43 +164,65 @@ NtwIntf<Decoder>::aggrbufinit(int fd)
 
 template<typename Decoder> 
 bool 
-NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, int remaining, int len, int fd)
+NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, int& remaining, int len, int fd)
 {
-    bool bMore = false;
-    bool next =true;
-    auto pItr = pAggrbufs.find(fd);
-    while (next)
-    {
+    	bool bMore = false;
+    	auto pItr = pAggrbufs.find(fd);
         if (remaining == len-pItr->second.bufIndx)
         {
             if(bufferOverFlowCheck(remaining, fd))
-                break;
-            memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
-            (*dcd)(pItr->second.aggrbuf, len, fd);
-		pFreeList.push_back(pItr->second.aggrbuf);
-		pAggrbufs.erase(pItr);
-            break;
+	    {
+		char tmpbuf[TMP_BUF];
+		memcpy(tmpbuf, pItr->second.aggrbuf, pItr->second.bufIndx);
+		memcpy(tmpbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
+            	(*dcd)(tmpbuf, pItr->second.bufIndx+remaining, fd);
+	    }
+	    else
+	    {
+            	memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
+            	(*dcd)(pItr->second.aggrbuf, len, fd);
+	    }
+	    pFreeList.push_back(pItr->second.aggrbuf);
+	    pAggrbufs.erase(pItr);
         }
         else if (remaining < (len -pItr->second.bufIndx))
         {
             if(bufferOverFlowCheck(remaining, fd))
-                break;
-            memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
-            pItr->second.bufIndx += remaining;
+	    {
+		char tmpbuf[TMP_BUF];
+		memcpy(tmpbuf, pItr->second.aggrbuf, pItr->second.bufIndx);
+		memcpy(tmpbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
+            	(*dcd)(tmpbuf, pItr->second.bufIndx+remaining, fd);
+            	pItr->second.bufIndx = 2*sizeof(int);
+		int newlen = len-remaining;
+		memcpy(pItr->second.aggrbuf, &newlen, sizeof(int));
+	    }
+	    else
+	    {
+            	memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
+            	pItr->second.bufIndx += remaining;
+	    }
             bMore = true;
-            break;
             
         }
         else
         {
             if(bufferOverFlowCheck(len-pItr->second.bufIndx, fd))
-                break;
-            memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, len-pItr->second.bufIndx);
-            (*dcd)(pItr->second.aggrbuf, len, fd);
-            pItr->second.bufIndx =0;
+	    {
+		char tmpbuf[TMP_BUF];
+		memcpy(tmpbuf, pItr->second.aggrbuf, pItr->second.bufIndx);
+		memcpy(tmpbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
+            	(*dcd)(tmpbuf, pItr->second.bufIndx+remaining, fd);
+	    }
+	    else
+	    {
+            	memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, len-pItr->second.bufIndx);
+            	(*dcd)(pItr->second.aggrbuf, len, fd);
+	    }
             remaining -= len - pItr->second.bufIndx;
+	    pFreeList.push_back(pItr->second.aggrbuf);
+	    pAggrbufs.erase(pItr);
         }
-    }
 
     return bMore;
 
@@ -216,16 +251,9 @@ template<typename Decoder>
 bool 
 NtwIntf<Decoder>::bufferOverFlowCheck(ssize_t remaining, int fd)
 {
-	auto pItr = pAggrbufs.find(fd);
-	if (pItr == pAggrbufs.end())
-	{
-		std::cout << "Bug in the code , bufferOverFlowCheck failed " << std::endl;
-		return true;
-	}
+    auto pItr = pAggrbufs.find(fd);
     if (MSG_AGGR_BUF_LEN - pItr->second.bufIndx < remaining)
     {
-        std::cout << "Invalid message received remaining " << remaining << " bufIndx=" << pItr->second.bufIndx << std::endl;
-	pAggrbufs.erase(pItr);
         return true;
     }
     return false;
