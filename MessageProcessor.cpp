@@ -122,6 +122,8 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in EasyGrocMsgProcessor::processPicMetaDataMsg " << std::endl;
 		return;
 	}
+	dataStore.storePicMetaData(pPicMetaObj->getAppId(), pPicMetaObj->getShrId(), pPicMetaObj->getName(), pPicMetaObj->getFrndLst());
+	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pMsg);
 	return;
 }
 
@@ -136,7 +138,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 		return;
 	}
 	std::map<std::string, std::string> lstNameMp;
-	dataStore.getShareLists(pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), lstNameMp);
+	dataStore.getShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), lstNameMp);
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[32768];
 	int archlen = 0;
@@ -145,7 +147,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 		pArchMsg = m_pTransl->getListMsg(archbuf, &archlen, 32768, pItr->first, pItr->second);	
 		if (sendMsg(pArchMsg == nullptr? archbuf:pArchMsg.get(), archlen, pGetItemObj->getFd()))
 		{
-			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
+			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
 			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getShrId(), pItr->first, val, 32768))
 				sendArchiveMsg(archbuf, archlen, 10);	
 		}
@@ -162,7 +164,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in EasyGrocMsgProcessor::processItemMsg " << std::endl;
 		return;
 	}
-	dataStore.storeItem(pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList());	
+	dataStore.storeItem(pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList());	
 	
 	//int size= 
 
@@ -175,7 +177,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	std::vector<std::string>  shareIds;
 	if (m_pTransl->getShareIds(pLstObj->getList(), shareIds))
 	{
-		dataStore.storeLstShareInfo(shareIds, pLstObj->getName());
+		dataStore.storeLstShareInfo(pLstObj->getAppId(), shareIds, pLstObj->getName());
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
@@ -186,7 +188,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 				sendArchiveMsg(archbuf, archlen, 10);	
 		}
 		std::vector<std::string> tokens;
-		dataStore.getDeviceTkns(shareIds, tokens);	
+		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
 		sendApplePush(tokens, pLstObj->getName(), 1);
 	}
 	char buf[1024];
@@ -209,7 +211,7 @@ MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in EasyGrocMsgProcessor::processArchvItemMsg " << std::endl;
 		return;
 	}
-	dataStore.storeArchiveItem(pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList());	
+	dataStore.storeArchiveItem(pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList());	
 	
 	//int size= 
 
@@ -236,7 +238,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in EasyGrocMsgProcessor::processDeviceTknMsg " << std::endl;
 		return;
 	}
-	dataStore.storeDeviceTkn(pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn());
+	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn());
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen = 0;

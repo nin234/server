@@ -24,6 +24,16 @@ PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
 	return;
 }
 
+PicObj::PicObj()
+{
+	len = 0;
+}
+
+void
+PicObj::setBuf(char *pb, int pblen)
+{
+	memcpy(buf, pb, pblen);
+}
 
 void
 TemplLstObj::setName(const char *pName, int len)

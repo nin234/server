@@ -12,20 +12,21 @@
     
   class CommonDataMgr
   {               
-                  HashMap<long, CommonElem> commonElems;
+                  HashMap<long, CommonElem> commonElems[NO_OF_APPS];
           
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();
-                  void storeArchiveItem(long shareId, const std::string& name, const std::string& templList);
-                  void storeItem(long shareId, const std::string& name, const std::string& list);
-                  void storeLstShareInfo(long shareId, const std::string& name, const std::string& list);
-                  void storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn);
-		  void storeLstShareInfo(const std::vector<std::string>& shareIds, const std::string& name);
+                  void storeArchiveItem(int appId, long shareId, const std::string& name, const std::string& templList);
+                  void storeItem(int appId, long shareId, const std::string& name, const std::string& list);
+                  void storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list);
+                  void storeDeviceTkn(int appId, long shareId, const std::string& devId, const std::string& devTkn);
+		  void storeLstShareInfo(int appId, const std::vector<std::string>& shareIds, const std::string& name);
+                  void storePicMetaData(int appId, long shareId, const std::string& name, const std::vector<std::string>& shareIds);
 		  static CommonDataMgr& Instance();
-		  void getDeviceTkns(const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
-		  void getShareLists(long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp);
-		  std::string updateLstShareInfo(long shareId, const std::string& devId, const std::string& name);
+		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
+		  void getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp);
+		  std::string updateLstShareInfo(int appId, long shareId, const std::string& devId, const std::string& name);
   };
   #endif
 

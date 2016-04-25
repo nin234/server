@@ -26,6 +26,30 @@ ArchiveMsgCreator::createTrnIdShrIdMsg(char *pMsg, int& len, shrIdTrnId shtrId)
 }
 
 bool 
+ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, long shareId, const std::string& name, const std::string& frndLst)
+{
+	constexpr int msgId = ARCHIVE_PIC_METADATA_MSG;
+	memcpy(pMsg, &msgId, sizeof(int));
+	shrdIdTemplSize frndLens;
+	frndLens.shrId = shareId;
+	frndLens.name_len = name.size() + 1;
+	frndLens.list_len = frndLst.size() + 1;
+
+	int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + frndLens.name_len + frndLens.list_len ;
+
+	len = msglen;	
+
+	memcpy(pMsg+sizeof(int), &frndLens, sizeof(shrdIdTemplSize));
+	constexpr int nameoffset = sizeof(int) + sizeof(shrdIdTemplSize);
+	memcpy(pMsg+nameoffset, name.c_str(), frndLens.name_len);
+	int frndlstoffset = sizeof(int) + sizeof(shrdIdTemplSize) + frndLens.name_len;
+	memcpy(pMsg+frndlstoffset, frndLst.c_str(), frndLens.list_len);
+
+
+	return true;
+}
+
+bool 
 ArchiveMsgCreator::createEasyGrocDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn)
 {
 

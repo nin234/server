@@ -13,6 +13,7 @@
           HashMapStr items;
           HashMapStr deviceTokens;
 	  LckFreeLstSS lstShareInfo;
+	  LckFreeLstSS picShareInfo;
   };
   
 

@@ -9,6 +9,7 @@
 #include <Constants.h>
 #include <ApplePush.h>
 #include <CommonDataMgr.h>
+#include <map>
 
 class MessageProcessor
 {
@@ -19,7 +20,7 @@ class MessageProcessor
 	int nFds;
 	std::array<int, NO_COMMON_MSGS> msgTypPrcsrs;
 	std::shared_ptr<ApplePush> pAppleNotfy;	
-
+	std::map<int, std::unique_ptr<MsgObj>> fdPicMetaMp;	
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		MessageTranslator *m_pTrnsl;

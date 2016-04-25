@@ -22,44 +22,59 @@ CommonDataMgr::~CommonDataMgr()
 }
 
 void
-CommonDataMgr::storeArchiveItem(long shareId, const std::string& name, const std::string& templList)
+CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name, const std::string& templList)
 {
-  CommonElem& elem = commonElems[shareId];
+  CommonElem& elem = commonElems[appId][shareId];
   elem.archvItems.insert(name, templList);
   return;                                
 }                                              
 
 void
-CommonDataMgr::storeItem(long shareId, const std::string& name, const std::string& list)
+CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
-  	CommonElem& elem = commonElems[shareId];
+  	CommonElem& elem = commonElems[appId][shareId];
   	elem.items.insert(name, list);
 	return;
 }
 
 void
-CommonDataMgr::storeLstShareInfo(long shareId, const std::string& name, const std::string& list)
+CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list)
 {
-  	CommonElem& elem = commonElems[shareId];
+  	CommonElem& elem = commonElems[appId][shareId];
   	elem.lstShareInfo.insert(name, list);
 	return;
 }
 
 
 void
-CommonDataMgr::storeDeviceTkn(long shareId, const std::string& devId, const std::string& devTkn)
+CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devId, const std::string& devTkn)
 {
-  	CommonElem& elem = commonElems[shareId];
+  	CommonElem& elem = commonElems[appId][shareId];
   	elem.deviceTokens.insert(devId, devTkn);
 	return;
 }
 
-void
-CommonDataMgr::storeLstShareInfo(const std::vector<std::string>& shareIds, const std::string& name)
+void 
+CommonDataMgr::storePicMetaData(int appId, long shareId, const std::string& name, const std::vector<std::string>& shareIds)
 {
 	for (const std::string& shareId : shareIds)
 	{
-  		CommonElem& elem = commonElems[std::stol(shareId)];	
+  		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		std::ostringstream valstream;
+		valstream  << tv.tv_sec << ";";	
+		elem.picShareInfo.insertOrUpdate(name, valstream.str());
+	}
+	return;
+}
+
+void
+CommonDataMgr::storeLstShareInfo(int appId, const std::vector<std::string>& shareIds, const std::string& name)
+{
+	for (const std::string& shareId : shareIds)
+	{
+  		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
@@ -79,21 +94,21 @@ CommonDataMgr::Instance()
 }
 
 void
-CommonDataMgr::getDeviceTkns(const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
+CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
 	for (const std::string& shareId : shareIds)
 	{
-  		CommonElem& elem = commonElems[std::stol(shareId)];
+  		CommonElem& elem = commonElems[appId][std::stol(shareId)];
 		elem.deviceTokens.getVals(tokens);		
 	}
 	return;
 }
 
 std::string
-CommonDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const std::string& name)
+CommonDataMgr::updateLstShareInfo(int appId, long shareId, const std::string& devId, const std::string& name)
 {
 		
-	CommonElem& elem = commonElems[shareId];
+	CommonElem& elem = commonElems[appId][shareId];
 	std::string val;
 	elem.lstShareInfo.getVal(name, val);
 	val += devId;
@@ -103,9 +118,9 @@ CommonDataMgr::updateLstShareInfo(long shareId, const std::string& devId, const 
 }
 
 void
-CommonDataMgr::getShareLists(long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
+CommonDataMgr::getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
 {
-	CommonElem& elem = commonElems[shareId];
+	CommonElem& elem = commonElems[appId][shareId];
 	std::map<std::string, std::string> names;
 	elem.lstShareInfo.getKeyVals(names);
 	for (auto pItr = names.begin(); pItr != names.end(); ++pItr)

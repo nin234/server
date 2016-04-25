@@ -220,7 +220,7 @@ NtwIntf<Decoder>::bufferOverFlowCheck(ssize_t remaining, int fd)
 	if (pItr == pAggrbufs.end())
 	{
 		std::cout << "Bug in the code , bufferOverFlowCheck failed " << std::endl;
-		return false;
+		return true;
 	}
     if (MSG_AGGR_BUF_LEN - pItr->second.bufIndx < remaining)
     {

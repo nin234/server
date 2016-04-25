@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <Constants.h>
 
 class MsgObj
 {
@@ -20,6 +21,18 @@ class MsgObj
 
 };
 
+class PicObj : public MsgObj
+{
+		char buf[MAX_BUF];
+		int len;
+	public:
+		PicObj();
+		virtual ~PicObj(){}
+		int getLen() {return len;}
+		void setBuf(char *pb, int pblen);
+		const char *getBuf() {return buf;}
+};
+
 class PicMetaDataObj : public MsgObj
 {
 		std::string name;
@@ -34,7 +47,7 @@ class PicMetaDataObj : public MsgObj
 		void setShrId(long sid) {shrId = sid;}
 		std::string getName(){return name;}
 		void setName(const char *pName, int len);
-		std::vector<std::string> getFrndLst(){return frndLst;}
+		const std::vector<std::string>& getFrndLst(){return frndLst;}
 		void setFrndLst(const std::vector<std::string>& fl){frndLst = fl;}
 		int getPicLen() {return picLen;}
 		void setPicLen(int len){picLen = len;}

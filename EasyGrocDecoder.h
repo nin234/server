@@ -11,6 +11,6 @@ class EasyGrocDecoder : public MessageDecoder
 		EasyGrocDecoder();
 		virtual ~EasyGrocDecoder();
 		bool decodeMsg(char *buffer, ssize_t mlen, int fd);
-		int getAppId() {return 3;}
+		int getAppId() {return EASYGROCLIST_ID;}
 };
 #endif

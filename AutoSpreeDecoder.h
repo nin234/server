@@ -10,6 +10,6 @@ class AutoSpreeDecoder : public MessageDecoder
 		AutoSpreeDecoder();
 		virtual ~AutoSpreeDecoder();
 		bool decodeMsg(char *buffer, ssize_t mlen, int fd);
-		int getAppId() {return 2;}
+		int getAppId() {return AUTOSPREE_ID;}
 };
 #endif
