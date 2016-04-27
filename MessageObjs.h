@@ -25,10 +25,13 @@ class PicObj : public MsgObj
 {
 		char buf[MAX_BUF];
 		int len;
+		int buflen;
 	public:
 		PicObj();
 		virtual ~PicObj(){}
 		int getLen() {return len;}
+		void setLen(int ln) {len = ln;}
+		int getBufLen() {return buflen;}
 		void setBuf(char *pb, int pblen);
 		const char *getBuf() {return buf;}
 };

@@ -33,6 +33,7 @@ void
 PicObj::setBuf(char *pb, int pblen)
 {
 	memcpy(buf, pb, pblen);
+	buflen = pblen;
 }
 
 void

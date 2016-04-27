@@ -21,6 +21,7 @@ MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), pNtwIntf(new 
 	msgTypPrcsrs[STORE_DEVICE_TKN_MSG] = 5;
 	msgTypPrcsrs[GET_ITEMS] = 6;
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
+	msgTypPrcsrs[PIC_MSG] = 8;
 
 
 	
@@ -89,6 +90,7 @@ MessageProcessor::processRequests()
 	,std::bind(std::mem_fn(&MessageProcessor::processDeviceTknMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processGetItemMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMetaDataMsg), this, _1)
+	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
 };
 	auto itr = processors.begin();
 	for (;;)
@@ -113,13 +115,25 @@ MessageProcessor::processRequests()
 }
 
 void
+MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj>& pMsg)
+{
+	PicObj *pPicObj = dynamic_cast<PicObj*>(pMsg.get());
+	if (!pPicObj)
+	{
+		std::cout << "Invalid message received in MessageProcessor::processPicMsg " << std::endl;
+		return;
+	}
+	return;
+}
+
+void
 MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg)
 {
 
 	PicMetaDataObj *pPicMetaObj = dynamic_cast<PicMetaDataObj*>(pMsg.get());
 	if (!pPicMetaObj)
 	{
-		std::cout << "Invalid message received in EasyGrocMsgProcessor::processPicMetaDataMsg " << std::endl;
+		std::cout << "Invalid message received in MessageProcessor::processPicMetaDataMsg " << std::endl;
 		return;
 	}
 	dataStore.storePicMetaData(pPicMetaObj->getAppId(), pPicMetaObj->getShrId(), pPicMetaObj->getName(), pPicMetaObj->getFrndLst());
@@ -134,7 +148,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
 	if (!pGetItemObj)
 	{
-		std::cout << "Invalid message received in EasyGrocMsgProcessor::processGetItemMsg " << std::endl;
+		std::cout << "Invalid message received in MessageProcessor::processGetItemMsg " << std::endl;
 		return;
 	}
 	std::map<std::string, std::string> lstNameMp;
@@ -161,7 +175,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
 	if (!pLstObj)
 	{
-		std::cout << "Invalid message received in EasyGrocMsgProcessor::processItemMsg " << std::endl;
+		std::cout << "Invalid message received in MessageProcessor::processItemMsg " << std::endl;
 		return;
 	}
 	dataStore.storeItem(pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList());	
@@ -208,7 +222,7 @@ MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	TemplLstObj *pTmplObj = dynamic_cast<TemplLstObj*>(pMsg.get());
 	if (!pTmplObj)
 	{
-		std::cout << "Invalid message received in EasyGrocMsgProcessor::processArchvItemMsg " << std::endl;
+		std::cout << "Invalid message received in MessageProcessor::processArchvItemMsg " << std::endl;
 		return;
 	}
 	dataStore.storeArchiveItem(pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList());	
@@ -235,14 +249,14 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg)
 	DeviceTknObj *pDevTknObj = dynamic_cast<DeviceTknObj*>(pMsg.get());
 	if (!pDevTknObj)
 	{
-		std::cout << "Invalid message received in EasyGrocMsgProcessor::processDeviceTknMsg " << std::endl;
+		std::cout << "Invalid message received in MessageProcessor::processDeviceTknMsg " << std::endl;
 		return;
 	}
 	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn());
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen = 0;
-	if (ArchiveMsgCreator::createEasyGrocDevTknMsg(archbuf, archlen, pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn()))
+	if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn()))
 		sendArchiveMsg(archbuf, archlen, 10);	
 	char buf[1024];
 	int mlen=0;

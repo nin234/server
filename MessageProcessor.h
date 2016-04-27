@@ -30,6 +30,7 @@ class MessageProcessor
 		void processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg);
 		void processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg);
 		void processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processPicMsg(const std::unique_ptr<MsgObj>& pMsg);
 		CommonDataMgr& dataStore;
 
 

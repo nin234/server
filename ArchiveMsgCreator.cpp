@@ -50,7 +50,7 @@ ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, long shareId, cons
 }
 
 bool 
-ArchiveMsgCreator::createEasyGrocDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn)
+ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn)
 {
 
 	constexpr int msgId = ARCHIVE_DEVICE_TKN_MSG;

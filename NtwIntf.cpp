@@ -120,8 +120,6 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
 	    {
 		memcpy(pItr->second.aggrbuf, buffer+mlen-remaining, 2*sizeof(int));
             	(*dcd)(buffer+mlen-remaining, remaining, fd);
-		int remlen = (len-remaining) + 2*sizeof(int);
-		memcpy(pItr->second.aggrbuf, &remlen, sizeof(int));
 		pItr->second.bufIndx = 2*sizeof(int);
                 break;
 	    }
@@ -194,8 +192,6 @@ NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, int& rema
 		memcpy(tmpbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
             	(*dcd)(tmpbuf, pItr->second.bufIndx+remaining, fd);
             	pItr->second.bufIndx = 2*sizeof(int);
-		int newlen = len-remaining;
-		memcpy(pItr->second.aggrbuf, &newlen, sizeof(int));
 	    }
 	    else
 	    {

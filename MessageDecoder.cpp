@@ -17,6 +17,7 @@ MessageDecoder::MessageDecoder()
 	msgTypPrcsrs[STORE_DEVICE_TKN_MSG] = 5;
 	msgTypPrcsrs[GET_ITEMS] = 6;
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
+	msgTypPrcsrs[PIC_MSG] = 8;
 }
 
 MessageDecoder::~MessageDecoder()
@@ -39,8 +40,9 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
     std::bind(std::mem_fn(&MessageDecoder::createTemplLstObj), this, _1, _2, _3), 
     std::bind(std::mem_fn(&MessageDecoder::createLstObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createDeviceTknObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3)};
-    std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3)};
+    std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3),
+    std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3),
+    std::bind(std::mem_fn(&MessageDecoder::createPicObj), this, _1, _2, _3)
 }; 
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
@@ -50,6 +52,32 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 	auto itr = processors.begin();
 	return itr[pindx](buffer, mlen, fd);
     
+}
+
+bool
+MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
+{
+	auto pItr = picObjs.find(fd);
+	PicObj *pPic;
+	if (pItr == picObjs.end())	
+	{
+		pPic = new PicObj();
+	}
+	else
+	{
+		pPic = pItr->second;
+	}
+	auto del = [] (PicObj*){};
+	std::unique_ptr<PicObj> pMsg(pPic, del);
+	pMsg->setMsgTyp(PIC_MSG);	
+	pMsg->setFd(fd);
+	pMsg->setAppId(getAppId());
+	pMsg->setBuf(buffer+2*sizeof(int), mlen-2*sizeof(int));
+	int len;
+	memcpy(&len, buffer, sizeof(int));
+	pMsg->setLen(len);
+	pMsgs.push_back(std::move(pMsg));
+	return true;
 }
 
 bool
@@ -77,6 +105,7 @@ MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 	memcpy(&metaStrLen, buffer + metastrlenoffset, sizeof(int));
 	int metastroffset = metastrlenoffset + sizeof(int);
 	pMsg->setFrndLstStr(buffer+metastroffset, metaStrLen);
+	pMsgs.push_back(std::move(pMsg));
 	return true;
 }
 
@@ -180,7 +209,7 @@ MessageDecoder::addMsgObj(std::unique_ptr<MsgObj> pMsg)
 }
 
 bool
-EasyGrocDecoder::createTemplLstObj(char *buffer,  ssize_t mlen, int fd)
+MessageDecoder::createTemplLstObj(char *buffer,  ssize_t mlen, int fd)
 {
 	std::unique_ptr<TemplLstObj> pMsg{new TemplLstObj()};
 
@@ -204,12 +233,12 @@ EasyGrocDecoder::createTemplLstObj(char *buffer,  ssize_t mlen, int fd)
 		pMsg->setTemplList(buffer+templlstoffset, templLen);	
 	else
 		return false;
-	addMsgObj(std::move(pMsg));
+	pMsgs.push_back(std::move(pMsg));
 	return true;
 }
 
 bool
-EasyGrocDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
+MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 {
 	std::unique_ptr<DeviceTknObj> pMsg = std::unique_ptr<DeviceTknObj>{new DeviceTknObj()};
 	pMsg->setMsgTyp(STORE_DEVICE_TKN_MSG);
@@ -222,13 +251,13 @@ EasyGrocDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 	pMsg->setDeviceTkn(buffer + devTknOffset);
 	int devIdOffset = devTknOffset + pMsg->getDeviceTkn().size() + 1;
 	pMsg->setDeviceId(buffer + devIdOffset);
-	addMsgObj(std::move(pMsg));
+	pMsgs.push_back(std::move(pMsg));
 	return true;
 }
 
 
 bool
-EasyGrocDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
+MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 {
 	std::unique_ptr<GetItemObj> pMsg = std::unique_ptr<GetItemObj>{new GetItemObj()};
 	pMsg->setMsgTyp(GET_ITEMS);
@@ -239,7 +268,7 @@ EasyGrocDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	pMsg->setAppId(getAppId());
 	constexpr int devIdOffset = offset + sizeof(long);
 	pMsg->setDeviceId(buffer + devIdOffset);
-	addMsgObj(std::move(pMsg));
+	pMsgs.push_back(std::move(pMsg));
 	return true;
 }
 

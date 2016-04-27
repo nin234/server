@@ -7,6 +7,7 @@
 #include <list>
 #include <memory>
 #include <array>
+#include <map>
 
 class MessageDecoder
 {
@@ -20,7 +21,8 @@ class MessageDecoder
 	bool createDeviceTknObj(char *buffer, ssize_t mlen, int fd);
 	bool createGetItemObj(char *buffer, ssize_t mlen, int fd);
 	bool createPicMetaDataObj(char *buffer, ssize_t mlen, int fd);
-
+	bool createPicObj(char *buffer, ssize_t mlen, int fd);
+	std::map<int, PicObj*> picObjs;
 	protected:
 		void addMsgObj(std::unique_ptr<MsgObj> pMsg);
 
