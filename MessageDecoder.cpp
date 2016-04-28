@@ -83,7 +83,9 @@ MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 {
-	std::unique_ptr<PicMetaDataObj> pMsg{new PicMetaDataObj()};
+	auto del = [] (PicMetaDataObj*){};
+	PicMetaDataObj *pPicMeta = new PicMetaDataObj();
+	std::unique_ptr<PicMetaDataObj> pMsg(pPicMeta, del);
 	pMsg->setMsgTyp(PIC_METADATA_MSG);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
