@@ -15,7 +15,8 @@
   class CommonDataMgr
   {               
                   HashMap<long, CommonElem> commonElems[NO_OF_APPS];
-		  std::map<int, std::unique_ptr<MsgObj>> fdPicMetaMp;
+		  std::unordered_map<int, std::unique_ptr<MsgObj>> fdPicMetaMp;
+		  std::unordered_map<int, int> fdFdMp;
 
           
           public: 
@@ -27,7 +28,7 @@
                   void storeDeviceTkn(int appId, long shareId, const std::string& devId, const std::string& devTkn);
 		  void storeLstShareInfo(int appId, const std::vector<std::string>& shareIds, const std::string& name);
                   void storePicMetaData(PicMetaDataObj *pPicMetaObj);
-		  void storePic(PicObj *pObj);
+		  bool storePic(PicObj *pObj);
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
 		  void getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp);

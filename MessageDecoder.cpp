@@ -144,7 +144,7 @@ MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 {
-      std::unique_ptr<ShareIdObj> pMsg = std::unique_ptr<ShareIdObj>{new ShareIdObj()};	
+      std::unique_ptr<ShareIdObj> pMsg{new ShareIdObj()};	
       pMsg->setMsgTyp(GET_SHARE_ID_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long tid;
@@ -191,7 +191,7 @@ MessageDecoder::getNextMsg()
 bool
 MessageDecoder::createFrndLstObj(char *buffer, ssize_t mlen, int fd)
 {
-	std::unique_ptr<FrndLstObj> pMsg = std::unique_ptr<FrndLstObj>{new FrndLstObj()};
+	std::unique_ptr<FrndLstObj> pMsg{new FrndLstObj()};
 	pMsg->setMsgTyp(STORE_FRIEND_LIST_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long shareId;

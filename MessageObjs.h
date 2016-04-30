@@ -43,6 +43,7 @@ class PicMetaDataObj : public MsgObj
 		std::string frndLstStr;
 		long shrId;
 		int picLen;
+		int writtenLen;
 	public:
 		virtual ~PicMetaDataObj(){}
 		PicMetaDataObj(){}
@@ -54,6 +55,8 @@ class PicMetaDataObj : public MsgObj
 		void setFrndLst(const std::vector<std::string>& fl){frndLst = fl;}
 		int getPicLen() {return picLen;}
 		void setPicLen(int len){picLen = len;}
+		int getWrittenLen() {return writtenLen;}
+		void setWrittenLen(int len) {writtenLen = len;}
 		std::string getFrnLstStr() {return frndLstStr;}
 		void setFrndLstStr(const char *pFlist, int len); 
 };

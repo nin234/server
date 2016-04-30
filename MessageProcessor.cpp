@@ -123,6 +123,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in MessageProcessor::processPicMsg " << std::endl;
 		return;
 	}
+	dataStore.storePic(pPicObj);
 	return;
 }
 
@@ -136,8 +137,7 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg)
 		std::cout << "Invalid message received in MessageProcessor::processPicMetaDataMsg " << std::endl;
 		return;
 	}
-	dataStore.storePicMetaData(pPicMetaObj->getAppId(), pPicMetaObj->getShrId(), pPicMetaObj->getName(), pPicMetaObj->getFrndLst());
-	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pMsg);
+	dataStore.storePicMetaData(pPicMetaObj);
 	return;
 }
 

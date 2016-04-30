@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <sys/time.h>
+#include <unistd.h>
 
 CommonDataMgr::CommonDataMgr()
 {
@@ -54,9 +55,74 @@ CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devId,
 	return;
 }
 
-void 
-CommonDataMgr::storePicMetaData(int appId, long shareId, const std::string& name, const std::vector<std::string>& shareIds)
+bool
+CommonDataMgr::storePic(PicObj *pPicObj)
 {
+	auto pItr = fdFdMp(pPicObj->getFd());
+	auto pItr1 = fdPicMetaMp(pPicObj->getFd());
+	if (pItr1 == fdPicMetaMp.end())
+	{
+		std::cout << "Failed to find metadata for picture " << std::endl;
+		return false;
+	}
+	int fd = = -1;
+	if (pItr != fdFdMp.end())
+	{	
+		fd = pItr->second;	
+	}		
+	else
+	{
+		std::string file = "/home/ninan/data/pictures/";
+		int dir = pItr1->getShrId()%1000;
+		std::string dirstr = std::to_string(dir);
+		file += dirstr;
+		file += "/";
+		std::string filesuffx = std::to_string(pItr1->getShrId());
+		filesuffx += "_";
+		filesuffx += pItr1->second->getName();
+		file += filesuffx;
+		fd = open(file.c_str(), O_CREAT|O_RDWR);
+		
+		if (fd == -1)
+		{
+			std::cout << "Failed to open file " << file << std::endl;
+			fdPicMetaMp.erase(fd);
+			return false;
+		}
+		fdFdMp[pPicObj->getFd()] = fd;
+	}
+	if (write(fd, pPicObj->getBuf() + 2*sizeof(int), pPicObj->getBufLen() - 2*sizeof(int)) == -1)
+	{
+		fdFdMp.erase(pPicObj->getFd());
+		fdPicMetaMp.erase(fd);
+		std::cout << "Failed to store picture " << pItr1->second->getName() << std::endl;
+		return false;
+	}
+	int lenWrittenSoFar = pItr1->second->getWrittenLen();
+	int lenWrittenNow = pPicObj->getBufLen() - 2*sizeof(int);
+	int totLenWritten = lenWrittenSoFar + lenWrittenNow;
+	if (totLenWritten >= pItr1->second->getPicLen())
+	{
+		std::cout << "Picture " << pItr1->second->getName() << " stored picLen=" << pItr1->second->getPicLen() << " totalWritten=" << totLenWritten << std::endl;
+		close(fd);
+		fdFdMp.erase(fd);
+		fdPicMetaMp.erase(fd);
+		//signifies that the picture is completly stored , time to send push notification
+		return true;
+	}
+	pItr1->second->setWrittenLen(totLenWritten);
+	//not an error condition, signifies that more data expected
+	return false;
+
+}
+
+void 
+CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
+{
+	int appId = pPicMetaObj->getAppId();
+	long shareId = pPicMetaObj->getShrId();
+	std::string name = pPicMetaObj->getName();
+	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
@@ -66,6 +132,8 @@ CommonDataMgr::storePicMetaData(int appId, long shareId, const std::string& name
 		valstream  << tv.tv_sec << ";";	
 		elem.picShareInfo.insertOrUpdate(name, valstream.str());
 	}
+	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
+	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
 	return;
 }
 
