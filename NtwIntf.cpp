@@ -162,7 +162,7 @@ NtwIntf<Decoder>::aggrbufinit(int fd)
 
 template<typename Decoder> 
 bool 
-NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, int& remaining, int len, int fd)
+NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, ssize_t& remaining, int len, int fd)
 {
     	bool bMore = false;
     	auto pItr = pAggrbufs.find(fd);

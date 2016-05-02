@@ -17,7 +17,7 @@ class MsgObj
 	int getFd() const {return fd;}
 	void setFd(int fdes) {fd = fdes;}
 	int getAppId() const {return appId;}
-	void setAppId() (int appid) {appId = appid;}
+	void setAppId (int appid) {appId = appid;}
 
 };
 

@@ -2,6 +2,7 @@
 #define _MESSAGE_TRANSLATOR_H_
 
 #include <MessageObjs.h>
+#include <memory>
 
 class MessageTranslator
 {

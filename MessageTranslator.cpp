@@ -1,6 +1,8 @@
 #include <MessageTranslator.h>
 #include <string.h>
 #include <Constants.h>
+#include <iostream>
+#include <sstream>
 
 MessageTranslator::MessageTranslator()
 {

@@ -1,5 +1,7 @@
 #include <MessageObjs.h>
 #include <string.h>
+#include <iostream>
+#include <sstream>
 
 void
 PicMetaDataObj::setName(const char *pName, int len)

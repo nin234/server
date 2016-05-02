@@ -182,7 +182,7 @@ std::shared_ptr<CommonArchvr>
 ArchiveMgr::getCommonArchvr()
 {
 
-	auto pItr = pArchvrs.find(ARCHIVE_STORE_TEMPL_LST_MSG);
+	auto pItr = pArchvrs.find(ARCHIVE_ARCHIVE_ITEM_MSG);
 
 	if (pItr != pArchvrs.end())
 		return std::dynamic_pointer_cast<CommonArchvr>(pItr->second);

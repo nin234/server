@@ -68,7 +68,7 @@ MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
 		pPic = pItr->second;
 	}
 	auto del = [] (PicObj*){};
-	std::unique_ptr<PicObj> pMsg(pPic, del);
+	std::unique_ptr<PicObj, decltype(del)> pMsg(pPic, del);
 	pMsg->setMsgTyp(PIC_MSG);	
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
@@ -85,7 +85,7 @@ MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 {
 	auto del = [] (PicMetaDataObj*){};
 	PicMetaDataObj *pPicMeta = new PicMetaDataObj();
-	std::unique_ptr<PicMetaDataObj> pMsg(pPicMeta, del);
+	std::unique_ptr<PicMetaDataObj, decltype(del)> pMsg(pPicMeta, del);
 	pMsg->setMsgTyp(PIC_METADATA_MSG);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
