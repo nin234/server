@@ -4,6 +4,20 @@
 #include <sstream>
 
 void
+MsgObjDeltr::operator () (MsgObj *pMsg)
+{
+	PicObj *pPicObj = dynamic_cast<PicObj*>(pMsg);	
+	if (pPicObj)
+		return;
+	PicMetaDataObj *pPicMetaObj = dynamic_cast<PicMetaDataObj*>(pMsg);
+	if (pPicMetaObj)
+		return;
+	delete pMsg;
+	return;
+}
+
+
+void
 PicMetaDataObj::setName(const char *pName, int len)
 {
 	name.resize(len);

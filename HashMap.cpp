@@ -197,4 +197,4 @@ HashMap<key, val>::hash2(key k)
 
 template class HashMap<long, long>;
 template class HashMap<long, std::string>;
-template class HashMap<long, EasyGrocElem>;
+template class HashMap<long, CommonElem>;

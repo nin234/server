@@ -5,6 +5,7 @@
 #include <vector>
 #include <Constants.h>
 
+
 class MsgObj
 {
 	int msgTyp;
@@ -20,6 +21,13 @@ class MsgObj
 	void setAppId (int appid) {appId = appid;}
 
 };
+
+class MsgObjDeltr
+{
+	public:
+		void operator ()(MsgObj *ptr);
+};
+
 
 class PicObj : public MsgObj
 {

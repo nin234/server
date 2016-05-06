@@ -67,8 +67,7 @@ MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
 	{
 		pPic = pItr->second;
 	}
-	auto del = [] (PicObj*){};
-	std::unique_ptr<PicObj, decltype(del)> pMsg(pPic, del);
+	std::unique_ptr<PicObj, MsgObjDeltr> pMsg(pPic, MsgObjDeltr());
 	pMsg->setMsgTyp(PIC_MSG);	
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
@@ -83,9 +82,8 @@ MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 {
-	auto del = [] (PicMetaDataObj*){};
 	PicMetaDataObj *pPicMeta = new PicMetaDataObj();
-	std::unique_ptr<PicMetaDataObj, decltype(del)> pMsg(pPicMeta, del);
+	std::unique_ptr<PicMetaDataObj, MsgObjDeltr> pMsg(pPicMeta, MsgObjDeltr());
 	pMsg->setMsgTyp(PIC_METADATA_MSG);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
@@ -115,7 +113,7 @@ bool
 MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 {
 
-	std::unique_ptr<LstObj> pMsg{new LstObj()};
+	std::unique_ptr<LstObj, MsgObjDeltr> pMsg{new LstObj(), MsgObjDeltr()};
 	pMsg->setMsgTyp(SHARE_ITEM_MSG);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
@@ -144,7 +142,7 @@ MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 {
-      std::unique_ptr<ShareIdObj> pMsg{new ShareIdObj()};	
+	std::unique_ptr<ShareIdObj, MsgObjDeltr> pMsg{new ShareIdObj(), MsgObjDeltr()};
       pMsg->setMsgTyp(GET_SHARE_ID_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long tid;
@@ -160,7 +158,7 @@ MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createStoreIdObj(char *buffer,  ssize_t mlen, int fd)
 {
-      std::unique_ptr<ShareIdObj> pMsg{new ShareIdObj()};	
+	std::unique_ptr<ShareIdObj, MsgObjDeltr> pMsg{new ShareIdObj(), MsgObjDeltr()};
       pMsg->setMsgTyp(STORE_TRNSCTN_ID_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long tid;
@@ -175,23 +173,23 @@ MessageDecoder::createStoreIdObj(char *buffer,  ssize_t mlen, int fd)
 	pMsgs.push_back(std::move(pMsg));
     return true;
 }
-std::unique_ptr<MsgObj>
+std::unique_ptr<MsgObj, MsgObjDeltr>
 MessageDecoder::getNextMsg()
 {
 	if (!pMsgs.empty())
 	{
-		std::unique_ptr<MsgObj> pMsg = std::move(pMsgs.front());
+		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg = std::move(pMsgs.front());
 		pMsgs.pop_front();
 		return pMsg;
 	}
-	std::unique_ptr<MsgObj> pNll{};
+	std::unique_ptr<MsgObj, MsgObjDeltr> pNll{};
 	return pNll;
 }
 
 bool
 MessageDecoder::createFrndLstObj(char *buffer, ssize_t mlen, int fd)
 {
-	std::unique_ptr<FrndLstObj> pMsg{new FrndLstObj()};
+	std::unique_ptr<FrndLstObj, MsgObjDeltr> pMsg{new FrndLstObj(), MsgObjDeltr()};
 	pMsg->setMsgTyp(STORE_FRIEND_LIST_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long shareId;
@@ -205,7 +203,7 @@ MessageDecoder::createFrndLstObj(char *buffer, ssize_t mlen, int fd)
 }
 
 void
-MessageDecoder::addMsgObj(std::unique_ptr<MsgObj> pMsg)
+MessageDecoder::addMsgObj(std::unique_ptr<MsgObj, MsgObjDeltr> pMsg)
 {
 	pMsgs.push_back(std::move(pMsg));
 }
@@ -213,7 +211,7 @@ MessageDecoder::addMsgObj(std::unique_ptr<MsgObj> pMsg)
 bool
 MessageDecoder::createTemplLstObj(char *buffer,  ssize_t mlen, int fd)
 {
-	std::unique_ptr<TemplLstObj> pMsg{new TemplLstObj()};
+	std::unique_ptr<TemplLstObj, MsgObjDeltr> pMsg{new TemplLstObj(), MsgObjDeltr()};
 
 	pMsg->setMsgTyp(ARCHIVE_ITEM_MSG);
 	pMsg->setFd(fd);
@@ -242,7 +240,7 @@ MessageDecoder::createTemplLstObj(char *buffer,  ssize_t mlen, int fd)
 bool
 MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 {
-	std::unique_ptr<DeviceTknObj> pMsg = std::unique_ptr<DeviceTknObj>{new DeviceTknObj()};
+	std::unique_ptr<DeviceTknObj, MsgObjDeltr> pMsg{new DeviceTknObj(), MsgObjDeltr()};
 	pMsg->setMsgTyp(STORE_DEVICE_TKN_MSG);
 	constexpr int offset = 2*sizeof(int);
 	long shareId;
@@ -261,7 +259,7 @@ MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 bool
 MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 {
-	std::unique_ptr<GetItemObj> pMsg = std::unique_ptr<GetItemObj>{new GetItemObj()};
+	std::unique_ptr<GetItemObj, MsgObjDeltr> pMsg{new GetItemObj(), MsgObjDeltr()};
 	pMsg->setMsgTyp(GET_ITEMS);
 	constexpr int offset = 2*sizeof(int);
 	long shareId;
