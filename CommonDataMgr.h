@@ -16,7 +16,7 @@
   class CommonDataMgr
   {               
                   HashMap<long, CommonElem> commonElems[NO_OF_APPS];
-		  std::unordered_map<int, std::unique_ptr<MsgObj>> fdPicMetaMp;
+		  std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
 		  std::unordered_map<int, int> fdFdMp;
 
           

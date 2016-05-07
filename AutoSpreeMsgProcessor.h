@@ -10,6 +10,6 @@ class AutoSpreeMsgProcessor : public MessageProcessor
 	public:
 		AutoSpreeMsgProcessor();
 		~AutoSpreeMsgProcessor();
-		void processMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 };
 #endif

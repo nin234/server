@@ -24,9 +24,9 @@ class CommonArchvr : public Archvr
 		int lstFd;
 		int shrLstFd;
 		int deviceFd;
-		bool populateArchvItemsImpl(long& shareId, std::string& name, std::string& tmplLst);
-		bool populateItemImpl(int fd, long& shareId, std::string& name, std::string& lst);
-		bool populateDeviceTknImpl(long& shareId, std::string& devId, std::string& devTkn);
+		bool populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& tmplLst);
+		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst);
+		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
 		std::map<IndxKey, long> shrListRecIndx;
@@ -53,9 +53,10 @@ class CommonArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, tmplLst;
-				if (!populateArchvItemsImpl(shareId, name, tmplLst))
+				int appId;
+				if (!populateArchvItemsImpl(appId, shareId, name, tmplLst))
 					break;
-				op(shareId, name, tmplLst);
+				op(appId, shareId, name, tmplLst);
 			}
 		}
 
@@ -70,9 +71,10 @@ class CommonArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, lst;
-				if (!populateItemImpl(lstFd, shareId, name, lst))
+				int appId;
+				if (!populateItemImpl(appId, lstFd, shareId, name, lst))
 					break;
-				op(shareId, name, lst);
+				op(appId, shareId, name, lst);
 			}
 		}
 
@@ -87,9 +89,10 @@ class CommonArchvr : public Archvr
 			{
 				long shareId;
 				std::string name, lst;
-				if (!populateItemImpl(shrLstFd, shareId, name, lst))
+				int appId;
+				if (!populateItemImpl(appId, shrLstFd, shareId, name, lst))
 					break;
-				op(shareId, name, lst);
+				op(appId, shareId, name, lst);
 			}
 		}
 
@@ -105,9 +108,10 @@ class CommonArchvr : public Archvr
 			{
 				long shareId;
 				std::string devId, devTkn;
-				if (!populateDeviceTknImpl(shareId, devId, devTkn))
+				int appId;
+				if (!populateDeviceTknImpl(appId, shareId, devId, devTkn))
 					break;
-				op(shareId, devId, devTkn);
+				op(appId, shareId, devId, devTkn);
 			}
 		}
 		

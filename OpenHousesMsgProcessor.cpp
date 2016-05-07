@@ -14,7 +14,7 @@ OpenHousesMsgProcessor::~OpenHousesMsgProcessor()
 }
 
 void
-OpenHousesMsgProcessor::processMsg(const std::unique_ptr<MsgObj>& pMsg)
+OpenHousesMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 
 	return;

@@ -25,12 +25,12 @@ class MessageProcessor
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		MessageTranslator *m_pTrnsl;
 		bool sendMsg(char *buf, int mlen, int fd);
-		void processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processItemMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processPicMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		CommonDataMgr& dataStore;
 
 
@@ -42,10 +42,10 @@ class MessageProcessor
 		void setMaxFd(int mfd);
 		void setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl);
 		void processRequests();
-		void processShareIdMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processStoreIdMsg(const std::unique_ptr<MsgObj>& pMsg);
-		void processFrndLstMsg(const std::unique_ptr<MsgObj>& pMsg);
-		virtual void processMsg(const std::unique_ptr<MsgObj>& pMsg)=0;
+		void processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processStoreIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		virtual void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)=0;
 		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
 };

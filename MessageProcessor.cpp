@@ -4,12 +4,13 @@
 #include <MessageObjs.h>
 #include <Constants.h>
 #include <iostream>
+#include <sstream>
 #include <functional>
 #include <FrndLstMgr.h>
 
 using namespace std::placeholders;
 
-MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr())
+MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), dataStore{CommonDataMgr::Instance()}
 {
 	for (auto &msgTypPrc : msgTypPrcsrs)
 		msgTypPrc = -1;
@@ -95,7 +96,7 @@ MessageProcessor::processRequests()
 	auto itr = processors.begin();
 	for (;;)
 	{
-		std::unique_ptr<MsgObj> pMsg{m_pDcd->getNextMsg()};
+		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{m_pDcd->getNextMsg()};
 		if (!pMsg)
 			continue;
 		int nMsgTyp = pMsg->getMsgTyp();
@@ -115,7 +116,7 @@ MessageProcessor::processRequests()
 }
 
 void
-MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	PicObj *pPicObj = dynamic_cast<PicObj*>(pMsg.get());
 	if (!pPicObj)
@@ -128,7 +129,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 
 	PicMetaDataObj *pPicMetaObj = dynamic_cast<PicMetaDataObj*>(pMsg.get());
@@ -143,7 +144,7 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj>& pMsg)
 
 
 void
-MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
 	if (!pGetItemObj)
@@ -158,7 +159,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	int archlen = 0;
 	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
 	{
-		pArchMsg = m_pTransl->getListMsg(archbuf, &archlen, 32768, pItr->first, pItr->second);	
+		pArchMsg = m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first, pItr->second);	
 		if (sendMsg(pArchMsg == nullptr? archbuf:pArchMsg.get(), archlen, pGetItemObj->getFd()))
 		{
 			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
@@ -170,7 +171,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
 	if (!pLstObj)
@@ -189,7 +190,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	sendArchiveMsg(pArchMsg == nullptr?archbuf : pArchMsg.get(), archlen, 10);	
 
 	std::vector<std::string>  shareIds;
-	if (m_pTransl->getShareIds(pLstObj->getList(), shareIds))
+	if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
 	{
 		dataStore.storeLstShareInfo(pLstObj->getAppId(), shareIds, pLstObj->getName());
 		struct timeval tv;
@@ -207,7 +208,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	}
 	char buf[1024];
 	int mlen=0;
-	if (m_pTrnsl->getReply(buf, &mlen, SHARE_LIST_RPLY_MSG))
+	if (m_pTrnsl->getReply(buf, &mlen, SHARE_ITEM_RPLY_MSG))
 	{
 		sendMsg(buf, mlen, pLstObj->getFd());
 	}
@@ -217,7 +218,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	TemplLstObj *pTmplObj = dynamic_cast<TemplLstObj*>(pMsg.get());
 	if (!pTmplObj)
@@ -236,7 +237,7 @@ MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 	sendArchiveMsg(pArchMsg == nullptr?archbuf : pArchMsg.get(), archlen, 10);	
 	char buf[1024];
 	int mlen=0;
-	if (m_pTrnsl->getReply(buf, &mlen, STORE_TEMPL_LIST_RPLY_MSG))
+	if (m_pTrnsl->getReply(buf, &mlen, ARCHIVE_ITEM_RPLY_MSG))
 	{
 		sendMsg(buf, mlen, pTmplObj->getFd());
 	}
@@ -244,7 +245,7 @@ MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	DeviceTknObj *pDevTknObj = dynamic_cast<DeviceTknObj*>(pMsg.get());
 	if (!pDevTknObj)
@@ -260,7 +261,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg)
 		sendArchiveMsg(archbuf, archlen, 10);	
 	char buf[1024];
 	int mlen=0;
-	if (m_pTrnsl->getReply(buf, &mlen, STORE_EASYGROC_DEVICE_TKN_RPLY_MSG))
+	if (m_pTrnsl->getReply(buf, &mlen, STORE_DEVICE_TKN_RPLY_MSG))
 	{
 		sendMsg(buf, mlen, pDevTknObj->getFd());
 	}
@@ -271,7 +272,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj>& pMsg)
 
 
 void
-MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
 
@@ -306,7 +307,7 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processStoreIdMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processStoreIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
 	if (!pShObj)
@@ -334,7 +335,7 @@ MessageProcessor::processStoreIdMsg(const std::unique_ptr<MsgObj>& pMsg)
 }
 
 void
-MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj>& pMsg)
+MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	FrndLstObj *pFrndObj = dynamic_cast<FrndLstObj*>(pMsg.get());
 	if (!pFrndObj)

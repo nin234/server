@@ -45,7 +45,7 @@ CommonArchvr::~CommonArchvr()
 }
 
 bool
-CommonArchvr::populateDeviceTknImpl(long& shareId, std::string& devId, std::string& devTkn)
+CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn)
 {
 	int size;
 	int numread = read(deviceFd, &size, sizeof(int));
@@ -64,7 +64,7 @@ CommonArchvr::populateDeviceTknImpl(long& shareId, std::string& devId, std::stri
 }
 
 bool
-CommonArchvr::populateItemImpl(int lstFd, long& shareId, std::string& name, std::string& lst)
+CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string& name, std::string& lst)
 {
 	long offset = lseek(lstFd, 0, SEEK_CUR);
 	while (true)
@@ -111,7 +111,7 @@ CommonArchvr::populateItemImpl(int lstFd, long& shareId, std::string& name, std:
 }
 
 bool
-CommonArchvr::populateArchvItemsImpl(long& shareId, std::string& name, std::string& templLst)
+CommonArchvr::populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& templLst)
 {
 	long offset = lseek(tmplFd, 0, SEEK_CUR);
 	while (true)

@@ -4,14 +4,13 @@
 #include <functional>
 #include <iostream>
 #include <MessageObjs.h>
-#include <EasyGrocDataMgr.h>
 #include <ArchiveMsgCreator.h>
 #include <vector>
 #include <sstream>
 
 using namespace std::placeholders;
 
-EasyGrocMsgProcessor::EasyGrocMsgProcessor():dataStore{EasyGrocDataMgr::Instance()}
+EasyGrocMsgProcessor::EasyGrocMsgProcessor()
 {
 	MessageProcessor::setDcdTransl(new EasyGrocDecoder(), new EasyGrocTranslator());	
 
@@ -23,7 +22,7 @@ EasyGrocMsgProcessor::~EasyGrocMsgProcessor()
 }
 
 void
-EasyGrocMsgProcessor::processMsg(const std::unique_ptr<MsgObj>& pMsg)
+EasyGrocMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
    /*
 	int msgTyp = pMsg->getMsgTyp();

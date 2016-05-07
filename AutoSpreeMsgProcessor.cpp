@@ -13,7 +13,7 @@ AutoSpreeMsgProcessor::~AutoSpreeMsgProcessor()
 }
 
 void
-AutoSpreeMsgProcessor::processMsg(const std::unique_ptr<MsgObj>& pMsg)
+AutoSpreeMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 
 	return;

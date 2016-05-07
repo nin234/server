@@ -9,6 +9,6 @@ class OpenHousesMsgProcessor : public MessageProcessor
 	public:
 		OpenHousesMsgProcessor();
 		~OpenHousesMsgProcessor();
-		void processMsg(const std::unique_ptr<MsgObj>& pMsg);
+		void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 }; 
 #endif
