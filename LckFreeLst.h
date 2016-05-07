@@ -47,6 +47,13 @@ class LckFreeLst
 		const LckFreeLst& operator=(const LckFreeLst& rhs){}
 };
 
+struct timstr
+{
+	std::string str;
+	long tv_sec;
+	long tv_usec;
+};
 typedef LckFreeLst<std::string, std::string> LckFreeLstSS;
+typedef LckFreeLst<std::string, timestr> LckFreeLstSTS;
 
 #endif
