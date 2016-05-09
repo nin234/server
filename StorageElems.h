@@ -15,22 +15,12 @@
 	  LckFreeLstSS lstShareInfo;
 	  LckFreeLstSS picShareInfo;
   };
-  
 
-//Template items updated when a user updates (add, modify , delete ) list
-//need a lock free data structure that will store list in sort of time order at the same time maintaining a key of names
-// [1, 2, 3, 4,     ]
-// [WF, BJ, IS, WF]
-// 
-// []
-// time sorted-> [1 2 4 5 8]
-// row indx -> 
-//
-// concurrent tree 
-//
-//Requirements Template lists updates for user add , modify, delete
-//Push notification send to all devices.
-//On client reques
+//Each share_id will have an instance of CommonElem
+//lstShareInfo is a linked list and each element in the list is a key value
+//pair of shareId and list Name issue a shareId can more than one item to share so the key should be shareId:::listName value is listName
+//Each item should have an expiry time
+
 
 
 #endif
