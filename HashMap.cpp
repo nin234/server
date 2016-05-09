@@ -2,21 +2,21 @@
 #include <stdexcept>
 #include <string>
 
-template<typename key, typename val>
-HashMap<key, val>::HashMap()
+template<typename key, typename val, int N>
+HashMap<key, val, N>::HashMap()
 {
 	nElems =0;
 }
 
-template<typename key, typename val>
-HashMap<key, val>::~HashMap()
+template<typename key, typename val, int N>
+HashMap<key, val, N>::~HashMap()
 {
 
 }
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 bool
-HashMap<key, val>::getValue(const key& k, val& v)
+HashMap<key, val, N>::getValue(const key& k, val& v)
 {
 	int indx = hash1(k);
 	if (!store[indx].k)
@@ -61,9 +61,9 @@ HashMap<key, val>::getValue(const key& k, val& v)
 	return false;
 }
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 bool
-HashMap<key, val>::find(const key& k)
+HashMap<key, val, N>::find(const key& k)
 {
 	int indx = hash1(k);
 	if (!store[indx].k)
@@ -104,9 +104,9 @@ HashMap<key, val>::find(const key& k)
 	return false;
 }
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 long
-HashMap<key, val>::cas(long *reg, long oldval, long newval)
+HashMap<key, val, N>::cas(long *reg, long oldval, long newval)
 {
     long prev;
     __asm__ __volatile__("lock;"
@@ -118,14 +118,14 @@ HashMap<key, val>::cas(long *reg, long oldval, long newval)
 }
 
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 val&
-HashMap<key, val>::operator [] (const key& k)
+HashMap<key, val, N>::operator [] (const key& k)
 {
 	int indx = hash1(k);
 	if (!store[indx].k)
 	{
-		if (nElems > MAX_ELEMENTS_MAP)
+		if (nElems > N)
 			throw std::overflow_error("Max capacity of HashMap exceeded");
 		++nElems;
 		store[indx].k = k;
@@ -135,7 +135,7 @@ HashMap<key, val>::operator [] (const key& k)
 		return store[indx].v;
 	else
 	{
-		if (nElems > MAX_ELEMENTS_MAP)
+		if (nElems > N)
 			throw std::overflow_error("Max capacity of HashMap exceeded");
 		++nElems;
 		int indx2 = 1;
@@ -178,17 +178,17 @@ HashMap<key, val>::operator [] (const key& k)
 	}	
 }
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 long
-HashMap<key, val>::hash1(key k)
+HashMap<key, val, N>::hash1(key k)
 {
 
-	return 0;
+	return k%HASH_1_PRIME;
 }
 
-template<typename key, typename val>
+template<typename key, typename val, int N>
 long
-HashMap<key, val>::hash2(key k)
+HashMap<key, val, N>::hash2(key k)
 {
 
 	return k%HASH_1_PRIME;
@@ -198,3 +198,4 @@ HashMap<key, val>::hash2(key k)
 template class HashMap<long, long>;
 template class HashMap<long, std::string>;
 template class HashMap<long, CommonElem>;
+template class HashMap<long, LckFreeLstSS, 10>;

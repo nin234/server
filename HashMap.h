@@ -4,7 +4,7 @@
 #include <array>
 #include <Constants.h>
 #include <StorageElems.h>
-
+#include <LckFreeLst.h>
 
 template<typename key, typename val>
 struct MapElem
@@ -16,7 +16,7 @@ struct MapElem
 		~MapElem(){}
 };
 
-template<typename key, typename val>
+template<typename key, typename val, int N=HASH_MAP_SIZE>
 class HashMap
 {
 
@@ -25,7 +25,7 @@ class HashMap
 //This hash map uses double hashing described in page 529 of 
 //Art of computer programming volume 3 by Don Knuth
 //
-		std::array<MapElem<key,val>, HASH_MAP_SIZE> store;
+		std::array<MapElem<key,val>, N> store;
 		int nElems;
 		long cas(long *reg, long oldval, long newval);
 

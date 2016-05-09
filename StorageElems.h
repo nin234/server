@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <HashMapStr.h>
+#include <HashMap.h>
 
 //create a lock free list/map of template lists and ordinary items
 
@@ -12,8 +13,8 @@
           HashMapStr archvItems;
           HashMapStr items;
           HashMapStr deviceTokens;
-	  LckFreeLstSS lstShareInfo;
-	  LckFreeLstSS picShareInfo;
+	  HashMap<long, LckFreeLstSS, 10> lstShareInfo;
+	  HashMap<long, LckFreeLstSS, 10> picShareInfo;
   };
   
 
