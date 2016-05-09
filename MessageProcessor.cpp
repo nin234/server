@@ -192,7 +192,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 	std::vector<std::string>  shareIds;
 	if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
 	{
-		dataStore.storeLstShareInfo(pLstObj->getAppId(), shareIds, pLstObj->getName());
+		dataStore.storeLstShareInfo(pLstObj->getAppId(),pLstObj->getShrId(), shareIds, pLstObj->getName());
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;

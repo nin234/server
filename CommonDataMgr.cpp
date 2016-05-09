@@ -1,6 +1,7 @@
 #include <CommonDataMgr.h>
 #include <ArchiveMgr.h>
 #include <string>
+#include <string.h>
 #include <sstream>
 #include <sys/time.h>
 #include <unistd.h>
@@ -33,16 +34,28 @@ CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name
 void
 CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
+	constexpr int size = 2*sizeof(long);
+	char arr[size];
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	long sec = now.tv_sec;
+	long usec = now.tv_usec;
+	memcpy(arr, &sec, sizeof(long));
+	memcpy(arr+sizeof(long), &usec, sizeof(long));
+	std::string listandtime = arr;
+	listandtime += list;
   	CommonElem& elem = commonElems[appId][shareId];
-  	elem.items.insert(name, list);
+  	elem.items.insert(name, listandtime);
 	return;
 }
 
 void
 CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list)
 {
+/*
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.lstShareInfo.insert(name, list);
+*/
 	return;
 }
 
@@ -138,16 +151,18 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 }
 
 void
-CommonDataMgr::storeLstShareInfo(int appId, const std::vector<std::string>& shareIds, const std::string& name)
+CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name)
 {
 	for (const std::string& shareId : shareIds)
 	{
-  		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
+		long shId = std::stol(shareId);
+  		CommonElem& elem = commonElems[appId][shId];
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
 		valstream  << tv.tv_sec << ";";	
-		elem.lstShareInfo.insertOrUpdate(name, valstream.str());
+		LckFreeLstSS &lstSS = elem.lstShareInfo[shareId];
+		lstSS.insertOrUpdate(name, valstream.str());
 	}	
 	return;
 }
