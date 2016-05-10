@@ -143,7 +143,8 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
 		valstream  << tv.tv_sec << ";";	
-		elem.picShareInfo.insertOrUpdate(name, valstream.str());
+		LckFreeLstSS &lstSS = elem.picShareInfo[shareId];
+		lstSS.insertOrUpdate(name, valstream.str());
 	}
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
