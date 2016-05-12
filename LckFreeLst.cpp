@@ -258,3 +258,4 @@ LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) const
 
 template class LckFreeLst<std::string, std::string>;
 template class LckFreeLst<std::string, timstr>;
+template class LckFreeLst<long, std::string>;

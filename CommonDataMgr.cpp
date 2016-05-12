@@ -134,18 +134,14 @@ void
 CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 {
 	int appId = pPicMetaObj->getAppId();
-	long shareId = pPicMetaObj->getShrId();
+	long shareIdLst = pPicMetaObj->getShrId();
 	std::string name = pPicMetaObj->getName();
 	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		std::ostringstream valstream;
-		valstream  << tv.tv_sec << ";";	
-		LckFreeLstSS &lstSS = elem.picShareInfo[shareId];
-		lstSS.insertOrUpdate(name, valstream.str());
+		LckFreeLstLS &lstLS = elem.picShareInfo[shareIdLst];
+		lstLS.insertOrUpdate(shareIdLst, name);
 	}
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
@@ -159,22 +155,12 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 	{
 		long shId = std::stol(shareId);
   		CommonElem& elem = commonElems[appId][shId];
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		std::ostringstream valstream;
-		valstream  << tv.tv_sec;
-		LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
-		lstSS.insertOrUpdate(name, valstream.str());
+		LckFreeLstLS &lstLS = elem.lstShareInfo[shareIdLst];
+		lstLS.insertOrUpdate(shareIdLst, name);
 	}	
 	return;
 }
 
-void
-CommonDataMgr::sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio)
-{
-	pArch->sendMsg(pMsg, len, msg_prio);
-	return;
-}
 
 CommonDataMgr&
 CommonDataMgr::Instance()
@@ -200,10 +186,10 @@ CommonDataMgr::updateLstShareInfo(int appId, long shareId, const std::string& de
 		
 	CommonElem& elem = commonElems[appId][shareId];
 	std::string val;
-	elem.lstShareInfo.getVal(name, val);
+	//elem.lstShareInfo.getVal(name, val);
 	val += devId;
 	val += ";";
-	elem.lstShareInfo.insertOrUpdate(name, val);
+//	elem.lstShareInfo.insertOrUpdate(name, val);
 	return val;
 }
 
@@ -211,6 +197,7 @@ void
 CommonDataMgr::getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
 {
 	CommonElem& elem = commonElems[appId][shareId];
+/*
 	std::map<std::string, std::string> names;
 	elem.lstShareInfo.getKeyVals(names);
 	for (auto pItr = names.begin(); pItr != names.end(); ++pItr)
@@ -221,5 +208,6 @@ CommonDataMgr::getShareLists(int appId, long shareId, const std::string& devId, 
 		if (elem.items.getVal(pItr->first, list))
 			lstNameMp[pItr->first] = list;
 	}
+*/
 	return;
 }

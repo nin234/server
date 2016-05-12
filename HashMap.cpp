@@ -1,6 +1,7 @@
 #include <HashMap.h>
 #include <stdexcept>
 #include <string>
+#include <StorageElems.h>
 
 template<typename key, typename val, int N>
 HashMap<key, val, N>::HashMap()
@@ -198,4 +199,4 @@ HashMap<key, val, N>::hash2(key k)
 template class HashMap<long, long>;
 template class HashMap<long, std::string>;
 template class HashMap<long, CommonElem>;
-template class HashMap<long, LckFreeLstSS, 10>;
+template class HashMap<long, LckFreeLstLS, 10>;

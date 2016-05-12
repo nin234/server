@@ -13,8 +13,8 @@
           HashMapStr archvItems;
           HashMapStr items;
           HashMapStr deviceTokens;
-	  HashMap<long, LckFreeLstSS, 10> lstShareInfo;
-	  HashMap<long, LckFreeLstSS, 10> picShareInfo;
+	  HashMap<long, LckFreeLstLS, 10> lstShareInfo;
+	  HashMap<long, LckFreeLstLS, 10> picShareInfo;
   };
 
 //Each share_id will have an instance of CommonElem

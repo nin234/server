@@ -163,8 +163,8 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		if (sendMsg(pArchMsg == nullptr? archbuf:pArchMsg.get(), archlen, pGetItemObj->getFd()))
 		{
 			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
-			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first, val, 32768))
-				sendArchiveMsg(archbuf, archlen, 10);	
+			//if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first, val, 32768))
+	//			sendArchiveMsg(archbuf, archlen, 10);	
 		}
 	}	
 	return;

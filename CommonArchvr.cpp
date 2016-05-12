@@ -235,7 +235,7 @@ CommonArchvr::archiveShareLstInfo(const char *buf, int len)
 		return false;
 	}
 
-	if (write(fd, buf, len) == -1)
+	if (write(shrLstFd, buf, len) == -1)
 	{
 		std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 		return false;
