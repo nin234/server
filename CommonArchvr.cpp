@@ -220,8 +220,6 @@ CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
 		}
 		if (fd == lstFd)
 			listRecIndx[iky] = offset;
-		else if (fd == shrLstFd)
-			shrListRecIndx[iky] = offset;
 		else
 			tmplListRecIndx[iky] = offset;
 
@@ -237,19 +235,10 @@ CommonArchvr::archiveShareLstInfo(const char *buf, int len)
 		return false;
 	}
 
-	shrdIdTemplSize templSize;
-	memcpy(&templSize, buf, sizeof(shrdIdTemplSize));
-	IndxKey iky;
-	iky.shareId = templSize.shrId;
-	iky.name = buf + sizeof(shrdIdTemplSize);
-	auto pItr = shrListRecIndx.find(iky);
-	if (pItr == shrListRecIndx.end())
+	if (write(fd, buf, len) == -1)
 	{
-		return appendLst(iky, buf, len, shrLstFd);	
-	}
-	else
-	{
-		return updateLst(iky, buf, len, shrLstFd, pItr->second);	
+		std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
+		return false;
 	}
 	return true;
 }

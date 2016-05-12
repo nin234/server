@@ -15,7 +15,7 @@ class ArchiveMsgCreator
 		static std::unique_ptr<char> createItemMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& list, int buflen);
 		static bool createPicMetaDataMsg(char *pMsg, int &len, long shareId, const std::string& name, const std::string& frndLst);
 		static bool createDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn);
-		static bool createShareLstMsg(char *pMsg, int& len, long shareId, const std::string& name, const std::string& val, int maxlen);
+		static bool createShareLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, const std::string& val, int maxlen);
 		
 
 };

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <sys/time.h>
 #include <unistd.h>
+#include <ArchiveMsgCreator.h>
 
 CommonDataMgr::CommonDataMgr()
 {
@@ -152,7 +153,7 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 }
 
 void
-CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name)
+CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name)
 {
 	for (const std::string& shareId : shareIds)
 	{
@@ -161,14 +162,19 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::vector<std:
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
-		valstream  << tv.tv_sec << ";";	
-		LckFreeLstSS &lstSS = elem.lstShareInfo[shareId];
+		valstream  << tv.tv_sec;
+		LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
 		lstSS.insertOrUpdate(name, valstream.str());
 	}	
 	return;
 }
 
-
+void
+CommonDataMgr::sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio)
+{
+	pArch->sendMsg(pMsg, len, msg_prio);
+	return;
+}
 
 CommonDataMgr&
 CommonDataMgr::Instance()

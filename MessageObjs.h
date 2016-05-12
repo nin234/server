@@ -150,6 +150,17 @@ struct shrdIdTemplSize
 	int list_len;
 };
 
+struct shareInfo
+{
+	int appId;
+	long shrIdLst;
+	long shrId;
+	bool del;
+	int name_len;
+	int list_len;
+};
+
+
 class LstObj : public MsgObj
 {
 		long shrId;

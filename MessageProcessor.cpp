@@ -163,7 +163,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		if (sendMsg(pArchMsg == nullptr? archbuf:pArchMsg.get(), archlen, pGetItemObj->getFd()))
 		{
 			std::string val = dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getDeviceId(), pItr->first);
-			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getShrId(), pItr->first, val, 32768))
+			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first, val, 32768))
 				sendArchiveMsg(archbuf, archlen, 10);	
 		}
 	}	
@@ -196,10 +196,10 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		struct timeval tv;
 		gettimeofday(&tv, NULL);
 		std::ostringstream valstream;
-		valstream  << tv.tv_sec << ";";
+		valstream  << tv.tv_sec;
 		for (const std::string& shareId : shareIds)
 		{
-			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, std::stol(shareId), pLstObj->getName(), valstream.str(), 32768))
+			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pLstObj->getAppId(), false, std::stol(shareId), pLstObj->getShrId(), pLstObj->getName(), valstream.str(), 32768))
 				sendArchiveMsg(archbuf, archlen, 10);	
 		}
 		std::vector<std::string> tokens;

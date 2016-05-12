@@ -29,7 +29,6 @@ class CommonArchvr : public Archvr
 		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
-		std::map<IndxKey, long> shrListRecIndx;
 		char wrbuf[BUF_SIZE_32K];
 		bool appendLst(const IndxKey& iky , const char *buf, int len, int fd);
 		bool updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx);
