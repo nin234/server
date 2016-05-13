@@ -62,10 +62,10 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& nam
 
 
 void
-CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devId, const std::string& devTkn)
+CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn)
 {
   	CommonElem& elem = commonElems[appId][shareId];
-  	elem.deviceTokens.insert(devId, devTkn);
+  	elem.deviceToken = devTkn;
 	return;
 }
 
@@ -175,7 +175,7 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];
-		elem.deviceTokens.getVals(tokens);		
+		tokens.push_back(elem.deviceToken);
 	}
 	return;
 }

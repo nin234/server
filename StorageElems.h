@@ -12,7 +12,7 @@
   {       
           HashMapStr archvItems;
           HashMapStr items;
-          HashMapStr deviceTokens;
+          std::string deviceToken;
 	  HashMap<long, LckFreeLstLS, 10> lstShareInfo;
 	  HashMap<long, LckFreeLstLS, 10> picShareInfo;
   };

@@ -124,7 +124,10 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 		std::cout << "Invalid message received in MessageProcessor::processPicMsg " << std::endl;
 		return;
 	}
-	dataStore.storePic(pPicObj);
+	if (dataStore.storePic(pPicObj))
+	{
+
+	}
 	return;
 }
 
@@ -253,11 +256,11 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 		std::cout << "Invalid message received in MessageProcessor::processDeviceTknMsg " << std::endl;
 		return;
 	}
-	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn());
+	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn());
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen = 0;
-	if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getShrId(), pDevTknObj->getDeviceId(), pDevTknObj->getDeviceTkn()))
+	if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getAppId(),  pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn()))
 		sendArchiveMsg(archbuf, archlen, 10);	
 	char buf[1024];
 	int mlen=0;

@@ -27,7 +27,7 @@
                   void storeArchiveItem(int appId, long shareId, const std::string& name, const std::string& templList);
                   void storeItem(int appId, long shareId, const std::string& name, const std::string& list);
                   void storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list);
-                  void storeDeviceTkn(int appId, long shareId, const std::string& devId, const std::string& devTkn);
+                  void storeDeviceTkn(int appId, long shareId, const std::string& devTkn);
 		  void storeLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name);
                   void storePicMetaData(PicMetaDataObj *pPicMetaObj);
 		  bool storePic(PicObj *pObj);

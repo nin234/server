@@ -150,6 +150,13 @@ struct shrdIdTemplSize
 	int list_len;
 };
 
+struct devTknArchv
+{
+	long shareId;
+	int appId;
+	int tkn_len;
+};
+
 struct shareInfo
 {
 	int appId;

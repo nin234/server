@@ -50,26 +50,23 @@ ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, long shareId, cons
 }
 
 bool 
-ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, long shareId, const std::string& devId, const std::string& devTkn)
+ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn)
 {
 
 	constexpr int msgId = ARCHIVE_DEVICE_TKN_MSG;
 	memcpy(pMsg, &msgId, sizeof(int));
-	//reusing (hijacking) shrdIdTemplSize
-	shrdIdTemplSize devLens;
-	devLens.shrId = shareId;
-	devLens.name_len = devId.size() + 1;
-	devLens.list_len = devTkn.size() + 1;
+	devTknArchv devLens;
+	devLens.shareId = shareId;
+	devLens.appId = appId;
+	devLens.tkn_len = devTkn.size() + 1;
 
-	int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + devLens.name_len + devLens.list_len ;
+	int msglen = sizeof(int) + sizeof(devTknArchv) + devLens.tkn_len ;
 
 	len = msglen;	
 
-	memcpy(pMsg+sizeof(int), &devLens, sizeof(shrdIdTemplSize));
-	constexpr int devIdoffset = sizeof(int) + sizeof(shrdIdTemplSize);
-	memcpy(pMsg+devIdoffset, devId.c_str(), devLens.name_len);
-	int devTknoffset = sizeof(int) + sizeof(shrdIdTemplSize) + devLens.name_len;
-	memcpy(pMsg+devTknoffset, devTkn.c_str(), devLens.list_len);
+	memcpy(pMsg+sizeof(int), &devLens, sizeof(devTknArchv));
+	constexpr int devTknoffset = sizeof(int) + sizeof(devTknArchv);
+	memcpy(pMsg+devTknoffset, devTkn.c_str(), devLens.tkn_len);
 
 	return true;
 }
