@@ -27,6 +27,9 @@ CommonArchvr::CommonArchvr()
 	lstFd = open("/home/ninan/data/shareItems", O_RDWR|O_CREAT);
 	if (lstFd == -1)
 		throw std::system_error(errno, std::system_category());
+	itemFd = open("/home/ninan/data/items", O_RDWR|O_CREAT);
+	if (itemFd == -1)
+		throw std::system_error(errno, std::system_category());
 	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT);
 	if (deviceFd == -1)
 		throw std::system_error(errno, std::system_category());
@@ -176,13 +179,17 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 			return archiveShareLst(buf+sizeof(int), len-sizeof(int));
 		break;
 
+		case ARCHIVE_ITM_MSG:
+			return archiveBuf(itemFd, buf+sizeof(int), len-sizeof(int));
+		break;
+
 		case ARCHIVE_DEVICE_TKN_MSG:
 			return archiveDeviceTkn(buf+sizeof(int), len-sizeof(int));
 
 		break;
 
 		case ARCHIVE_SHARE_LST_MSG:
-			return archiveShareLstInfo(buf+sizeof(int), len-sizeof(int));
+			return archiveBuf(shrLstFd, buf+sizeof(int), len-sizeof(int));
 		break;
 
 		default:
@@ -227,15 +234,15 @@ CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
 }
 
 bool
-CommonArchvr::archiveShareLstInfo(const char *buf, int len)
+CommonArchvr::archiveBuf(int fd, const char *buf, int len)
 {
 	if (len <=0 )
 	{
-		std::cout << "Invalid length " << len << " CommonArchvr::archiveShareLstInfo message " << std::endl;
+		std::cout << "Invalid length " << len << " CommonArchvr::archiveBuf message " << std::endl;
 		return false;
 	}
 
-	if (write(shrLstFd, buf, len) == -1)
+	if (write(fd, buf, len) == -1)
 	{
 		std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 		return false;

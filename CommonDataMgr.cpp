@@ -35,18 +35,8 @@ CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name
 void
 CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
-	constexpr int size = 2*sizeof(long);
-	char arr[size];
-	struct timeval now;
-	gettimeofday(&now, NULL);
-	long sec = now.tv_sec;
-	long usec = now.tv_usec;
-	memcpy(arr, &sec, sizeof(long));
-	memcpy(arr+sizeof(long), &usec, sizeof(long));
-	std::string listandtime = arr;
-	listandtime += list;
   	CommonElem& elem = commonElems[appId][shareId];
-  	elem.items.insert(name, listandtime);
+  	elem.items.insert(name, list);
 	return;
 }
 
@@ -70,7 +60,7 @@ CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn
 }
 
 std::string 
-getPicName(int fd) 
+CommonDataMgr::getPicName(int fd) 
 {
 
 	auto pItr = fdPicMetaMp.find(fd);
@@ -82,7 +72,7 @@ getPicName(int fd)
 	return noName;
 }
 
-std::vector<std:string> 
+std::vector<std::string> 
 CommonDataMgr::getPicShareIds(int fd)
 {
 
@@ -113,6 +103,9 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	else
 	{
 		std::string file = "/home/ninan/data/pictures/";
+		std::string appId = std::to_string(pPicObj->getAppId());
+		file += appId;
+		file += "/";
 		int dir = pItr1->second->getShrId()%1000;
 		std::string dirstr = std::to_string(dir);
 		file += dirstr;

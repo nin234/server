@@ -24,6 +24,7 @@ class CommonArchvr : public Archvr
 		int lstFd;
 		int shrLstFd;
 		int deviceFd;
+		int itemFd;
 		bool populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& tmplLst);
 		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst);
 		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
@@ -39,7 +40,7 @@ class CommonArchvr : public Archvr
 		bool archiveMsg(const char *buf, int len);
 		bool archiveArchvItems(const char *buf, int len);
 		bool archiveShareLst(const char *buf, int len);
-		bool archiveShareLstInfo(const char *buf, int len);
+		bool archiveBuf(int fd, const char *buf, int len);
 		bool archiveDeviceTkn(const char *buf, int len);
 		template<class Op> void populateArchvItems(Op op)
 		{

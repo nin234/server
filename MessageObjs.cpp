@@ -2,6 +2,7 @@
 #include <string.h>
 #include <iostream>
 #include <sstream>
+#include <sys/time.h>
 
 void
 MsgObjDeltr::operator () (MsgObj *pMsg)
@@ -79,7 +80,14 @@ LstObj::setName(const char *pName, int len)
 void
 LstObj::setList(const char *pList, int len)
 {
-	list.resize(len);
-	memcpy(&list[0], pList, len);
+	list.resize(len + 2*sizeof(long));
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	long sec = now.tv_sec;
+	long usec = now.tv_usec;
+	memcpy(&list[0], &sec, sizeof(long));
+	memcpy(&list[sizeof(long)], &usec, sizeof(long));
+	constexpr int size = 2*sizeof(long);
+	memcpy(&list[size], pList, len);
 	return;
 }

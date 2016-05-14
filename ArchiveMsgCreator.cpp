@@ -134,7 +134,7 @@ ArchiveMsgCreator::createArchvItmMsg(char *pMsgStatic, int& len, long shareId, c
 
 
 std::unique_ptr<char>
-ArchiveMsgCreator::createItemMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& list, int buflen)
+ArchiveMsgCreator::createItemMsg(char *pMsgStatic, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen)
 {
 
 	constexpr int msgId = ARCHIVE_ITM_MSG;
@@ -142,6 +142,7 @@ ArchiveMsgCreator::createItemMsg(char *pMsgStatic, int& len, long shareId, const
 	templSize.shrId = shareId;
 	templSize.name_len = name.size()+1;
 	templSize.list_len = list.size()+1;
+	templSize.appId = appId;
 
 	int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + templSize.name_len + templSize.list_len ;
 

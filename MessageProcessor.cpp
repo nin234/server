@@ -134,7 +134,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 			dataStore.getDeviceTkns(pPicObj->getAppId(), shareIds, tokens);	
 			std::string picName = dataStore.getPicName(pPicObj->getFd());
 			sendApplePush(tokens, picName, 1);
-			dataStore.eraseFdMp();
+			dataStore.eraseFdMp(pPicObj->getFd());
 		}
 	
 	}
@@ -199,7 +199,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[32768];
 	int archlen = 0;
-	pArchMsg = ArchiveMsgCreator::createItemMsg(archbuf, archlen, pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList(), 32768);
+	pArchMsg = ArchiveMsgCreator::createItemMsg(archbuf, archlen, pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList(), 32768);
 	sendArchiveMsg(pArchMsg == nullptr?archbuf : pArchMsg.get(), archlen, 10);	
 
 	std::vector<std::string>  shareIds;

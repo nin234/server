@@ -146,8 +146,11 @@ class TemplLstObj : public MsgObj
 struct shrdIdTemplSize
 {
 	long shrId;
+	int appId;
+	bool del;
 	int name_len;
 	int list_len;
+	shrdIdTemplSize():del(false), name_len(0), list_len(0) {}
 };
 
 struct devTknArchv
