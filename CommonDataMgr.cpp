@@ -69,6 +69,32 @@ CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn
 	return;
 }
 
+std::string 
+getPicName(int fd) 
+{
+
+	auto pItr = fdPicMetaMp.find(fd);
+	if (pItr != fdPicMetaMp.end())
+	{
+		return pItr->second->getName();
+	}
+	std::string noName;
+	return noName;
+}
+
+std::vector<std:string> 
+CommonDataMgr::getPicShareIds(int fd)
+{
+
+	auto pItr = fdPicMetaMp.find(fd);
+	if (pItr != fdPicMetaMp.end())
+	{
+		return pItr->second->getFrndLst();
+	}
+	std::vector<std::string> emptyVec;
+	return emptyVec;
+}
+
 bool
 CommonDataMgr::storePic(PicObj *pPicObj)
 {
@@ -129,7 +155,12 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	return false;
 
 }
-
+void 
+CommonDataMgr::eraseFdMp(int fd)
+{
+	fdFdMp.erase(fd);
+	fdPicMetaMp.erase(fd);
+}
 void 
 CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 {

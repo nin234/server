@@ -126,7 +126,17 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 	}
 	if (dataStore.storePic(pPicObj))
 	{
-
+		//send push notification
+		std::vector<std::string> shareIds = dataStore.getPicShareIds(pPicObj->getFd()); 
+		if (shareIds.size())
+		{
+			std::vector<std::string> tokens;
+			dataStore.getDeviceTkns(pPicObj->getAppId(), shareIds, tokens);	
+			std::string picName = dataStore.getPicName(pPicObj->getFd());
+			sendApplePush(tokens, picName, 1);
+			dataStore.eraseFdMp();
+		}
+	
 	}
 	return;
 }
