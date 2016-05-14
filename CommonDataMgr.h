@@ -30,6 +30,9 @@
                   void storeDeviceTkn(int appId, long shareId, const std::string& devTkn);
 		  void storeLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name);
                   void storePicMetaData(PicMetaDataObj *pPicMetaObj);
+		  std::vector<std:string> getPicShareIds(int fd);
+		  std::string getPicName(int fd);
+		  void eraseFdMp(int fd);
 		  bool storePic(PicObj *pObj);
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
