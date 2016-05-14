@@ -15,7 +15,7 @@ CommonDataMgr::CommonDataMgr()
 		pCommonArch->populateArchvItems([&](int appId, long shareId, const std::string& name, const std::string& templList){storeArchiveItem(appId, shareId, name, templList);});
 		pCommonArch->populateItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeItem(appId, shareId, name, list);});
 		pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, const std::string& list){storeLstShareInfo(appId, shareId, name, list);});
-		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devId, devTkn);});
+		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn);});
 	}
 }
 
