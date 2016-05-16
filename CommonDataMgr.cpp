@@ -164,8 +164,9 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-		LckFreeLstLS &lstLS = elem.picShareInfo[shareIdLst];
-		lstLS.insertOrUpdate(shareIdLst, name);
+		LckFreeLstSS &lstSS = elem.picShareInfo[shareIdLst];
+		std::string val = "NONE";
+		lstSS.insertOrUpdate(name, val);
 	}
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
@@ -179,8 +180,9 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 	{
 		long shId = std::stol(shareId);
   		CommonElem& elem = commonElems[appId][shId];
-		LckFreeLstLS &lstLS = elem.lstShareInfo[shareIdLst];
-		lstLS.insertOrUpdate(shareIdLst, name);
+		LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
+		std::string val = "NONE";
+		lstSS.insertOrUpdate(name, val);
 	}	
 	return;
 }
@@ -204,34 +206,50 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
 	return;
 }
 
-std::string
-CommonDataMgr::updateLstShareInfo(int appId, long shareId, const std::string& devId, const std::string& name)
+void
+CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName)
 {
 		
 	CommonElem& elem = commonElems[appId][shareId];
-	std::string val;
-	//elem.lstShareInfo.getVal(name, val);
-	val += devId;
-	val += ";";
-//	elem.lstShareInfo.insertOrUpdate(name, val);
-	return val;
+	LckFreeLstSS lstSS;
+	if (elem.lstShareInfo.getValue(frndShareId, lstSS))
+	{
+		lstSS.erase(itemName);
+		if (lstSS.isEmpty())
+		{
+			lstSS.cleanUp();
+		}
+	}
+	return;
 }
 
 void
-CommonDataMgr::getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp)
+CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
 	CommonElem& elem = commonElems[appId][shareId];
-/*
-	std::map<std::string, std::string> names;
-	elem.lstShareInfo.getKeyVals(names);
-	for (auto pItr = names.begin(); pItr != names.end(); ++pItr)
+	bool isNext = true;
+	int indx = -1;
+	for (int i=0; i < 10; ++i)
 	{
-		if (pItr->second.find(devId) != std::string::npos)
-			continue;
-		std::string list;
-		if (elem.items.getVal(pItr->first, list))
-			lstNameMp[pItr->first] = list;
+		LckFreeLstSS lstSS;
+		long shrid_of_frndlst; 
+		isNext = elem.lstShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
+		
+		if (!isNext)
+			break;
+		std::vector<std::string> itemNames;
+		lstSS.getKeys(itemNames);
+
+		CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
+		for (const std::string& itemName : itemNames)
+		{
+			std::string item;
+			shrelem.items.getVal(itemName, item);
+			shrIdLstName shlst;
+			shlst.shareId = shrid_of_frndlst;
+			shlst.lstName = itemName;
+			lstNameMp[shlst] = item.substr(2*sizeof(long));
+		}
 	}
-*/
 	return;
 }

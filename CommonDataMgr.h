@@ -36,8 +36,8 @@
 		  bool storePic(PicObj *pObj);
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
-		  void getShareLists(int appId, long shareId, const std::string& devId, std::map<std::string, std::string>& lstNameMp);
-		  std::string updateLstShareInfo(int appId, long shareId, const std::string& devId, const std::string& name);
+		  void getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
+		  void updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
   };
   #endif
 

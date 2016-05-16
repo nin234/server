@@ -13,10 +13,23 @@
           HashMapStr archvItems;
           HashMapStr items;
           std::string deviceToken;
-	  HashMap<long, LckFreeLstLS, 10> lstShareInfo;
-	  HashMap<long, LckFreeLstLS, 10> picShareInfo;
+	  HashMap<long, LckFreeLstSS, 10> lstShareInfo;
+	  HashMap<long, LckFreeLstSS, 10> picShareInfo;
   };
 
+ struct shrIdLstName
+{
+	long shareId;
+	std::string lstName;
+	bool operator < (const shrIdLstName& shlst) const
+	{
+		if (shareId != shlst.shareId)
+			return shareId < shlst.shareId;
+		else
+			return lstName < shlst.lstName;
+
+	}
+};
 //Each share_id will have an instance of CommonElem
 //lstShareInfo is a linked list and each element in the list is a key value
 //pair of shareId and list Name issue a shareId can more than one item to share so the key should be shareId:::listName value is listName

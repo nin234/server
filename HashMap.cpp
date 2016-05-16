@@ -37,10 +37,10 @@ HashMap<key, val, N>::getValue(const key& k, val& v)
 		while(true)
 		{
 			++niter;
-			if (niter > HASH_MAP_SIZE)
+			if (niter > N)
 				break;	
 			if (indx < 0)
-				indx += HASH_MAP_SIZE;	
+				indx += N;	
 			if (!store[indx].k)
 			{
 				return false;
@@ -55,7 +55,7 @@ HashMap<key, val, N>::getValue(const key& k, val& v)
 				int indx2 = 1;
 				indx -= indx2;
 				if (indx < 0)
-					indx += HASH_MAP_SIZE;	
+					indx += N;	
 			}
 		}
 	}	
@@ -81,10 +81,10 @@ HashMap<key, val, N>::find(const key& k)
 		while(true)
 		{
 			++niter;
-			if (niter > HASH_MAP_SIZE)
+			if (niter > N)
 				break;	
 			if (indx < 0)
-				indx += HASH_MAP_SIZE;	
+				indx += N;	
 			if (!store[indx].k)
 			{
 				return false;
@@ -98,7 +98,7 @@ HashMap<key, val, N>::find(const key& k)
 				int indx2 = 1;
 				indx -= indx2;
 				if (indx < 0)
-					indx += HASH_MAP_SIZE;	
+					indx += N;	
 			}
 		}
 	}	
@@ -145,10 +145,10 @@ HashMap<key, val, N>::operator [] (const key& k)
 		while(true)
 		{
 			++niter;
-			if (niter > HASH_MAP_SIZE)
+			if (niter > N)
 				throw std::overflow_error("Max capacity of HashMap exceeded");
 			if (indx < 0)
-				indx += HASH_MAP_SIZE;	
+				indx += N;	
 			if (!store[indx].k)
 			{
 				store[indx].k = k;
@@ -160,7 +160,7 @@ HashMap<key, val, N>::operator [] (const key& k)
 				int indx2 = 1;
 				indx -= indx2;
 				if (indx < 0)
-					indx += HASH_MAP_SIZE;	
+					indx += N;	
 
 				}
 			}
@@ -173,7 +173,7 @@ HashMap<key, val, N>::operator [] (const key& k)
 				int indx2 = 1;
 				indx -= indx2;
 				if (indx < 0)
-					indx += HASH_MAP_SIZE;	
+					indx += N;	
 			}
 		}
 	}	
@@ -195,8 +195,23 @@ HashMap<key, val, N>::hash2(key k)
 	return k%HASH_1_PRIME;
 }
 
+template<typename key, typename val, int N>
+bool
+HashMap<key, val, N>::getNext(key& k, val& v, int &indx)
+{
+	for (int i=indx+1; i < N; ++i)
+	{
+		if (!store[i].k)
+			continue;
+		k = store[i].k;
+		v = store[i].v;
+		return true;
+	}
+	return false;
+}
+
 
 template class HashMap<long, long>;
 template class HashMap<long, std::string>;
 template class HashMap<long, CommonElem>;
-template class HashMap<long, LckFreeLstLS, 10>;
+template class HashMap<long, LckFreeLstSS, 10>;

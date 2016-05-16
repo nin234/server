@@ -40,11 +40,12 @@ class LckFreeLst
 		bool erase (KeyType key);
 		void cleanUp();
 		void getVals(std::vector<ValType>& vals) const;
-		void getKeys(std::vector<KeyType>& key) const;
+		void getKeys(std::vector<KeyType>& keys) const;
 		void getKeyVals(std::map<KeyType, ValType>& kvals) const;
 		bool getVal(const KeyType& key, ValType& val) const;
 		//dummy fn to make compiler happy
 		const LckFreeLst& operator=(const LckFreeLst& rhs){}
+		bool isEmpty();
 };
 
 struct timstr

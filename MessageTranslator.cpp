@@ -66,8 +66,8 @@ MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>&
 	return true;
 }
 
-std::unique_ptr<char>
-MessageTranslator::getListMsg(char *buf, int *mlen, int buflen, const std::string& name, const std::string& lst1)
+bool
+MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst1)
 {
 	std::string lst;
 	std::string::size_type xpos = lst.find(":::");
@@ -80,18 +80,8 @@ MessageTranslator::getListMsg(char *buf, int *mlen, int buflen, const std::strin
 		lst = lst1.substr(xpos+3);
 	}
 	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2;
-	std::unique_ptr<char> pMsgDynamic;
-	char *pMsg;
-	if (buflen >= msglen)
-		pMsg = buf;
-	else
-	{
-		std::unique_ptr<char> tmp{new char[msglen]};
-		pMsgDynamic = std::move(tmp);
-		pMsg = pMsgDynamic.get();
-		std::cout << "Dynamic allocation in getListMsg " << name << std::endl;
-	}
-	
+	if (buflen < msglen)
+		return false;
 
 	constexpr int msgId = GET_ITEMS_RPLY_MSG;
 	memcpy(pMsg, &msglen, sizeof(int));
@@ -104,6 +94,6 @@ MessageTranslator::getListMsg(char *buf, int *mlen, int buflen, const std::strin
 	int lstoffset = 4*sizeof(int) + namelen;
 	memcpy(pMsg+lstoffset, lst.c_str(), lstlen);
 	*mlen = msglen;
-	return pMsgDynamic;
+	return true;
 }
 

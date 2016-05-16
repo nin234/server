@@ -173,6 +173,17 @@ LckFreeLst<KeyType, ValType>::~LckFreeLst()
 }
 
 template<typename KeyType, typename ValType>
+bool
+LckFreeLst<KeyType, ValType>::isEmpty()
+{
+	if (head->next == tail)
+	{
+		return true;
+	}
+	return false;
+}
+
+template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::cleanUp()
 {

@@ -34,6 +34,8 @@ class HashMap
 		bool getValue(const key& k, val& v);
 		bool find (const key& k);
 		val& operator [](const key& k);
+		bool getNext(key& k, val& v, int& indx);
+		
 };
 
 #endif

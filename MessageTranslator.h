@@ -13,7 +13,7 @@ class MessageTranslator
 		bool getStoreIdReply (char *buf, int* mlen);
 		bool getReply (char *buf, int* mlen, int msgTyp);
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
-		std::unique_ptr<char> getListMsg(char *buf, int *mlen, int buflen, const std::string& name, const std::string& lst);
+		bool getListMsg(char *buf, int *mlen, int buflen, const std::string& name, const std::string& lst);
 		virtual bool translateMsg(char *buf, int *mlen, int msgTyp, MsgObj *pMsgObj)=0;		
 };
 #endif

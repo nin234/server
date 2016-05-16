@@ -12,10 +12,10 @@ class ArchiveMsgCreator
 		static bool createTrnIdShrIdMsg(char *pMsg, int& len, shrIdTrnId shtrId);
 		static std::unique_ptr<char> createFrndLstMsg(char *pMsgStatic, int& len, long shareId, const std::string& frndLst, int buflen);
 		static std::unique_ptr<char> createArchvItmMsg(char *pMsgStatic, int& len, long shareId, const std::string& name, const std::string& templList, int buflen);
-		static std::unique_ptr<char> createItemMsg(char *pMsgStatic, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen);
+		static bool createItemMsg(char *pMsgStatic, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen);
 		static bool createPicMetaDataMsg(char *pMsg, int &len, long shareId, const std::string& name, const std::string& frndLst);
 		static bool createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn);
-		static bool createShareLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, const std::string& val, int maxlen);
+		static bool createShareLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen);
 		
 
 };
