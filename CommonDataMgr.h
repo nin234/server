@@ -37,6 +37,7 @@
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
 		  void getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
+		  void getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNames);
 		  void updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
   };
   #endif

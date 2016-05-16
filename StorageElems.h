@@ -13,8 +13,8 @@
           HashMapStr archvItems;
           HashMapStr items;
           std::string deviceToken;
-	  HashMap<long, LckFreeLstSS, 10> lstShareInfo;
-	  HashMap<long, LckFreeLstSS, 10> picShareInfo;
+	  HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> lstShareInfo;
+	  HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> picShareInfo;
   };
 
  struct shrIdLstName

@@ -188,6 +188,8 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 }
 
 
+
+
 CommonDataMgr&
 CommonDataMgr::Instance()
 {
@@ -224,12 +226,41 @@ CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, con
 }
 
 void
+CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNamesShIds)
+{
+	
+  	CommonElem& elem = commonElems[appId][shareId];
+	bool isNext = true;
+	int indx = -1;
+	for (int i=0; i < SHARE_MAP_SIZE; ++i)
+	{
+		LckFreeLstSS lstSS;
+		long shrid_of_frndlst; 
+		isNext = elem.picShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
+		
+		if (!isNext)
+			break;
+		std::vector<std::string> picNames;
+		lstSS.getKeys(picNames);
+		for (const std::string& picName : picNames)
+		{
+			shrIdLstName shlst;
+			shlst.shareId = shrid_of_frndlst;
+			shlst.lstName = picName;
+			picNamesShIds.push_back(shlst);
+		}
+
+	}
+	return;
+}
+
+void
 CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
 	CommonElem& elem = commonElems[appId][shareId];
 	bool isNext = true;
 	int indx = -1;
-	for (int i=0; i < 10; ++i)
+	for (int i=0; i < SHARE_MAP_SIZE; ++i)
 	{
 		LckFreeLstSS lstSS;
 		long shrid_of_frndlst; 
