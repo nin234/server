@@ -10,7 +10,7 @@
 
 using namespace std::placeholders;
 
-MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), dataStore{CommonDataMgr::Instance()}
+MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pPicSndr(NULL),  m_pTrnsl(NULL), pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), dataStore{CommonDataMgr::Instance()}
 {
 	for (auto &msgTypPrc : msgTypPrcsrs)
 		msgTypPrc = -1;
@@ -75,6 +75,7 @@ void
 MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 {
 	m_pDcd.reset(pDcd);
+	m_pPicSndr = std::make_shared<PictureSender>();
 	m_pTrnsl = pTrnsl;
 	pNtwIntf->setDecoder(m_pDcd);
 	return;

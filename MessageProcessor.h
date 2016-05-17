@@ -10,10 +10,12 @@
 #include <ApplePush.h>
 #include <CommonDataMgr.h>
 #include <map>
+#include <PictureSender.h>
 
 class MessageProcessor
 {
 	std::shared_ptr<MessageDecoder> m_pDcd;
+	std::shared_ptr<PictureSender> m_pPicSndr;
 	std::unique_ptr<NtwIntf<MessageDecoder>>  pNtwIntf;
 	std::unique_ptr<ArchiveSndr> pArch;
 	int maxFd;
