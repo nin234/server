@@ -24,7 +24,9 @@ class HashMapStr
 		bool getVal(const std::string& key, std::string& val);	
 		
 		//dummy function to keep compiler happy
-		const HashMapStr& operator = (const HashMapStr& rhs){}		
+		const HashMapStr& operator = (const HashMapStr& rhs){
+
+return *(new HashMapStr());}		
 };
 
 #endif

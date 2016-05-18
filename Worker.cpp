@@ -47,6 +47,7 @@ Worker::main()
         {
                 std::cout << "Caught unknown exception " << std::endl;
         }       
+	return this;
 }
 
 bool

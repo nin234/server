@@ -30,7 +30,6 @@ MessageDecoder::~MessageDecoder()
 bool 
 MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 {
-    bool bRet = true;
     int msgTyp;
     memcpy(&msgTyp, buffer+sizeof(int), sizeof(int));
     static auto processors = {
@@ -150,7 +149,6 @@ MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 	pMsg->setTrnId(tid);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
-	constexpr int shidOffset = offset + sizeof(long);
 	pMsgs.push_back(std::move(pMsg));
     return true;
 }

@@ -90,7 +90,7 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
 	bufinit = true;
     while (next)
     {
-        if (remaining < sizeof(int))
+        if (remaining < (ssize_t)sizeof(int))
         {
 		if (!bufinit)
 		{
