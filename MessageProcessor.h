@@ -11,6 +11,7 @@
 #include <CommonDataMgr.h>
 #include <map>
 #include <PictureSender.h>
+#include <MessageEnqueuer.h>
 
 class MessageProcessor
 {
@@ -18,6 +19,7 @@ class MessageProcessor
 	std::shared_ptr<PictureSender> m_pPicSndr;
 	std::unique_ptr<NtwIntf<MessageDecoder>>  pNtwIntf;
 	std::unique_ptr<ArchiveSndr> pArch;
+	std::unique_ptr<MessageEnqueuer> pMsgEnq;
 	int maxFd;
 	int nFds;
 	std::array<int, NO_COMMON_MSGS> msgTypPrcsrs;

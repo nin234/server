@@ -7,5 +7,7 @@ class PictureSender
 	public:
 		PictureSender();
 		virtual ~PictureSender();
+		void sendPictures();
+		bool shouldEnqueMsg(int fd);
 };
 #endif

@@ -298,7 +298,6 @@ NtwIntf<Decoder>::waitAndGetMsg()
 				//TO DO process message
 				std::cout << "Received message=" << buf << std::endl;
 				processMessage(buf, s, evlist[j].data.fd);
-				return true;
 			}
 		}
 		else if (evlist[j].events &(EPOLLHUP | EPOLLERR))
@@ -308,6 +307,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			return false;
 		}
 	}
+	picsnd->sendPictures();
 	
 	return true;
 }
@@ -318,6 +318,14 @@ NtwIntf<Decoder>::setDecoder(std::shared_ptr<Decoder> pDcd)
 {
 	dcd = pDcd;
 }
+
+template<typename Decoder>
+void
+NtwIntf<Decoder>::setPicSndr(std::shared_ptr<PictureSender> pPicSnd)
+{
+	picsnd = pPicSnd;
+}
+
 
 template<typename Decoder>
 bool

@@ -1,6 +1,6 @@
 CXX = g++
 
-CPPFLAGS = -I. -std=c++14 -mcmodel=large -fpic
+CPPFLAGS = -I. -std=c++14 -mcmodel=large -fpic -Wall
 
 LDFLAGS = -lpthread -lrt -L/usr/lib64/capn -lcapn
 
