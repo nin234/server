@@ -55,6 +55,7 @@ struct timstr
 	long tv_usec;
 };
 typedef LckFreeLst<std::string, std::string> LckFreeLstSS;
+typedef LckFreeLst<std::string, long> LckFreeLstSL;
 typedef LckFreeLst<long, std::string> LckFreeLstLS;
 typedef LckFreeLst<std::string, timstr> LckFreeLstSTS;
 
