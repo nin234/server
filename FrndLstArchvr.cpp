@@ -73,7 +73,7 @@ FrndLstArchvr::appendLst(long shareId, const char *buf, int len)
 {
 	long offset = lseek(frndFd, 0, SEEK_END);
 	int size;
-	if (len >= BUF_SIZE_4K-2*sizeof(int))
+	if (len >= (int)(BUF_SIZE_4K-2*sizeof(int)))
 	{
 		size = len*2 + 2*sizeof(int);
 	}

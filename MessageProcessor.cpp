@@ -10,8 +10,9 @@
 
 using namespace std::placeholders;
 
-MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pPicSndr(NULL),  m_pTrnsl(NULL), pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
+MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
 {
+	m_pTrnsl = NULL;
 	for (auto &msgTypPrc : msgTypPrcsrs)
 		msgTypPrc = -1;
 	msgTypPrcsrs[GET_SHARE_ID_MSG] = 0;
@@ -358,7 +359,6 @@ MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	if (!pFrndObj)
 		return;
 	FrndLstMgr::Instance().storeFrndLst(pFrndObj);
-	int size = sizeof(long) + pFrndObj->getFrndLst().size() + 1;
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen =0;

@@ -14,8 +14,8 @@ ShareIdArchvr::ShareIdArchvr()
 	shareFd = open("/home/ninan/data/shareId", O_RDWR|O_CREAT);
 	if (shareFd == -1)
 		throw std::system_error(errno, std::system_category());
-	int nRead;
-	if (nRead = read(shareFd, &shareId, sizeof(long)))
+	int nRead = read(shareFd, &shareId, sizeof(long));
+	if (nRead )
 	{
 		if (!nRead)
 			shareId = SHARE_ID_START_VAL;

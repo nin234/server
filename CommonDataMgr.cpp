@@ -164,8 +164,8 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-		LckFreeLstSS &lstSS = elem.picShareInfo[shareIdLst];
-		std::string val = "NONE";
+		LckFreeLstSL &lstSS = elem.picShareInfo[shareIdLst];
+		long val = pPicMetaObj->getPicLen();
 		lstSS.insertOrUpdate(name, val);
 	}
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
@@ -234,7 +234,7 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 	int indx = -1;
 	for (int i=0; i < SHARE_MAP_SIZE; ++i)
 	{
-		LckFreeLstSS lstSS;
+		LckFreeLstSL lstSS;
 		long shrid_of_frndlst; 
 		isNext = elem.picShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
 		

@@ -215,3 +215,4 @@ template class HashMap<long, long>;
 template class HashMap<long, std::string>;
 template class HashMap<long, CommonElem>;
 template class HashMap<long, LckFreeLstSS, 10>;
+template class HashMap<long, LckFreeLstSL, 10>;

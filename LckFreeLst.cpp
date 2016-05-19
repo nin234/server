@@ -141,18 +141,28 @@ LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType>
 		right_node = t;
 		/* 2: Check nodes are adjacent */ 
 		if (left_node_next == right_node)
+		{
 			if ((right_node != tail) && is_marked_reference(right_node)) 
+			{
 				goto search_again;
-			else
-				return right_node;
-		/* 3: Remove one or more marked nodes */
-		if (__sync_bool_compare_and_swap (&((*left_node)->next), left_node_next, right_node))
-			if ((right_node != tail) && is_marked_reference(right_node)) 
-				goto search_again;
+			}
 			else
 			{
 				return right_node;
 			}
+		}
+		/* 3: Remove one or more marked nodes */
+		if (__sync_bool_compare_and_swap (&((*left_node)->next), left_node_next, right_node))
+		{
+			if ((right_node != tail) && is_marked_reference(right_node)) 
+			{
+				goto search_again;
+			}
+			else
+			{
+				return right_node;
+			}
+		}
 	} 
 	while (true);
 	return NULL;

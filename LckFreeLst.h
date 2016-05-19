@@ -44,7 +44,8 @@ class LckFreeLst
 		void getKeyVals(std::map<KeyType, ValType>& kvals) const;
 		bool getVal(const KeyType& key, ValType& val) const;
 		//dummy fn to make compiler happy
-		const LckFreeLst& operator=(const LckFreeLst& rhs){}
+		const LckFreeLst& operator=(const LckFreeLst& rhs)
+		{ return *(new LckFreeLst());}
 		bool isEmpty();
 };
 

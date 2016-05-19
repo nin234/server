@@ -39,7 +39,7 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
     }
     else
     {
-       if (pItr->second.bufIndx >= sizeof(int))
+       if (pItr->second.bufIndx >= (ssize_t)sizeof(int))
        {
            int len = 0;
            memcpy(&len, pItr->second.aggrbuf, sizeof(int));
@@ -53,7 +53,7 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
         {
             int len = 0;
             ssize_t remaining = mlen;
-            if (remaining +pItr->second.bufIndx < sizeof(int))
+            if (remaining +pItr->second.bufIndx < (ssize_t)sizeof(int))
             {
                 bMore = true;
                 memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
