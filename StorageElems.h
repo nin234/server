@@ -22,6 +22,7 @@
 	long shareId;
 	std::string lstName;
 	long picLen;
+	int fd;
 	bool operator < (const shrIdLstName& shlst) const
 	{
 		if (shareId != shlst.shareId)

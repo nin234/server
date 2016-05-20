@@ -38,11 +38,14 @@ MessageProcessor::process()
 {
 	for (;;)
 	{
-		if (!pNtwIntf->waitAndGetMsg())
+		if (!pNtwIntf->waitAndGetMsg())	
+		{
 			--nFds;
+		}
 		else
 		{
 			processRequests();
+			m_pPicSndr->sendPictures();
 		}
 	}
 	return false;
@@ -189,8 +192,9 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	}	
 	std::vector<shrIdLstName> picNamesShIds;
 	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
-	for (const auto& picNameShId : picNamesShIds)
+	for (auto& picNameShId : picNamesShIds)
 	{
+		picNameShId.fd = pGetItemObj->getFd();
 		m_pPicSndr->insertPicNameShid(picNameShId);
 	}
 	return;

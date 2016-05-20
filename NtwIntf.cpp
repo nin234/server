@@ -307,7 +307,6 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			return false;
 		}
 	}
-	picsnd->sendPictures();
 	
 	return true;
 }
@@ -319,12 +318,6 @@ NtwIntf<Decoder>::setDecoder(std::shared_ptr<Decoder> pDcd)
 	dcd = pDcd;
 }
 
-template<typename Decoder>
-void
-NtwIntf<Decoder>::setPicSndr(std::shared_ptr<PictureSender> pPicSnd)
-{
-	picsnd = pPicSnd;
-}
 
 
 template<typename Decoder>
