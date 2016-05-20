@@ -247,7 +247,7 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 			shrIdLstName shlst;
 			shlst.shareId = shrid_of_frndlst;
 			shlst.lstName = pItr->first;
-			shlst.picLen =  pItr->second
+			shlst.picLen =  pItr->second;
 			picNamesShIds.push_back(shlst);
 
 		}

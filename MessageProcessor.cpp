@@ -10,9 +10,8 @@
 
 using namespace std::placeholders;
 
-MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
+MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
 {
-	m_pTrnsl = NULL;
 	for (auto &msgTypPrc : msgTypPrcsrs)
 		msgTypPrc = -1;
 	msgTypPrcsrs[GET_SHARE_ID_MSG] = 0;
@@ -77,9 +76,10 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 {
 	m_pDcd.reset(pDcd);
 	m_pPicSndr = std::make_shared<PictureSender>();
-	m_pTrnsl = pTrnsl;
+	m_pTrnsl.reset(pTrnsl);
 	pNtwIntf->setDecoder(m_pDcd);
 	pNtwIntf->setPicSndr(m_pPicSndr);
+	m_pPicSndr->setTrnsl(pTrnsl);
 	return;
 }
 
@@ -189,7 +189,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	}	
 	std::vector<shrIdLstName> picNamesShIds;
 	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
-	for (const picNameShId& : picNamesShIds)
+	for (const auto& picNameShId : picNamesShIds)
 	{
 		m_pPicSndr->insertPicNameShid(picNameShId);
 	}

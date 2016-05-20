@@ -16,6 +16,7 @@
 class MessageProcessor
 {
 	std::shared_ptr<MessageDecoder> m_pDcd;
+	std::shared_ptr<MessageTranslator> m_pTrnsl;
 	std::shared_ptr<PictureSender> m_pPicSndr;
 	std::unique_ptr<NtwIntf<MessageDecoder>>  pNtwIntf;
 	std::unique_ptr<ArchiveSndr> pArch;
@@ -27,7 +28,6 @@ class MessageProcessor
 
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
-		MessageTranslator *m_pTrnsl;
 		bool sendMsg(char *buf, int mlen, int fd);
 		void processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);

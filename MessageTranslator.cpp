@@ -72,7 +72,7 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 	int msglen = 2*sizeof(long) + 3*sizeof(int) + shidlst.lstName.size() +1;
 	if (buflen < msglen)
 	{
-		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl;
 		return false;
 	}
 	constexpr int msgId = PIC_METADATA_MSG;
@@ -105,7 +105,7 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2;
 	if (buflen < msglen)
 	{
-		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getListMsg " << std::endl
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getListMsg " << std::endl;
 		return false;
 	}
 
