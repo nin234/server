@@ -189,7 +189,10 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	}	
 	std::vector<shrIdLstName> picNamesShIds;
 	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
-	
+	for (const picNameShId& : picNamesShIds)
+	{
+		m_pPicSndr->insertPicNameShid(picNameShId);
+	}
 	return;
 }
 

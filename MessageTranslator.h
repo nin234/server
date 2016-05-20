@@ -3,6 +3,7 @@
 
 #include <MessageObjs.h>
 #include <memory>
+#include <StorageElems.h>
 
 class MessageTranslator
 {
@@ -14,6 +15,7 @@ class MessageTranslator
 		bool getReply (char *buf, int* mlen, int msgTyp);
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getListMsg(char *buf, int *mlen, int buflen, const std::string& name, const std::string& lst);
+		bool getPicMetaMsg(char *buf, int *mlen, int buflen, const shrIdLstName& shidlst);
 		virtual bool translateMsg(char *buf, int *mlen, int msgTyp, MsgObj *pMsgObj)=0;		
 };
 #endif

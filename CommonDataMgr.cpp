@@ -240,14 +240,16 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 		
 		if (!isNext)
 			break;
-		std::vector<std::string> picNames;
-		lstSS.getKeys(picNames);
-		for (const std::string& picName : picNames)
+		std::map<std::string, long> picNamesLens;
+		lstSS.getKeyVals(picNamesLens);
+		for (auto pItr = picNamesLens.begin(); pItr != picNamesLens.end(); ++pItr)
 		{
 			shrIdLstName shlst;
 			shlst.shareId = shrid_of_frndlst;
-			shlst.lstName = picName;
+			shlst.lstName = pItr->first;
+			shlst.picLen =  pItr->second
 			picNamesShIds.push_back(shlst);
+
 		}
 
 	}

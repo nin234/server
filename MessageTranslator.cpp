@@ -67,6 +67,29 @@ MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>&
 }
 
 bool
+MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdLstName& shidlst)
+{
+	int msglen = 2*sizeof(long) + 3*sizeof(int) + shidlst.lstName.size() +1;
+	if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl
+		return false;
+	}
+	constexpr int msgId = PIC_METADATA_MSG;
+	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+	memcpy(pMsg+2*sizeof(int), &shidlst.shareId, sizeof(long));
+	int picNameLen = shidlst.lstName.size() + 1;
+	int picNameLenOffset = 2*sizeof(int) + sizeof(long);
+	memcpy(pMsg+picNameLenOffset, &picNameLen, sizeof(int));
+	int picNameOffset = picNameLenOffset+sizeof(int);	
+	memcpy(pMsg+picNameOffset, shidlst.lstName.c_str(), picNameLen);
+	int picLenOffset = picNameOffset+picNameLen;
+	memcpy(pMsg+picLenOffset, &shidlst.picLen, sizeof(long));
+	return true;
+}
+
+bool
 MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst1)
 {
 	std::string lst;
@@ -81,9 +104,12 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 	}
 	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2;
 	if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getListMsg " << std::endl
 		return false;
+	}
 
-	constexpr int msgId = GET_ITEMS_RPLY_MSG;
+	constexpr int msgId = SHARE_ITEM_MSG;
 	memcpy(pMsg, &msglen, sizeof(int));
 	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
 	int namelen = name.size() + 1;
