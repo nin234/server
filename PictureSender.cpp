@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <iostream>
 #include <Util.h>
+#include <Constants.h>
+#include <unistd.h>
 
 PictureSender::PictureSender():m_pTrnsl(NULL), m_pObs(NULL)
 {
@@ -84,6 +86,43 @@ void
 PictureSender::sendPictures()
 {
 	sendPicMetaDat();	
+	sendPicData();
+	return;
+}
+
+void
+PictureSender::sendPicData()
+{
+	auto pItr = picFdMp.begin();
+	while (pItr != picFdMp.end())
+	{
+		char buf[MAX_BUF];
+		int numread = read(pItr->second.picFd, buf, MAX_BUF);
+		if (numread == -1)
+		{
+			close(pItr->second.picFd);
+			picFdMp.erase(pItr++);
+			continue;
+		}
+		
+		if (m_pObs && m_pObs->notify(buf, numread, pItr->first))
+		{
+			pItr->second.totWritten += numread;
+			if (pItr->second.totWritten >= 	pItr->second.picLen)
+			{
+				close(pItr->second.picFd);
+				picFdMp.erase(pItr++);
+				continue;
+			}
+		}
+		else
+		{
+			close(pItr->second.picFd);
+			picFdMp.erase(pItr++);
+			continue;
+		}
+		++pItr;	
+	}
 	return;
 }
 
@@ -91,7 +130,7 @@ bool
 PictureSender::shouldEnqueMsg(int fd)
 {
 
-	return false;
+	return picFdMp.find(fd) != picFdMp.end();
 }
 
 void

@@ -52,11 +52,11 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 {
 	int size;
 	int numread = read(deviceFd, &size, sizeof(int));
-	if (!numread)
+	if (numread == -1)
 		return false;
 	int toread = size- sizeof(int);
 	numread = read(deviceFd, wrbuf, toread);
-	if (!numread)
+	if (numread == -1)
 		return false;
 	shrdIdTemplSize devLens;
 	memcpy(&devLens, wrbuf, sizeof(shrdIdTemplSize));
@@ -74,7 +74,7 @@ CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string
 	{
 		int size;
 		int numread = read(lstFd, &size, sizeof(int));
-		if (!numread)
+		if (numread == -1)
 			return false;
 		int toread = size- sizeof(int);
 		char *pBufPt;
@@ -91,7 +91,7 @@ CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string
 			pBufPt = pBuf.get();
 		}
 		numread = read(lstFd, pBufPt, toread);
-		if (!numread)
+		if (numread == -1)
 			return false;
 
 		int valid;
@@ -121,7 +121,7 @@ CommonArchvr::populateArchvItemsImpl(int& appId, long& shareId, std::string& nam
 	{
 		int size;
 		int numread = read(tmplFd, &size, sizeof(int));
-		if (!numread)
+		if (numread == -1)
 			return false;
 		int toread = size- sizeof(int);
 		char *pBufPt;
@@ -138,7 +138,7 @@ CommonArchvr::populateArchvItemsImpl(int& appId, long& shareId, std::string& nam
 			pBufPt = pBuf.get();
 		}
 		numread = read(tmplFd, pBufPt, toread);
-		if (!numread)
+		if (numread == -1)
 			return false;
 
 		int valid;
@@ -255,7 +255,12 @@ CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd
 {
 	lseek(lstFd, indx, SEEK_SET);
 	int size;
-	read(lstFd, &size, sizeof(int));
+	int nbytes = read(lstFd, &size, sizeof(int));
+	if (nbytes == -1)
+	{
+		std::cout << "read failed to lstFd " << std::endl;
+		return false;
+	}
 	int datalen = size - 2*sizeof(int);
 	if (len <= datalen)
 	{
@@ -352,7 +357,12 @@ CommonArchvr::archiveArchvItems(const char *buf, int len)
 	{
 		lseek(tmplFd, pItr->second, SEEK_SET);
 		int size;
-		read(tmplFd, &size, sizeof(int));
+		int nbytes = read(tmplFd, &size, sizeof(int));
+		if (nbytes == -1)
+		{
+			std::cout << "read failed to lstFd " << std::endl;
+			return false;
+		}
 		int datalen = size - 2*sizeof(int);
 		if (len <= datalen)
 		{

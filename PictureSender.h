@@ -22,6 +22,7 @@ class PictureSender
 	Observer *m_pObs;
 	std::map<int, PicFileDetails> picFdMp;
 	void sendPicMetaDat();	
+	void sendPicData();
 
 	public:
 		PictureSender();
