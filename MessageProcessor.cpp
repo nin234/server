@@ -81,8 +81,8 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 	m_pPicSndr = std::make_shared<PictureSender>();
 	m_pTrnsl.reset(pTrnsl);
 	pNtwIntf->setDecoder(m_pDcd);
-	pNtwIntf->setPicSndr(m_pPicSndr);
 	m_pPicSndr->setTrnsl(pTrnsl);
+	m_pPicSndr->attach(this);
 	return;
 }
 
@@ -387,6 +387,12 @@ MessageProcessor::sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_
 {
 	pArch->sendMsg(pMsg, len, msg_prio);
 	return;
+}
+
+bool
+MessageProcessor::notify(char *buf, int mlen, int fd)
+{
+	return sendMsg(buf, mlen , fd);
 }
 
 bool

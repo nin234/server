@@ -12,8 +12,9 @@
 #include <map>
 #include <PictureSender.h>
 #include <MessageEnqueuer.h>
+#include <Observer.h>
 
-class MessageProcessor
+class MessageProcessor : public Observer
 {
 	std::shared_ptr<MessageDecoder> m_pDcd;
 	std::shared_ptr<MessageTranslator> m_pTrnsl;
@@ -52,5 +53,6 @@ class MessageProcessor
 		virtual void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)=0;
 		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
+		bool notify (char *buf, int mlen, int fd);
 };
 #endif

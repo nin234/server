@@ -5,11 +5,24 @@
 #include <list>
 #include <string>
 #include <MessageTranslator.h>
+#include <Observer.h>
+
+struct PicFileDetails
+{
+	int picFd;
+	int picLen;
+	int totWritten;
+	
+};
 
 class PictureSender
 {
 	std::list<shrIdLstName> picNamesShIds;
 	std::shared_ptr<MessageTranslator> m_pTrnsl;
+	Observer *m_pObs;
+	std::map<int, PicFileDetails> picFdMp;
+	void sendPicMetaDat();	
+
 	public:
 		PictureSender();
 		virtual ~PictureSender();
@@ -17,6 +30,7 @@ class PictureSender
 		bool shouldEnqueMsg(int fd);
 		void insertPicNameShid(const shrIdLstName& shidlst);
 		void setTrnsl(MessageTranslator *pTrnsl);
+		void attach (Observer *pObs);
 	
 };
 #endif

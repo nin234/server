@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <ArchiveMsgCreator.h>
+#include <Util.h>
 
 CommonDataMgr::CommonDataMgr()
 {
@@ -102,18 +103,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	}		
 	else
 	{
-		std::string file = "/home/ninan/data/pictures/";
-		std::string appId = std::to_string(pPicObj->getAppId());
-		file += appId;
-		file += "/";
-		int dir = pItr1->second->getShrId()%1000;
-		std::string dirstr = std::to_string(dir);
-		file += dirstr;
-		file += "/";
-		std::string filesuffx = std::to_string(pItr1->second->getShrId());
-		filesuffx += "_";
-		filesuffx += pItr1->second->getName();
-		file += filesuffx;
+		std::string file = Util::constructPicFile(pItr1->second->getShrId(), pPicObj->getAppId(), pItr1->second->getName());
 		fd = open(file.c_str(), O_CREAT|O_RDWR);
 		
 		if (fd == -1)
@@ -248,6 +238,7 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 			shlst.shareId = shrid_of_frndlst;
 			shlst.lstName = pItr->first;
 			shlst.picLen =  pItr->second;
+			shlst.appId = appId;
 			picNamesShIds.push_back(shlst);
 
 		}
