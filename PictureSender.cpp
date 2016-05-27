@@ -91,17 +91,28 @@ PictureSender::sendPictures()
 }
 
 void
+PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails>::iterator& pItr)
+{
+
+	close(picFd);
+	picFdMp.erase(pItr++);
+	if (m_pObs)
+		 m_pObs->picDone(fd);
+	return;
+}
+
+void
 PictureSender::sendPicData()
 {
 	auto pItr = picFdMp.begin();
 	while (pItr != picFdMp.end())
 	{
 		char buf[MAX_BUF];
+		int fd = pItr->first;
 		int numread = read(pItr->second.picFd, buf, MAX_BUF);
 		if (numread == -1)
 		{
-			close(pItr->second.picFd);
-			picFdMp.erase(pItr++);
+			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
 		
@@ -110,15 +121,13 @@ PictureSender::sendPicData()
 			pItr->second.totWritten += numread;
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
-				close(pItr->second.picFd);
-				picFdMp.erase(pItr++);
+				closeAndNotify(pItr->second.picFd, fd, pItr);
 				continue;
 			}
 		}
 		else
 		{
-			close(pItr->second.picFd);
-			picFdMp.erase(pItr++);
+			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
 		++pItr;	

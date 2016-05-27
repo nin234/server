@@ -104,7 +104,7 @@ MessageProcessor::processRequests()
 	{
 		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{m_pDcd->getNextMsg()};
 		if (!pMsg)
-			continue;
+			break;
 		int nMsgTyp = pMsg->getMsgTyp();
 		if (nMsgTyp < 0)
 			continue;
@@ -115,6 +115,10 @@ MessageProcessor::processRequests()
 		}	
 		if (msgTypPrcsrs[nMsgTyp] == -1)
 			continue;
+		if (m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
+		{
+			pMsgEnq->enqMsg(std::move(pMsg));	
+		}
 		itr[msgTypPrcsrs[nMsgTyp]](pMsg);
 						
 	}
@@ -393,6 +397,30 @@ bool
 MessageProcessor::notify(char *buf, int mlen, int fd)
 {
 	return sendMsg(buf, mlen , fd);
+}
+
+bool
+MessageProcessor::picDone(int fd)
+{
+	for (;;)
+	{
+		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{pMsgEnq->getNextMsg(fd)};
+		if (!pMsg)
+			break;
+		int nMsgTyp = pMsg->getMsgTyp();
+		if (nMsgTyp < 0)
+			continue;
+		if (msgTypPrcsrs[nMsgTyp] == -1)
+			continue;
+		if (m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
+		{
+			pMsgEnq->enqMsg(std::move(pMsg));	
+			break;
+		}
+		itr[msgTypPrcsrs[nMsgTyp]](pMsg);
+		
+	}
+	return true;
 }
 
 bool

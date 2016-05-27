@@ -171,6 +171,7 @@ MessageDecoder::createStoreIdObj(char *buffer,  ssize_t mlen, int fd)
 	pMsgs.push_back(std::move(pMsg));
     return true;
 }
+
 std::unique_ptr<MsgObj, MsgObjDeltr>
 MessageDecoder::getNextMsg()
 {

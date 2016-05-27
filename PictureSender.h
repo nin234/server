@@ -23,7 +23,7 @@ class PictureSender
 	std::map<int, PicFileDetails> picFdMp;
 	void sendPicMetaDat();	
 	void sendPicData();
-
+	void closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails>::iterator& pItr);
 	public:
 		PictureSender();
 		virtual ~PictureSender();
