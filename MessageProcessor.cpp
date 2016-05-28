@@ -87,7 +87,7 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 }
 
 void
-MessageProcessor::processRequests()
+MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp)
 {
 	static auto processors = {std::bind(std::mem_fn(&MessageProcessor::processShareIdMsg), this, _1)
 	,std::bind(std::mem_fn(&MessageProcessor::processStoreIdMsg), this, _1)
@@ -100,7 +100,15 @@ MessageProcessor::processRequests()
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
 };
 	auto itr = processors.begin();
-	for (;;)
+	itr[msgTypPrcsrs[nMsgTyp]](pMsg);
+
+	return;
+}
+
+void
+MessageProcessor::processRequests()
+{
+		for (;;)
 	{
 		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{m_pDcd->getNextMsg()};
 		if (!pMsg)
@@ -119,8 +127,7 @@ MessageProcessor::processRequests()
 		{
 			pMsgEnq->enqMsg(std::move(pMsg));	
 		}
-		itr[msgTypPrcsrs[nMsgTyp]](pMsg);
-						
+		processMsg(pMsg, nMsgTyp);						
 	}
 	return;
 }
@@ -417,7 +424,7 @@ MessageProcessor::picDone(int fd)
 			pMsgEnq->enqMsg(std::move(pMsg));	
 			break;
 		}
-		itr[msgTypPrcsrs[nMsgTyp]](pMsg);
+		processMsg(pMsg, nMsgTyp);						
 		
 	}
 	return true;

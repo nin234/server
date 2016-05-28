@@ -36,9 +36,10 @@ class MessageProcessor : public Observer
 		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp);
 		CommonDataMgr& dataStore;
 
-
+		
 	public:
 		MessageProcessor();
 		virtual ~MessageProcessor();
@@ -54,5 +55,6 @@ class MessageProcessor : public Observer
 		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
 		bool notify (char *buf, int mlen, int fd);
+		bool picDone(int fd);
 };
 #endif

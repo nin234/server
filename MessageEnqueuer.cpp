@@ -34,8 +34,8 @@ MessageEnqueuer::getNextMsg(int fd)
 			return pMsg;
 		}
 		std::unique_ptr<MsgObj, MsgObjDeltr> pNll{};
-		return pNil;
+		return pNll;
 	}
 	std::unique_ptr<MsgObj, MsgObjDeltr> pNll{};
-	return pNil;
+	return pNll;
 }

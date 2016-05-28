@@ -97,7 +97,7 @@ PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails
 	close(picFd);
 	picFdMp.erase(pItr++);
 	if (m_pObs)
-		 m_pObs->picDone(fd);
+		 m_pObs->picDone(ntwFd);
 	return;
 }
 
