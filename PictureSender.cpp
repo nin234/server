@@ -6,6 +6,7 @@
 #include <Util.h>
 #include <Constants.h>
 #include <unistd.h>
+#include <string.h>
 
 PictureSender::PictureSender():m_pTrnsl(NULL), m_pObs(NULL)
 {
@@ -109,13 +110,16 @@ PictureSender::sendPicData()
 	{
 		char buf[MAX_BUF];
 		int fd = pItr->first;
-		int numread = read(pItr->second.picFd, buf, MAX_BUF);
+		constexpr int msgId = PIC_MSG;
+		int msglen = MAX_BUF;
+		memcpy(buf, &msglen, sizeof(int));
+		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+		int numread = read(pItr->second.picFd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
 		if (numread == -1)
 		{
 			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
-		
 		if (m_pObs && m_pObs->notify(buf, numread, pItr->first))
 		{
 			pItr->second.totWritten += numread;

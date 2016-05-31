@@ -57,4 +57,5 @@ class MessageProcessor : public Observer
 		bool notify (char *buf, int mlen, int fd);
 		bool picDone(int fd);
 };
+
 #endif
