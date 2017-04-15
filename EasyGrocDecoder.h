@@ -6,7 +6,9 @@
 class EasyGrocDecoder : public MessageDecoder
 {
 
-
+std::array<int, NO_EASYGROC_MSGS> msgTypPrcsrs;
+    bool createShareTemplLstObj(char *buffer,  ssize_t mlen, int fd);
+    
 	public:
 		EasyGrocDecoder();
 		virtual ~EasyGrocDecoder();

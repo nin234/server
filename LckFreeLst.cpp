@@ -117,7 +117,7 @@ template<typename KeyType, typename ValType>
 Node<KeyType, ValType> *
 LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType> **left_node)
 {
-	Node<KeyType, ValType> *left_node_next, *right_node;
+	Node<KeyType, ValType> *left_node_next = nullptr, *right_node;
     search_again:
         do 
 	{

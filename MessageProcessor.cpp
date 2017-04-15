@@ -100,7 +100,17 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
 };
 	auto itr = processors.begin();
-	itr[msgTypPrcsrs[nMsgTyp]](pMsg);
+    if (nMsgTyp >= NO_COMMON_MSGS)
+        return;
+    int pindx =msgTypPrcsrs[nMsgTyp];
+    
+    if (pindx == -1)
+    {
+        std::cout << "No handler found for msgTyp=" << nMsgTyp << std::endl;
+        return;
+    }
+
+	itr[pindx](pMsg);
 
 	return;
 }

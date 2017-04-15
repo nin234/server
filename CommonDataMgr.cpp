@@ -42,6 +42,14 @@ CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const
 }
 
 void
+CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list)
+{
+    CommonElem& elem = commonElems[appId][shareId];
+    elem.templItems.insert(name, list);
+    return;
+}
+
+void
 CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list)
 {
 /*

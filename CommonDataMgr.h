@@ -39,6 +39,7 @@
 		  void getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
 		  void getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNames);
 		  void updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
+            void storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list);
   };
   #endif
 

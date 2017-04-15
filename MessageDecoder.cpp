@@ -46,8 +46,12 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
 	int pindx = msgTypPrcsrs[msgTyp];
-	if (pindx == -1)
-		return false;
+    if (pindx == -1)
+    {
+        std::cout << "No handler found for msgTyp=" << msgTyp << std::endl;
+        return false;
+    }
+
 	auto itr = processors.begin();
 	return itr[pindx](buffer, mlen, fd);
     
