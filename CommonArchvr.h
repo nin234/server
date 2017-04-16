@@ -22,24 +22,26 @@ class CommonArchvr : public Archvr
 
 		int tmplFd;
 		int lstFd;
-		int shrLstFd;
+        int templLstFd;
 		int deviceFd;
 		int itemFd;
+        int templItemFd;
 		bool populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& tmplLst);
-		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst);
+		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst, std::map<IndxKey, long>* recIndx);
 		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
+        std::map<IndxKey, long> tmplShrlListRecIndx;
 		char wrbuf[BUF_SIZE_32K];
-		bool appendLst(const IndxKey& iky , const char *buf, int len, int fd);
-		bool updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx);
+		bool appendLst(const IndxKey& iky , const char *buf, int len, int fd, std::map<IndxKey, long>& recIndx);
+		bool updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx, std::map<IndxKey, long>& recIndx);
 
 	public:
 		CommonArchvr();
 		~CommonArchvr();
 		bool archiveMsg(const char *buf, int len);
 		bool archiveArchvItems(const char *buf, int len);
-		bool archiveShareLst(const char *buf, int len);
+		bool archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey, long>& recIndx);
 		bool archiveBuf(int fd, const char *buf, int len);
 		bool archiveDeviceTkn(const char *buf, int len);
 		template<class Op> void populateArchvItems(Op op)
@@ -62,6 +64,24 @@ class CommonArchvr : public Archvr
 
 		template<class Op> void populateItem(Op op)
 		{
+			if(lseek(itemFd, 0, SEEK_SET) == -1)
+			{
+				std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
+				return ;
+			}
+			while(true)
+			{
+				long shareId;
+				std::string name, lst;
+				int appId;
+				if (!populateItemImpl(appId, itemFd, shareId, name, lst))
+					break;
+				op(appId, shareId, name, lst);
+			}
+		}
+
+		template<class Op> void populateShareLst(Op op)
+		{
 			if(lseek(lstFd, 0, SEEK_SET) == -1)
 			{
 				std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
@@ -70,32 +90,52 @@ class CommonArchvr : public Archvr
 			while(true)
 			{
 				long shareId;
-				std::string name, lst;
+				std::string name;
 				int appId;
-				if (!populateItemImpl(appId, lstFd, shareId, name, lst))
+                long shareIdLst;
+				if (!populateShareLstImpl(appId, lstFd, shareId, name, shareIdLst, listRecIndx))
 					break;
-				op(appId, shareId, name, lst);
+				op(appId, shareId, name, shareIdLst);
 			}
 		}
 
-		template<class Op> void populateShareLst(Op op)
-		{
-			if(lseek(shrLstFd, 0, SEEK_SET) == -1)
-			{
-				std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
-				return ;
-			}
-			while(true)
-			{
-				long shareId;
-				std::string name, lst;
-				int appId;
-				if (!populateItemImpl(appId, shrLstFd, shareId, name, lst))
-					break;
-				op(appId, shareId, name, lst);
-			}
-		}
-
+    template<class Op> void populateTemplItem(Op op)
+    {
+        if(lseek(itemFd, 0, SEEK_SET) == -1)
+        {
+            std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
+            return ;
+        }
+        while(true)
+        {
+            long shareId;
+            std::string name, lst;
+            int appId;
+            
+            if (!populateItemImpl(appId, tmplFd, shareId, name, lst))
+                break;
+            op(appId, shareId, name, lst);
+        }
+    }
+    
+    template<class Op> void populateTemplShareLst(Op op)
+    {
+        if(lseek(lstFd, 0, SEEK_SET) == -1)
+        {
+            std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
+            return ;
+        }
+        while(true)
+        {
+            long shareId;
+            std::string name;
+            int appId;
+            long shareIdLst;
+            if (!populateshareLstImpl(appId, templLstFd, shareId, name, shareIdLst, tmplShrlListRecIndx))
+                break;
+            op(appId, shareId, name, shareIdLst);
+        }
+    }
 
 		template<class Op> void populateDeviceTkn(Op op)
 		{

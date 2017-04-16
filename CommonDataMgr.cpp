@@ -15,9 +15,32 @@ CommonDataMgr::CommonDataMgr()
 	{
 		pCommonArch->populateArchvItems([&](int appId, long shareId, const std::string& name, const std::string& templList){storeArchiveItem(appId, shareId, name, templList);});
 		pCommonArch->populateItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeItem(appId, shareId, name, list);});
-		pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, const std::string& list){storeLstShareInfo(appId, shareId, name, list);});
+		
 		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn);});
+        pCommonArch->populateTemplItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeTemplItem(appId, shareId, name, list);});
+        
+        pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeLstShareInfo(appId, shareId, name, shareIdLst);});
+        pCommonArch->populateTemplShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeTemplLstShareInfo(appId, shareId, name, shareIdLst);});
 	}
+}
+
+void
+CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
+{
+    
+  		CommonElem& elem = commonElems[appId][shareId];
+    LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
+    std::string val = "NONE";
+    lstSS.insertOrUpdate(name, val);
+}
+
+void
+CommonDataMgr::storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
+{
+    CommonElem& elem = commonElems[appId][shareId];
+    LckFreeLstSS &lstSS = elem.templLstShareInfo[shareIdLst];
+    std::string val = "NONE";
+    lstSS.insertOrUpdate(name, val);
 }
 
 CommonDataMgr::~CommonDataMgr()
@@ -49,15 +72,6 @@ CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, 
     return;
 }
 
-void
-CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list)
-{
-/*
-  	CommonElem& elem = commonElems[appId][shareId];
-  	elem.lstShareInfo.insert(name, list);
-*/
-	return;
-}
 
 
 void
@@ -170,6 +184,21 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
 	return;
 }
+
+void
+CommonDataMgr::storeTemplLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name)
+{
+    for (const std::string& shareId : shareIds)
+    {
+        long shId = std::stol(shareId);
+        CommonElem& elem = commonElems[appId][shId];
+        LckFreeLstSS &lstSS = elem.templLstShareInfo[shareIdLst];
+        std::string val = "NONE";
+        lstSS.insertOrUpdate(name, val);
+    }	
+    return;
+}
+
 
 void
 CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name)

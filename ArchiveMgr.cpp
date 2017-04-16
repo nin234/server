@@ -30,7 +30,11 @@ ArchiveMgr::ArchiveMgr()
 	pArchvrs[ARCHIVE_FRND_LST_MSG] = std::make_shared<FrndLstArchvr>();
 	pArchvrs[ARCHIVE_ARCHIVE_ITEM_MSG] = std::make_shared<CommonArchvr>();
 	pArchvrs[ARCHIVE_DEVICE_TKN_MSG] = std::make_shared<CommonArchvr>();
-	
+    pArchvrs[ARCHIVE_SHARE_LST_MSG] = std::make_shared<CommonArchvr>();
+    pArchvrs[ARCHIVE_ITM_MSG] = std::make_shared<CommonArchvr>();
+    pArchvrs[ARCHIVE_TEMPL_ITM_MSG] = std::make_shared<CommonArchvr>();
+    pArchvrs[ARCHIVE_SHARE_TEMPL_LST_MSG] = std::make_shared<CommonArchvr>();
+    
 }
 
 ArchiveMgr::~ArchiveMgr()

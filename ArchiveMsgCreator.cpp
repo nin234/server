@@ -132,36 +132,82 @@ ArchiveMsgCreator::createArchvItmMsg(char *pMsgStatic, int& len, long shareId, c
 	return pMsgDynamic;
 }
 
+ bool
+ArchiveMsgCreator::createCmnTemplAndItemMsg(char *pMsg, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen, int msgId)
+{
+    shrdIdTemplSize templSize;
+    templSize.shrId = shareId;
+    templSize.name_len = name.size()+1;
+    templSize.list_len = list.size()+1;
+    templSize.appId = appId;
+    
+    int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + templSize.name_len + templSize.list_len ;
+    
+    len = msglen;
+    
+    if (buflen < msglen)
+    {
+        std::cout << "Message len " << msglen << " greater than buflen " << buflen << std::endl;
+        return false;
+    }
+    memcpy(pMsg, &msgId, sizeof(int));
+    memcpy(pMsg+sizeof(int), &templSize, sizeof(shrdIdTemplSize));
+    constexpr int nameoffset = sizeof(int) + sizeof(shrdIdTemplSize);
+    memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
+    int listoffset = sizeof(int) + sizeof(shrdIdTemplSize) + templSize.name_len;
+    memcpy(pMsg+listoffset, list.c_str(), templSize.list_len);
+    return true;
+
+}
+
+bool
+ArchiveMsgCreator::createTemplItemMsg(char *pMsg, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen)
+{
+    constexpr int msgId = ARCHIVE_TEMPL_ITM_MSG;
+    return createCmnTemplAndItemMsg(pMsg, len, appId, shareId, name, list, buflen, msgId);
+}
 
 bool
 ArchiveMsgCreator::createItemMsg(char *pMsg, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen)
 {
 
 	constexpr int msgId = ARCHIVE_ITM_MSG;
-	shrdIdTemplSize templSize;
-	templSize.shrId = shareId;
-	templSize.name_len = name.size()+1;
-	templSize.list_len = list.size()+1;
-	templSize.appId = appId;
+	return createCmnTemplAndItemMsg(pMsg, len, appId, shareId, name, list, buflen, msgId);
 
-	int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + templSize.name_len + templSize.list_len ;
+}
 
-	len = msglen;	
-	std::unique_ptr<char> pMsgDynamic;
-	if (buflen < msglen)
-	{
-		std::cout << "Message len " << msglen << " greater than buflen " << buflen << std::endl;
-		return false;
-	}
-	memcpy(pMsg, &msgId, sizeof(int));
-	memcpy(pMsg+sizeof(int), &templSize, sizeof(shrdIdTemplSize));
-	constexpr int nameoffset = sizeof(int) + sizeof(shrdIdTemplSize);
-	memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
-	int listoffset = sizeof(int) + sizeof(shrdIdTemplSize) + templSize.name_len;
-	memcpy(pMsg+listoffset, list.c_str(), templSize.list_len);
+bool
+ArchiveMsgCreator::createCmnShareTemplAndLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen, int msgId)
+{
+    shareInfo templSize;
+    templSize.shrId = shareId;
+    templSize.shrIdLst = shareIdLst;
+    templSize.name_len = name.size()+1;
+    templSize.del = del;
+    templSize.appId = appId;
+    
+    int msglen = sizeof(int) + sizeof(shareInfo) + templSize.name_len;
+    if (msglen > maxlen)
+    {
+        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createShareLstMsg failed " << std::endl;
+        return false;
+    }
+    memcpy(pMsg, &msgId, sizeof(int));
+    memcpy(pMsg+sizeof(int), &templSize, sizeof(shareInfo));
+    constexpr int nameoffset = sizeof(int) + sizeof(shareInfo);
+    memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
+    len = msglen;
+    
+    return true;
 
-	return true;
+    
+}
 
+bool
+ArchiveMsgCreator::createShareTemplLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen)
+{
+    constexpr int msgId =  ARCHIVE_SHARE_TEMPL_LST_MSG;
+    return createCmnShareTemplAndLstMsg(pMsg, len, appId, del, shareId, shareIdLst, name, maxlen, msgId);
 }
 
 bool
@@ -169,25 +215,6 @@ ArchiveMsgCreator::createShareLstMsg(char *pMsg, int& len, int appId, bool del, 
 {
 
 	constexpr int msgId = ARCHIVE_SHARE_LST_MSG;
-	shareInfo templSize;
-	templSize.shrId = shareId;
-	templSize.shrIdLst = shareIdLst;
-	templSize.name_len = name.size()+1;
-	templSize.del = del;
-	templSize.appId = appId;
-
-	int msglen = sizeof(int) + sizeof(shareInfo) + templSize.name_len;
-	if (msglen > maxlen)
-	{
-		std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createShareLstMsg failed " << std::endl;
-		return false;
-	}
-	memcpy(pMsg, &msgId, sizeof(int));
-	memcpy(pMsg+sizeof(int), &templSize, sizeof(shareInfo));
-	constexpr int nameoffset = sizeof(int) + sizeof(shareInfo);
-	memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
-	len = msglen;
-
-	return true;
+    return createCmnShareTemplAndLstMsg(pMsg, len, appId, del, shareId, shareIdLst, name, maxlen, msgId);
 }
 

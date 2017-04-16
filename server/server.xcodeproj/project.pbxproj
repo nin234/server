@@ -477,8 +477,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				"HEADER_SEARCH_PATHS[arch=*]" = /Users/ninanthomas/projects/server;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -488,8 +488,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
-				CLANG_CXX_LIBRARY = "compiler-default";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libstdc++";
 				"HEADER_SEARCH_PATHS[arch=*]" = /Users/ninanthomas/projects/server;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

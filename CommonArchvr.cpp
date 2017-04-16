@@ -33,9 +33,13 @@ CommonArchvr::CommonArchvr()
 	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT);
 	if (deviceFd == -1)
 		throw std::system_error(errno, std::system_category());
-	shrLstFd = open("/home/ninan/data/shareLstInfo", O_RDWR|O_CREAT);
-	if (shrLstFd == -1)
-		throw std::system_error(errno, std::system_category());
+	
+    templItemFd = open("/home/ninan/data/templItems", O_RDWR|O_CREAT);
+    if (templItemFd == -1)
+        throw std::system_error(errno, std::system_category());
+    templLstFd = open("/home/ninan/data/templShareItems", O_RDWR|O_CREAT);
+    if (shrTemplLstFd == -1)
+        throw std::system_error(errno, std::system_category());
 
 }
 
@@ -67,13 +71,53 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 }
 
 bool
-CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string& name, std::string& lst)
+CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst, std::map<IndxKey, long>* recIndx)
 {
-	long offset = lseek(lstFd, 0, SEEK_CUR);
+    long offset = lseek(fd, 0, SEEK_CUR);
+    while (true)
+    {
+        int size;
+        int numread = read(fd, &size, sizeof(int));
+        if (numread == -1)
+            return false;
+        int toread = size- sizeof(int);
+        char *pBufPt;
+        std::unique_ptr<char> pBuf;
+        
+        if (toread <= BUF_SIZE_32K)
+        {
+            pBufPt = wrbuf;
+        }
+        else
+        {
+            
+            pBuf = std::unique_ptr<char>{new char[size]};
+            pBufPt = pBuf.get();
+        }
+        numread = read(fd, pBufPt, toread);
+        if (numread == -1)
+            return false;
+        
+        
+        shrdIdTemplSize templSize;
+        memcpy(&templSize, pBufPt, sizeof(shrdIdTemplSize));
+        shareId = templSize.shrId;
+        name = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize);
+        lst = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize) + templSize.name_len;
+        break;
+    }
+    return true;
+}
+
+
+bool
+CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::string& name, long& shareIdLst, std::map<IndxKey, long>& recIndx)
+{
+	long offset = lseek(fd, 0, SEEK_CUR);
 	while (true)
 	{
 		int size;
-		int numread = read(lstFd, &size, sizeof(int));
+		int numread = read(fd, &size, sizeof(int));
 		if (numread == -1)
 			return false;
 		int toread = size- sizeof(int);
@@ -90,7 +134,7 @@ CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string
 			pBuf = std::unique_ptr<char>{new char[size]};
 			pBufPt = pBuf.get();
 		}
-		numread = read(lstFd, pBufPt, toread);
+		numread = read(fd, pBufPt, toread);
 		if (numread == -1)
 			return false;
 
@@ -98,16 +142,17 @@ CommonArchvr::populateItemImpl(int& appId, int lstFd, long& shareId, std::string
 		memcpy(&valid, pBufPt, sizeof(int));
 		if (!valid)
 			continue;
-		shrdIdTemplSize templSize;
-		memcpy(&templSize, pBufPt+sizeof(int), sizeof(shrdIdTemplSize));
+		shareInfo templSize;
+		memcpy(&templSize, pBufPt+sizeof(int), sizeof(shareInfo));
 		shareId = templSize.shrId;		
-		name = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize);		
-		lst = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize) + templSize.name_len;		
+		name = pBufPt+sizeof(int)+sizeof(shareInfo);
+        shareIdLst = templSize.shrIdLst;
 		IndxKey iky;
 		iky.shareId = templSize.shrId;
-		iky.name = name;
-		listRecIndx[iky] = offset;
-		offset +=size;
+        iky.name = std::to_string(templSize.shrIdLst);
+		iky.name += name;
+        recIndx[iky] = offset;
+        offset +=size;
 		break;
 	}
 	return true;
@@ -175,8 +220,8 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 			return archiveArchvItems(buf+sizeof(int), len-sizeof(int));
 		break;
 
-		case ARCHIVE_FRND_LST_MSG:
-			return archiveShareLst(buf+sizeof(int), len-sizeof(int));
+		case ARCHIVE_SHARE_LST_MSG:
+			return archiveShareLst(lstFd, buf+sizeof(int), len-sizeof(int), listRecIndx);
 		break;
 
 		case ARCHIVE_ITM_MSG:
@@ -187,12 +232,16 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 			return archiveDeviceTkn(buf+sizeof(int), len-sizeof(int));
 
 		break;
+            
+        case ARCHIVE_TEMPL_ITM_MSG:
+                return archiveBuf(templItemFd, buf+sizeof(int), len-sizeof(int));
+            break;
+        
+        case ARCHIVE_SHARE_TEMPL_LST_MSG:
+            return archiveShareLst(templLstFd, buf+sizeof(int), len-sizeof(int), tmplShrlListRecIndx);
+            break;
 
-		case ARCHIVE_SHARE_LST_MSG:
-			return archiveBuf(shrLstFd, buf+sizeof(int), len-sizeof(int));
-		break;
-
-		default:
+        default:
 			std::cout << "Invalid msgTyp " << msgTyp << " received in CommonArchvr::archiveMsg " << std::endl;
 			return false;	
 		break;
@@ -201,7 +250,7 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 }
 
 bool
-CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
+CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd, std::map<IndxKey, long>& recIndx)
 {
 		long offset = lseek(lstFd, 0, SEEK_END);
 		int size= len*2 + 2*sizeof(int);
@@ -225,12 +274,9 @@ CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd)
 			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 			return false;
 		}
-		if (fd == lstFd)
-			listRecIndx[iky] = offset;
-		else
-			tmplListRecIndx[iky] = offset;
+        recIndx[iky] = offset;
 
-	return true;
+        return true;
 }
 
 bool
@@ -251,11 +297,11 @@ CommonArchvr::archiveBuf(int fd, const char *buf, int len)
 }
 
 bool
-CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd, long indx)
+CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx, std::map<IndxKey, long>& recIndx)
 {
-	lseek(lstFd, indx, SEEK_SET);
+	lseek(fd, indx, SEEK_SET);
 	int size;
-	int nbytes = read(lstFd, &size, sizeof(int));
+	int nbytes = read(fd, &size, sizeof(int));
 	if (nbytes == -1)
 	{
 		std::cout << "read failed to lstFd " << std::endl;
@@ -264,8 +310,8 @@ CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd
 	int datalen = size - 2*sizeof(int);
 	if (len <= datalen)
 	{
-		lseek(lstFd, sizeof(int), SEEK_CUR);
-		if (write(lstFd, buf,len) ==-1)
+		lseek(fd, sizeof(int), SEEK_CUR);
+		if (write(fd, buf,len) ==-1)
 		{
 			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 			return false;
@@ -274,18 +320,18 @@ CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int lstFd
 	else
 	{
 		int valid = 0;
-		if (write(lstFd, &valid, sizeof(int)) == -1)
+		if (write(fd, &valid, sizeof(int)) == -1)
 		{
 			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 			return false;
 		}
-		return appendLst(iky, buf, len, lstFd);	
+		return appendLst(iky, buf, len, fd, recIndx);
 	}
 	return true;
 }
 
 bool
-CommonArchvr::archiveShareLst(const char *buf, int len)
+CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey, long>& recIndx)
 {
 	if (len <=0 )
 	{
@@ -293,19 +339,21 @@ CommonArchvr::archiveShareLst(const char *buf, int len)
 		return false;
 	}
 
-	shrdIdTemplSize templSize;
-	memcpy(&templSize, buf, sizeof(shrdIdTemplSize));
+	 shareInfo templSize;
+	memcpy(&templSize, buf, sizeof(shareInfo));
 	IndxKey iky;
 	iky.shareId = templSize.shrId;
-	iky.name = buf + sizeof(shrdIdTemplSize);
-	auto pItr = listRecIndx.find(iky);
-	if (pItr == listRecIndx.end())
+    iky.name = std::to_string(templSize.shrIdLst);
+    iky.name += buf + sizeof(shareInfo);
+    
+	auto pItr = recIndx.find(iky);
+	if (pItr == recIndx.end())
 	{
-		return appendLst(iky, buf, len, lstFd);	
+		return appendLst(iky, buf, len, fd, recIndx);
 	}
 	else
 	{
-		return updateLst(iky, buf, len, lstFd, pItr->second);	
+		return updateLst(iky, buf, len, fd, pItr->second, recIndx);
 	}
 	
 	return true;
@@ -351,7 +399,7 @@ CommonArchvr::archiveArchvItems(const char *buf, int len)
 	auto pItr = tmplListRecIndx.find(iky);
 	if (pItr == tmplListRecIndx.end())
 	{
-		return appendLst(iky, buf, len, tmplFd);	
+		return appendLst(iky, buf, len, tmplFd, tmplListRecIndx);
 	}
 	else
 	{
@@ -378,7 +426,7 @@ CommonArchvr::archiveArchvItems(const char *buf, int len)
 				return false;
 
 			}
-			return appendLst(iky, buf, len, tmplFd);	
+			return appendLst(iky, buf, len, tmplFd, tmplListRecIndx);
 		}
 	}
 	
