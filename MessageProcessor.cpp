@@ -201,7 +201,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		std::string itemName = std::to_string(pItr->first.shareId);
 		itemName += ":::";
 		itemName += pItr->first.lstName;
-		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second))
+		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_ITEM_MSG))
 		{
 			if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
 			{
@@ -210,7 +210,29 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 					sendArchiveMsg(archbuf, archlen, 10);	
 			}
 		}
-	}	
+	}
+    
+    std::map<shrIdLstName, std::string> templLstNameMp;
+    dataStore.getShareTemplLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), templLstNameMp);
+    
+    archlen = 0;
+    
+    for(auto pItr = templLstNameMp.begin(); pItr != templLstNameMp.end(); ++pItr)
+    {
+        std::string itemName = std::to_string(pItr->first.shareId);
+        itemName += ":::";
+        itemName += pItr->first.lstName;
+        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_TEMPL_ITEM_MSG))
+        {
+            if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
+            {
+                dataStore.updateTemplLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName);
+                if (ArchiveMsgCreator::createShareTemplLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName, 32768))
+                    sendArchiveMsg(archbuf, archlen, 10);
+            }
+        }
+    }
+    
 	std::vector<shrIdLstName> picNamesShIds;
 	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
 	for (auto& picNameShId : picNamesShIds)

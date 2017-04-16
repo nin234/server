@@ -265,6 +265,7 @@ CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd, s
 		{
 			pBufPt = wrbuf;
 		}
+    
 		memcpy (pBufPt, &size, sizeof(int));
 		int valid=1;
 		memcpy (pBufPt+sizeof(int), &valid, sizeof(int));

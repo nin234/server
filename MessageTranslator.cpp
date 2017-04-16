@@ -90,10 +90,10 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 }
 
 bool
-MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst1)
+MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst1, int msgId)
 {
 	std::string lst;
-	std::string::size_type xpos = lst.find(":::");
+	std::string::size_type xpos = lst1.find(":::");
 	if (xpos == std::string::npos)
 	{
 		lst = lst1;
@@ -109,7 +109,7 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 		return false;
 	}
 
-	constexpr int msgId = SHARE_ITEM_MSG;
+	
 	memcpy(pMsg, &msglen, sizeof(int));
 	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
 	int namelen = name.size() + 1;
