@@ -14,6 +14,7 @@
           HashMapStr items;
         HashMapStr templItems;
           std::string deviceToken;
+      std::string os;
 	  HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> lstShareInfo;
       HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> templLstShareInfo;
 	  HashMap<long, LckFreeLstSL, SHARE_MAP_SIZE> picShareInfo;
