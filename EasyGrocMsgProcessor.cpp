@@ -70,7 +70,7 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
     if (ArchiveMsgCreator::createTemplItemMsg(archbuf, archlen, pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList(), 32768))
         sendArchiveMsg(archbuf , archlen, 10);
     std::vector<std::string>  shareIds;
-    if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
+    if (getShareIds(pTmplObj->getTemplList(), shareIds))
     {
         dataStore.storeTemplLstShareInfo(pTmplObj->getAppId(),pTmplObj->getShrId(), shareIds, pTmplObj->getName());
         for (const std::string& shareId : shareIds)
@@ -78,17 +78,17 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
             if (ArchiveMsgCreator::createShareTemplLstMsg(archbuf, archlen, pTmplObj->getAppId(), false, std::stol(shareId), pTmplObj->getShrId(), pTmplObj->getName(),  32768))
                 sendArchiveMsg(archbuf, archlen, 10);
             std::vector<std::string> tokens;
-            dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);
-            sendApplePush(tokens, pLstObj->getName(), 1);
+            dataStore.getDeviceTkns(pTmplObj->getAppId(), shareIds, tokens);
+            sendApplePush(tokens, pTmplObj->getName(), 1);
             
         }
 
     }
     char buf[1024];
     int mlen=0;
-    if (m_pTrnsl->getReply(buf, &mlen, SHARE_TEMPL_ITEM_RPLY_MSG))
+    if (getReply(buf, &mlen, SHARE_TEMPL_ITEM_RPLY_MSG))
     {
-        sendMsg(buf, mlen, pLstObj->getFd());
+        sendMsg(buf, mlen, pTmplObj->getFd());
     }
 
     

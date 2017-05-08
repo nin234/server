@@ -29,8 +29,10 @@
                   void storeLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list);
                     void storeTemplLstShareInfo(int appId, long shareId, const std::string& name, const std::string& list);
       void storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform);
-		  void storeLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name);
-      void storeTemplLstShareInfo(int appId, long shareId, const std::vector<std::string>& shareIds, const std::string& name);
+		  void storeLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst);
+      		void storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst);
+      		void storeTemplLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
+      		void storeLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
                   void storePicMetaData(PicMetaDataObj *pPicMetaObj);
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);
