@@ -321,7 +321,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 		std::cout << "Invalid message received in MessageProcessor::processDeviceTknMsg " << std::endl;
 		return;
 	}
-	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn());
+	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn(), pDevTknObj->getPlatform());
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen = 0;

@@ -75,10 +75,11 @@ CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, 
 
 
 void
-CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn)
+CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.deviceToken = devTkn;
+    elem.os = platform;
 	return;
 }
 
@@ -230,7 +231,8 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
 	for (const std::string& shareId : shareIds)
 	{
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];
-		tokens.push_back(elem.deviceToken);
+        if (elem.os == "ios")
+            tokens.push_back(elem.deviceToken);
 	}
 	return;
 }

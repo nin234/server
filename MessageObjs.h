@@ -106,17 +106,20 @@ class DeviceTknObj : public MsgObj
 {
 	std::string deviceTkn;
 	std::string deviceId;
+    std::string platform;
 	long shrId;
 	public:
 		virtual ~DeviceTknObj(){}
 		DeviceTknObj() :shrId(0) {}
 		long  getShrId() const {return shrId;}
+   
 		void setShrId(long sid) {shrId = sid;}
 		const std::string& getDeviceTkn() const {return deviceTkn;}
 		void setDeviceTkn(const char *pLst) {deviceTkn = pLst;}
 		const std::string& getDeviceId() const {return deviceId;}
 		void setDeviceId(const char *pLst) {deviceId = pLst;}
-		
+        const std::string& getPlatform() const {return platform;}
+        void setPlatform(const char *pOs) {platform = pOs;}
 };
 
 

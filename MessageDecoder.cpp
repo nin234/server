@@ -253,7 +253,7 @@ MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 	constexpr int devTknOffset = offset + sizeof(long);
 	pMsg->setDeviceTkn(buffer + devTknOffset);
 	int devIdOffset = devTknOffset + pMsg->getDeviceTkn().size() + 1;
-	pMsg->setDeviceId(buffer + devIdOffset);
+	pMsg->setPlatform(buffer + devIdOffset);
 	pMsgs.push_back(std::move(pMsg));
 	return true;
 }
