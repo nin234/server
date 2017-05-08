@@ -487,3 +487,16 @@ MessageProcessor::sendApplePush(const std::vector<std::string>& tokens, const st
 
 	return pAppleNotfy->send(tokens, msg, badge);
 }
+
+bool
+MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& shareIds)
+{
+
+	return m_pTrnsl->getShareIds(lst, shareIds);
+}
+
+bool
+MessageProcessor::getReply(char *buf, int *mlen, int msgTyp)
+{
+	return m_pTrnsl->getReply(buf, mlen, msgTyp);
+}

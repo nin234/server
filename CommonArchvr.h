@@ -27,7 +27,8 @@ class CommonArchvr : public Archvr
 		int itemFd;
         int templItemFd;
 		bool populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& tmplLst);
-		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst, std::map<IndxKey, long>* recIndx);
+		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst);
+		bool populateshareLstImpl(int& appId, int fd, long& shareId, std::string& name, long& shareIdLst, std::map<IndxKey, long>& recIndx);
 		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
@@ -93,7 +94,7 @@ class CommonArchvr : public Archvr
 				std::string name;
 				int appId;
                 long shareIdLst;
-				if (!populateShareLstImpl(appId, lstFd, shareId, name, shareIdLst, listRecIndx))
+				if (!populateshareLstImpl(appId, lstFd, shareId, name, shareIdLst, listRecIndx))
 					break;
 				op(appId, shareId, name, shareIdLst);
 			}
@@ -101,7 +102,7 @@ class CommonArchvr : public Archvr
 
     template<class Op> void populateTemplItem(Op op)
     {
-        if(lseek(itemFd, 0, SEEK_SET) == -1)
+        if(lseek(templItemFd, 0, SEEK_SET) == -1)
         {
             std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
             return ;
@@ -112,48 +113,48 @@ class CommonArchvr : public Archvr
             std::string name, lst;
             int appId;
             
-            if (!populateItemImpl(appId, tmplFd, shareId, name, lst))
+            if (!populateItemImpl(appId, templItemFd, shareId, name, lst))
                 break;
             op(appId, shareId, name, lst);
         }
     }
     
-    template<class Op> void populateTemplShareLst(Op op)
-    {
-        if(lseek(lstFd, 0, SEEK_SET) == -1)
-        {
-            std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
-            return ;
-        }
-        while(true)
-        {
-            long shareId;
-            std::string name;
-            int appId;
-            long shareIdLst;
-            if (!populateshareLstImpl(appId, templLstFd, shareId, name, shareIdLst, tmplShrlListRecIndx))
-                break;
-            op(appId, shareId, name, shareIdLst);
-        }
-    }
+template<class Op> void populateTemplShareLst(Op op)
+{
+	if(lseek(templLstFd, 0, SEEK_SET) == -1)
+	{
+	    std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
+	    return ;
+	}
+	while(true)
+	{
+	    long shareId;
+	    std::string name;
+	    int appId;
+	    long shareIdLst;
+	    if (!populateshareLstImpl(appId, templLstFd, shareId, name, shareIdLst, tmplShrlListRecIndx))
+		break;
+	    op(appId, shareId, name, shareIdLst);
+	}
+}
 
-		template<class Op> void populateDeviceTkn(Op op)
-		{
-			if(lseek(deviceFd, 0, SEEK_SET) == -1)
-			{
-				std::cout << "lseek failed in easyGrocDeviceTkns archive " << strerror(errno) << std::endl;
-				return ;
-			}
-			while(true)
-			{
-				long shareId;
-				std::string devId, devTkn;
-				int appId;
-				if (!populateDeviceTknImpl(appId, shareId, devId, devTkn))
-					break;
-				op(appId, shareId, devId, devTkn);
-			}
-		}
+template<class Op> void populateDeviceTkn(Op op)
+{
+	if(lseek(deviceFd, 0, SEEK_SET) == -1)
+	{
+		std::cout << "lseek failed in easyGrocDeviceTkns archive " << strerror(errno) << std::endl;
+		return ;
+	}
+	while(true)
+	{
+		long shareId;
+		std::string devId, devTkn;
+		int appId;
+		if (!populateDeviceTknImpl(appId, shareId, devId, devTkn))
+			break;
+		op(appId, shareId, devId, devTkn);
+	}
+}
 		
 };
 

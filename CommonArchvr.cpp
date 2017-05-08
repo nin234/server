@@ -38,7 +38,7 @@ CommonArchvr::CommonArchvr()
     if (templItemFd == -1)
         throw std::system_error(errno, std::system_category());
     templLstFd = open("/home/ninan/data/templShareItems", O_RDWR|O_CREAT);
-    if (shrTemplLstFd == -1)
+    if (templLstFd == -1)
         throw std::system_error(errno, std::system_category());
 
 }
@@ -71,9 +71,9 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 }
 
 bool
-CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst, std::map<IndxKey, long>* recIndx)
+CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst)
 {
-    long offset = lseek(fd, 0, SEEK_CUR);
+    lseek(fd, 0, SEEK_CUR);
     while (true)
     {
         int size;
