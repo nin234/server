@@ -50,7 +50,7 @@ ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, long shareId, cons
 }
 
 bool 
-ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn)
+ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
 
 	constexpr int msgId = ARCHIVE_DEVICE_TKN_MSG;
@@ -59,6 +59,18 @@ ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId
 	devLens.shareId = shareId;
 	devLens.appId = appId;
 	devLens.tkn_len = devTkn.size() + 1;
+    if (platform == "android")
+    {
+        devLens.platform = 1;
+    }
+    else if (platform == "ios")
+    {
+        devLens.platform = 0;
+    }
+     else
+     {
+         devLens.platform = 100;
+    }
 
 	int msglen = sizeof(int) + sizeof(devTknArchv) + devLens.tkn_len ;
 

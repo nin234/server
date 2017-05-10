@@ -51,6 +51,7 @@ CommonArchvr::~CommonArchvr()
 
 }
 
+
 bool
 CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn)
 {
@@ -62,11 +63,20 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 	numread = read(deviceFd, wrbuf, toread);
 	if (numread == -1)
 		return false;
-	shrdIdTemplSize devLens;
-	memcpy(&devLens, wrbuf, sizeof(shrdIdTemplSize));
-	shareId = devLens.shrId;
-	devId = wrbuf+sizeof(shrdIdTemplSize);
-	devTkn = wrbuf + sizeof(shrdIdTemplSize) + devLens.name_len;
+	devTknArchv devLens;
+	memcpy(&devLens, wrbuf, sizeof(devTknArchv));
+	shareId = devLens.shareId;
+	devTkn = wrbuf + sizeof(devTknArchv);
+    if (devLens.platform == 0)
+    {
+        devId = "ios";
+    }
+    else if (devLens.platform == 1)
+    {
+        devId = "android";
+    }
+    appId = devLens.appId;
+    
 	return true;
 }
 

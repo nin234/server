@@ -18,7 +18,7 @@ class ArchiveMsgCreator
 		static bool createItemMsg(char *pMsg, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen);
         static bool createTemplItemMsg(char *pMsg, int& len, int appId, long shareId, const std::string& name, const std::string& list, int buflen);
 		static bool createPicMetaDataMsg(char *pMsg, int &len, long shareId, const std::string& name, const std::string& frndLst);
-		static bool createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn);
+    static bool createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn, const std::string& platform);
 		static bool createShareLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen);
         static bool createShareTemplLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen);
 		

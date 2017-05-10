@@ -161,6 +161,7 @@ struct devTknArchv
 	long shareId;
 	int appId;
 	int tkn_len;
+    int platform;
 };
 
 struct shareInfo
