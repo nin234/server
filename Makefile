@@ -2,7 +2,7 @@ CXX = g++
 
 CPPFLAGS = -I. -std=c++14 -mcmodel=large -fpic -Wall -Werror
 
-LDFLAGS = -lpthread -lrt -L/usr/lib64/capn -lcapn
+LDFLAGS = -lpthread -lrt -L/usr/lib64/capn -lcapn -lstrophe
 
 objects := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 

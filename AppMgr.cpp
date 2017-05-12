@@ -7,9 +7,11 @@
 #include <unistd.h>
 #include <ShareIdMgr.h>
 #include <ApplePush.h>
+#include <FirebaseConnHdlr.h>
 
 AppMgr::AppMgr()
 {
+	FirebaseConnHdlr::initialize();
 	OpenHousesMgr *pOhMgr = new OpenHousesMgr();
 	pOhMgr->initialize(OPENHOUSES_THREADS);
 	wrkMgr.push_back(pOhMgr);

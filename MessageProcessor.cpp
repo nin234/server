@@ -325,7 +325,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];
 	int archlen = 0;
-	if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getAppId(),  pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn()))
+	if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getAppId(),  pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn(), pDevTknObj->getPlatform()))
 		sendArchiveMsg(archbuf, archlen, 10);	
 	char buf[1024];
 	int mlen=0;
