@@ -49,21 +49,22 @@ FirebaseConnHdlr::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t
 int
 FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza, void * const userdata)
 {
+    FirebaseConnHdlr *hdlr = (FirebaseConnHdlr *)userdata;
     if (strcmp(xmpp_stanza_get_name(stanza), "message"))
     {
         std::cout << "Dropping non message stanza" << std::endl;
         return 1;
     }
-     char *pMsgId = xmpp_stanza_get_attribute(stanza, "message_id");
+     const char *pMsgId = xmpp_stanza_get_attribute(stanza, "message_id");
     if (pMsgId == NULL)
         return 1;
-    char *pMsgTyp = xmpp_stanza_get_attribute(stanza, "message_type");
+    const char *pMsgTyp = xmpp_stanza_get_attribute(stanza, "message_type");
     if (pMsgTyp == NULL)
         return 1;
     if (!strcmp(pMsgTyp, "ack"))
     {
         std::cout << "Ack received for message id" << pMsgId << std::endl;
-        pendingAckTknsMp.erase(pMsgId);
+        hdlr->pendingAckTknsMp.erase(pMsgId);
         return 1;
     }
     return 1;
@@ -77,9 +78,9 @@ FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
         for (const std::string& token : tokens)
         {
             xmpp_stanza_t* pStanza = xmpp_stanza_new(ctx);
-            xmpp_stanza_set_ns(pStanza, "google:mobile:data")
+            xmpp_stanza_set_ns(pStanza, "google:mobile:data");
             std::string msgid = std::to_string(++message_id);
-            xmpp_stanza_set_id(pStanza, msgid.c_str())
+            xmpp_stanza_set_id(pStanza, msgid.c_str());
             xmpp_stanza_set_name(pStanza, "message");
             
             xmpp_stanza_set_attribute(pStanza, "to", token.c_str());
