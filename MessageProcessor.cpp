@@ -38,6 +38,7 @@ MessageProcessor::process()
 {
 	for (;;)
 	{
+        pFirebaseNotify->getSendEvents();
 		if (!pNtwIntf->waitAndGetMsg())	
 		{
 			--nFds;

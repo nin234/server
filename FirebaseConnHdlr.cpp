@@ -1,6 +1,7 @@
 #include <FirebaseConnHdlr.h>
 #include <stdexcept>
 #include <iostream>
+#include <string.h>
 
 
 FirebaseConnHdlr::FirebaseConnHdlr(const std::string& jabberId, const std::string& password)
@@ -17,6 +18,7 @@ FirebaseConnHdlr::FirebaseConnHdlr(const std::string& jabberId, const std::strin
     jid = jabberId;
     pass = password;
     bConnected = false;
+    message_id = 0;
    }
 
 FirebaseConnHdlr::~FirebaseConnHdlr()
@@ -47,13 +49,50 @@ FirebaseConnHdlr::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t
 int
 FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza, void * const userdata)
 {
-    
+    if (strcmp(xmpp_stanza_get_name(stanza), "message"))
+    {
+        std::cout << "Dropping non message stanza" << std::endl;
+        return 1;
+    }
+     char *pMsgId = xmpp_stanza_get_attribute(stanza, "message_id");
+    if (pMsgId == NULL)
+        return 1;
+    char *pMsgTyp = xmpp_stanza_get_attribute(stanza, "message_type");
+    if (pMsgTyp == NULL)
+        return 1;
+    if (!strcmp(pMsgTyp, "ack"))
+    {
+        std::cout << "Ack received for message id" << pMsgId << std::endl;
+        pendingAckTknsMp.erase(pMsgId);
+        return 1;
+    }
     return 1;
 }
 
 bool
 FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
 {
+    if (bConnected)
+    {
+        for (const std::string& token : tokens)
+        {
+            xmpp_stanza_t* pStanza = xmpp_stanza_new(ctx);
+            xmpp_stanza_set_ns(pStanza, "google:mobile:data")
+            std::string msgid = std::to_string(++message_id);
+            xmpp_stanza_set_id(pStanza, msgid.c_str())
+            xmpp_stanza_set_name(pStanza, "message");
+            
+            xmpp_stanza_set_attribute(pStanza, "to", token.c_str());
+            std::cout << "Sending to token to firebase=" << token << " msgid=" << msgid << std::endl;
+            xmpp_send(conn, pStanza);
+            pendingAckTknsMp[msgid] = token;
+        }
+
+    }
+    else
+    {
+        tknsToSend.insert(tknsToSend.end(), tokens.begin(), tokens.end());
+    }
     return true;
 }
 
@@ -65,6 +104,15 @@ FirebaseConnHdlr::getSendEvents()
         connect();
     }
     xmpp_run_once(ctx, 1);
+    if (bConnected)
+    {
+        if (tknsToSend.size())
+        {
+            std::vector<std::string> tokens;
+            tokens.swap(tknsToSend);
+            send(tokens);
+        }
+    }
 }
 
 bool

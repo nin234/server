@@ -4,6 +4,7 @@
 #include <strophe.h>
 #include <string>
 #include <vector>
+#include <map>
 
 class FirebaseConnHdlr
 {
@@ -13,6 +14,9 @@ class FirebaseConnHdlr
     std::string jid;
     std::string pass;
     bool bConnected;
+    int message_id;
+    std::map<std::string, std::string> pendingAckTknsMp;
+    std::vector<std::string> tknsToSend;
 
 	public:
     FirebaseConnHdlr(const std::string& jabberId, const std::string& password);
