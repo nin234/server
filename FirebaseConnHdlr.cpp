@@ -67,6 +67,7 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
         hdlr->pendingAckTknsMp.erase(pMsgId);
         return 1;
     }
+
     return 1;
 }
 
