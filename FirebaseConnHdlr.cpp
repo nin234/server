@@ -19,6 +19,8 @@ FirebaseConnHdlr::FirebaseConnHdlr(const std::string& jabberId, const std::strin
     pass = password;
     bConnected = false;
     message_id = 0;
+    backoff = 0;
+    backoff_till = 0;
    }
 
 FirebaseConnHdlr::~FirebaseConnHdlr()
@@ -67,11 +69,48 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
 	std::cout << "Dropping message with no message_type " << std::endl;
         return 1;
      }
+    
     if (!strcmp(pMsgTyp, "ack"))
     {
-        std::cout << "Ack received for message id" << pMsgId << std::endl;
+        std::cout << "Ack received for message id=" << pMsgId << std::endl;
         hdlr->pendingAckTknsMp.erase(pMsgId);
+        backoff = 0;
         return 1;
+    }
+    else if (!strcmp(pMsgTyp, "nack"))
+    {
+        const char *pErr = xmpp_stanza_get_attribute(stanza, "error");
+        if (pErr == NULL)
+        {
+            std::cout << "Deleting message with no error from pendingAckTknsMp message id=" << pMsgId << std::endl;
+            hdlr->pendingAckTknsMp.erase(pMsgId);
+            backoff =0;
+            return 1;
+        }
+        
+        if (!strcmp(pErr, "SERVICE_UNAVAILABLE") || !strcmp(pErr, "INTERNAL_SERVER_ERROR") || !strcmp(pErr, "DEVICE_MESSAGE_RATE_EXCEEDED"))
+        {
+            if (backoff)
+                backoff *= 2;
+            else
+                backoff = 5;
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            backoff_till = tv.tv_sec + backoff;
+            auto pItr = hdlr->pendingAckTknsMp.find(pMsgId);
+            if (pItr != hdlr->pendingAckTknsMp.end())
+            {
+                tknsToSend.push_back(pItr->second);
+                hdlr->pendingAckTknsMp.erase(pMsgId);
+            }
+        }
+        else
+        {
+            std::cout << "Deleting message with  error=" << pErr << " from pendingAckTknsMp message id=" << pMsgId << std::endl;
+            hdlr->pendingAckTknsMp.erase(pMsgId);
+            backoff = 0;
+            return 1;
+        }
     }
 
     return 1;
@@ -82,6 +121,23 @@ FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
 {
     if (bConnected)
     {
+        if (backoff)
+        {
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            if (backoff_till > tv.tv_sec)
+            {
+                tknsToSend.insert(tknsToSend.end(), tokens.begin(), tokens.end());
+                return true;
+            }
+            
+        }
+        
+        if (pendingAckTknsMp.size() > 100)
+        {
+             tknsToSend.insert(tknsToSend.end(), tokens.begin(), tokens.end());
+            return true;
+        }
         for (const std::string& token : tokens)
         {
             xmpp_stanza_t* pStanza = xmpp_stanza_new(ctx);
@@ -114,6 +170,21 @@ FirebaseConnHdlr::getSendEvents()
     xmpp_run_once(ctx, 1);
     if (bConnected)
     {
+        if (backoff)
+        {
+            struct timeval tv;
+            gettimeofday(&tv, NULL);
+            if (backoff_till > tv.tv_sec)
+            {
+                return;
+            }
+        }
+        if (pendingAckTknsMp.size() > 100)
+        {
+            
+            return;
+        }
+        
         if (tknsToSend.size())
         {
             std::vector<std::string> tokens;

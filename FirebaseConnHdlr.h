@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <sys/time.h>
 
 class FirebaseConnHdlr
 {
@@ -17,6 +18,8 @@ class FirebaseConnHdlr
     int message_id;
     std::map<std::string, std::string> pendingAckTknsMp;
     std::vector<std::string> tknsToSend;
+    int backoff;
+    time_t backoff_till;
 
 	public:
     FirebaseConnHdlr(const std::string& jabberId, const std::string& password);
