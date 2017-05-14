@@ -74,7 +74,7 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
     {
         std::cout << "Ack received for message id=" << pMsgId << std::endl;
         hdlr->pendingAckTknsMp.erase(pMsgId);
-        backoff = 0;
+        hdlr->backoff = 0;
         return 1;
     }
     else if (!strcmp(pMsgTyp, "nack"))
@@ -84,23 +84,23 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
         {
             std::cout << "Deleting message with no error from pendingAckTknsMp message id=" << pMsgId << std::endl;
             hdlr->pendingAckTknsMp.erase(pMsgId);
-            backoff =0;
+            hdlr->backoff =0;
             return 1;
         }
         
         if (!strcmp(pErr, "SERVICE_UNAVAILABLE") || !strcmp(pErr, "INTERNAL_SERVER_ERROR") || !strcmp(pErr, "DEVICE_MESSAGE_RATE_EXCEEDED"))
         {
-            if (backoff)
-                backoff *= 2;
+            if (hdlr->backoff)
+                hdlr->backoff *= 2;
             else
-                backoff = 5;
+                hdlr->backoff = 5;
             struct timeval tv;
             gettimeofday(&tv, NULL);
-            backoff_till = tv.tv_sec + backoff;
+            hdlr->backoff_till = tv.tv_sec + hdlr->backoff;
             auto pItr = hdlr->pendingAckTknsMp.find(pMsgId);
             if (pItr != hdlr->pendingAckTknsMp.end())
             {
-                tknsToSend.push_back(pItr->second);
+                hdlr->tknsToSend.push_back(pItr->second);
                 hdlr->pendingAckTknsMp.erase(pMsgId);
             }
         }
@@ -108,7 +108,7 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
         {
             std::cout << "Deleting message with  error=" << pErr << " from pendingAckTknsMp message id=" << pMsgId << std::endl;
             hdlr->pendingAckTknsMp.erase(pMsgId);
-            backoff = 0;
+            hdlr->backoff = 0;
             return 1;
         }
     }
