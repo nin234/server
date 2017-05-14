@@ -21,7 +21,7 @@ WorkerMgr::initialize(int nThrds)
 	{
 		Worker *pWrkr = getWorker();
 		pWrkr->setMaxFd();
-		pWrkr->setMsgProcessor(getApplePushPtr());
+		pWrkr->setMsgProcessors(getApplePushPtr(), getFirebaseConnPtr());
 		workers.push_back(pWrkr);
 		pthread_t tid;
 		if (pthread_create(&tid, NULL, &Worker::entry, pWrkr) != 0)

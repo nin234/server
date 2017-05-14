@@ -35,12 +35,12 @@ FirebaseConnHdlr::conn_handler(xmpp_conn_t * const conn, const xmpp_conn_event_t
     if (status == XMPP_CONN_CONNECT)
     {
         xmpp_handler_add(conn, message_handler, "google:mobile:data", NULL, NULL, userdata);
-        bConnected = true;
+        hdlr->bConnected = true;
     }
     else
     {
         xmpp_conn_release(conn);
-        bConnected = false;
+        hdlr->bConnected = false;
     }
 }
 
@@ -74,8 +74,8 @@ FirebaseConnHdlr::connect()
     long flags = 0;
     flags |= XMPP_CONN_FLAG_MANDATORY_TLS;
     xmpp_conn_set_flags(conn, flags);
-    xmpp_conn_set_jid(conn, jid);
-    xmpp_conn_set_pass(conn, pass);
+    xmpp_conn_set_jid(conn, jid.c_str());
+    xmpp_conn_set_pass(conn, pass.c_str());
     if  (xmpp_connect_client(conn, "fcm-xmpp.googleapis.com", 5236, conn_handler, this) == -1)
     {
         std::cout << "Failed to connect to google firebase ccs" << std::endl;
