@@ -508,7 +508,7 @@ MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& 
 bool
 MessageProcessor::sendFirebaseMsg(const std::vector<std::string>& tokens)
 {
-    
+	return pFirebaseNotify->send(tokens);    
 }
 
 bool

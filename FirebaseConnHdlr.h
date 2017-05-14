@@ -3,6 +3,7 @@
 
 #include <strophe.h>
 #include <string>
+#include <vector>
 
 class FirebaseConnHdlr
 {
