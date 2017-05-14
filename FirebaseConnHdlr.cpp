@@ -57,10 +57,16 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
     }
      const char *pMsgId = xmpp_stanza_get_attribute(stanza, "message_id");
     if (pMsgId == NULL)
+    {
+	std::cout << "Dropping message with no message_id " << std::endl;
         return 1;
+    }
     const char *pMsgTyp = xmpp_stanza_get_attribute(stanza, "message_type");
     if (pMsgTyp == NULL)
+    {
+	std::cout << "Dropping message with no message_type " << std::endl;
         return 1;
+     }
     if (!strcmp(pMsgTyp, "ack"))
     {
         std::cout << "Ack received for message id" << pMsgId << std::endl;
