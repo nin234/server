@@ -238,6 +238,18 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
 }
 
 void
+CommonDataMgr::getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
+{
+    for (const std::string& shareId : shareIds)
+    {
+        CommonElem& elem = commonElems[appId][std::stol(shareId)];
+        if (elem.os == "android")
+            tokens.push_back(elem.deviceToken);
+    }
+    return;
+}
+
+void
 CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName)
 {
 		

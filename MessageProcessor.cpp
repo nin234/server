@@ -481,6 +481,12 @@ MessageProcessor::setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy)
 	return;
 }
 
+void
+MessageProcessor::setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNtfy)
+{
+    pFirebaseNotify = pFirebaseNtfy;
+}
+
 bool
 MessageProcessor::sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge)
 {

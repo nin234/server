@@ -21,10 +21,11 @@ OpenHousesWorker::setMaxFd()
 
 
 void
-OpenHousesWorker::setMsgProcessor(std::shared_ptr<ApplePush> pAppleNtfy)
+OpenHousesWorker::setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)
 {
 	OpenHousesMsgProcessor *pMsgPr = new OpenHousesMsgProcessor();
 	pMsgPr->setAppleNotify(pAppleNtfy);
+    pMsgPr->setFirebaseNotify(pFirebaseNotify);
 	Worker::setMsgProcessor(pMsgPr);
 	return;
 }

@@ -4,6 +4,7 @@
 EasyGrocMgr::EasyGrocMgr()
 {
 	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/config/EasyGroc.p12", true);
+    pFirebaseNotify = std::make_shared<FirebaseConnHdlr> ("Not Defined", "Not defined");
 }
 
 EasyGrocMgr::~EasyGrocMgr()
@@ -28,5 +29,11 @@ std::shared_ptr<ApplePush>
 EasyGrocMgr::getApplePushPtr()
 {
 	return pAppleNotify;
+}
+
+std::shared_ptr<FirebaseConnHdlr>
+EasyGrocMgr::getFirebaseConnPtr()
+{
+    return pFirebaseNotify;
 }
 
