@@ -51,6 +51,12 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
     return 1;
 }
 
+bool
+FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
+{
+    return true;
+}
+
 void
 FirebaseConnHdlr::getSendEvents()
 {

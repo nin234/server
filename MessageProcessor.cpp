@@ -273,6 +273,10 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		std::vector<std::string> tokens;
 		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
 		sendApplePush(tokens, pLstObj->getName(), 1);
+        std::vector<std::string> regIds;
+        dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
+        sendFirebaseMsg(regIds);
+        
 	}
 	char buf[1024];
 	int mlen=0;
@@ -499,6 +503,12 @@ MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& 
 {
 
 	return m_pTrnsl->getShareIds(lst, shareIds);
+}
+
+bool
+MessageProcessor::sendFirebaseMsg(const std::vector<std::string>& tokens)
+{
+    
 }
 
 bool

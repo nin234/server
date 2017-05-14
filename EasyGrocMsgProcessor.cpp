@@ -80,6 +80,9 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
             std::vector<std::string> tokens;
             dataStore.getDeviceTkns(pTmplObj->getAppId(), shareIds, tokens);
             sendApplePush(tokens, pTmplObj->getName(), 1);
+            std::vector<std::string> regIds;
+            dataStore.getAndroidDeviceTkns(pTmplObj->getAppId(), shareIds, regIds);
+            sendFirebaseMsg(regIds)
             
         }
 
