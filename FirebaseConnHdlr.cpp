@@ -192,7 +192,7 @@ FirebaseConnHdlr::getSendEvents()
         {
             std::vector<std::string> tokens;
             tokens.swap(tknsToSend);
-            send(tokens);
+            send(tokens, "pending tkns");
         }
     }
 }

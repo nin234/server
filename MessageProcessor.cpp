@@ -276,7 +276,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		sendApplePush(tokens, pLstObj->getName(), 1);
         std::vector<std::string> regIds;
         dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
-        sendFirebaseMsg(regIds, pLsgObj->getName());
+        sendFirebaseMsg(regIds, pLstObj->getName());
         
 	}
 	char buf[1024];
