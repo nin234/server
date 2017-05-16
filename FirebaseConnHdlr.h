@@ -33,7 +33,7 @@ class FirebaseConnHdlr
     bool isConnected () {return bConnected;}
     void getSendEvents();
     static int message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * const stanza, void * const userdata);
-    bool send(const std::vector<std::string>& tokens);
+    bool send(const std::vector<std::string>& tokens, const std::string& msg);
 };
 
 #endif

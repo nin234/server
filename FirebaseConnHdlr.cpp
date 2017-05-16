@@ -117,7 +117,7 @@ FirebaseConnHdlr::message_handler(xmpp_conn_t * const conn, xmpp_stanza_t * cons
 }
 
 bool
-FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
+FirebaseConnHdlr::send(const std::vector<std::string>& tokens, const std::string& msg)
 {
     if (bConnected)
     {
@@ -145,9 +145,12 @@ FirebaseConnHdlr::send(const std::vector<std::string>& tokens)
             std::string msgid = std::to_string(++message_id);
             xmpp_stanza_set_id(pStanza, msgid.c_str());
             xmpp_stanza_set_name(pStanza, "message");
-            
+            std::string dataval = "{ \"msg\": \"";
+            dataval += msg;
+            dataval += "\",}";
+            xmpp_stanza_set_attribute(pStanza, "data", dataval.c_str());
             xmpp_stanza_set_attribute(pStanza, "to", token.c_str());
-            std::cout << "Sending to token to firebase=" << token << " msgid=" << msgid << std::endl;
+            std::cout << "Sending  token to firebase=" << token << " msgid=" << msgid << std::endl;
             xmpp_send(conn, pStanza);
             pendingAckTknsMp[msgid] = token;
         }
