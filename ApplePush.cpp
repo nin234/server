@@ -22,7 +22,7 @@ ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NU
 		throw std::runtime_error("Failed to initialize APNS library");
 	}
 
-	apn_set_pkcs12_file(ctx, certfile.c_str(), "12345678");
+	apn_set_pkcs12_file(ctx, certfile.c_str(), "Kiev94'MICR");
 	if (bSandBox)
 		apn_set_mode(ctx,  APN_MODE_SANDBOX);
 	apn_set_log_level(ctx, APN_LOG_LEVEL_INFO | APN_LOG_LEVEL_ERROR | APN_LOG_LEVEL_DEBUG);

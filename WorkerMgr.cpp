@@ -1,5 +1,6 @@
 #include <WorkerMgr.h>
 #include <system_error>
+#include <iostream>
 
 WorkerMgr::WorkerMgr()
 {
@@ -17,15 +18,19 @@ WorkerMgr::initialize(int nThrds)
 {
 	setNoOfThreads(nThrds);
 	//start workers threads
+	//
+	std::cout << "Initializing WorkerMgr and creating thread pool of workers " << __FILE__ << ":" << __LINE__ << std::endl;
 	for (int i=0; i < no_of_threads; ++i)
 	{
 		Worker *pWrkr = getWorker();
-		pWrkr->setMaxFd();
 		pWrkr->setMsgProcessors(getApplePushPtr(), getFirebaseConnPtr());
+		std::cout << "Initializing Worker number " << i << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		pWrkr->setMaxFd();
 		workers.push_back(pWrkr);
 		pthread_t tid;
 		if (pthread_create(&tid, NULL, &Worker::entry, pWrkr) != 0)
 		{
+			std::cout << "Failed to create Worker thread " << __FILE__ << ":" << __LINE__ << std::endl;
 			throw std::system_error(errno, std::system_category());			
 		}
 	}

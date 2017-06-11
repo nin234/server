@@ -1,10 +1,12 @@
 #include <OpenHousesMgr.h>
 #include <OpenHousesWorker.h>
+#include <iostream>
 
 OpenHousesMgr::OpenHousesMgr()
 {
-	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/config/OpenHouses.p12", true);
+	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/AutoSpree.p12", true);
     pFirebaseNotify = std::make_shared<FirebaseConnHdlr> ("Not Defined", "Not defined");
+	std::cout << "Constructed OpenHousesMgr " << __FILE__ << ":" << __LINE__ << std::endl;
 }
 
 OpenHousesMgr::~OpenHousesMgr()

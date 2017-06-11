@@ -21,26 +21,43 @@ IndxKey::operator < (const IndxKey& rhs) const
 
 CommonArchvr::CommonArchvr()
 {
-	tmplFd = open("/home/ninan/data/archiveItems", O_RDWR|O_CREAT);
+	tmplFd = open("/home/ninan/data/archiveItems", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (tmplFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/archiveItems " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
-	lstFd = open("/home/ninan/data/shareItems", O_RDWR|O_CREAT);
+	}
+	lstFd = open("/home/ninan/data/shareItems", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (lstFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/shareItems " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
-	itemFd = open("/home/ninan/data/items", O_RDWR|O_CREAT);
+	}
+	itemFd = open("/home/ninan/data/items", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (itemFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/items " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
-	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT);
+	}
+	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (deviceFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/items " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
+	}
 	
-    templItemFd = open("/home/ninan/data/templItems", O_RDWR|O_CREAT);
+    templItemFd = open("/home/ninan/data/templItems", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
     if (templItemFd == -1)
+    {
+	std::cout << "Failed to open /home/ninan/data/templItems " << __FILE__ << ":" << __LINE__ << std::endl;
         throw std::system_error(errno, std::system_category());
-    templLstFd = open("/home/ninan/data/templShareItems", O_RDWR|O_CREAT);
+    }
+    templLstFd = open("/home/ninan/data/templShareItems", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
     if (templLstFd == -1)
+    {
+	std::cout << "Failed to open /home/ninan/data/templShareItems " << __FILE__ << ":" << __LINE__ << std::endl;
         throw std::system_error(errno, std::system_category());
-
+    }
 }
 
 CommonArchvr::~CommonArchvr()

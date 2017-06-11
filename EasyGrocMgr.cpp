@@ -3,7 +3,7 @@
 
 EasyGrocMgr::EasyGrocMgr()
 {
-	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/config/EasyGroc.p12", true);
+	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/AutoSpree.p12", true);
     pFirebaseNotify = std::make_shared<FirebaseConnHdlr> ("Not Defined", "Not defined");
 }
 

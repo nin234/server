@@ -29,8 +29,14 @@
 #define MAX_MQ_BUF 1000
 #define MAX_MQ_EVENTS 5
 
-#define HASH_MAP_SIZE 1600000
-#define MAX_ELEMENTS_MAP 1000000
+//The following two definitions are for mq_attr used in mq_open
+#define MQ_MAXMSG 10
+#define MQ_MSGSIZE 32768
+
+//#define HASH_MAP_SIZE 1600000
+//#define MAX_ELEMENTS_MAP 1000000
+#define HASH_MAP_SIZE 1600
+#define MAX_ELEMENTS_MAP 1000
 #define HASH_1_PRIME 960259
 #define STORE_ARRAY_SIZE 255
 #define SHARE_MAP_SIZE 10

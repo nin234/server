@@ -12,6 +12,7 @@ using namespace std::placeholders;
 
 MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
 {
+	std::cout << "Setting MessageProcessor message to member function mapping " << __FILE__ << ":" << __LINE__ << std::endl;
 	for (auto &msgTypPrc : msgTypPrcsrs)
 		msgTypPrc = -1;
 	msgTypPrcsrs[GET_SHARE_ID_MSG] = 0;

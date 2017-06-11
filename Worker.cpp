@@ -37,7 +37,7 @@ Worker::main()
 	}
 	catch(std::system_error& error)
 	{
-		std::cout << "System Error: " << error.code() << " - " << error.what() << std::endl;
+		std::cout << "Caught exception System Error: " << error.code() << " - " << error.what()  << " " <<  __FILE__ << ":" << __LINE__  << std::endl;
 	}
 	catch(std::exception& error)
         {

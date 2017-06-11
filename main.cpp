@@ -18,8 +18,12 @@ main()
 	{
 		
 		AppMgr appMgr;
+		std::cout << "Constructed AppMgr " << " " << __FILE__ << ":"<< __LINE__ << std::endl;
 		ConnMgr appConns;
+		std::cout << "Constructed ConnMgr " << " " << __FILE__ << ":"<< __LINE__ << std::endl;
 		appConns.initializeListeners();
+		std::cout << "Initialized listeners " << " " << __FILE__ << ":"<< __LINE__ << std::endl;
+		
 
 		for(;;)
 		{
@@ -32,7 +36,7 @@ main()
 	}
 	catch (std::system_error& error)
 	{
-		std::cout << "System Error: " << error.code() << " - " << error.what() << std::endl;
+		std::cout << "Caught exception System Error: " << error.code() << " - " << error.what() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	}
 	catch(std::runtime_error& error)
 	{

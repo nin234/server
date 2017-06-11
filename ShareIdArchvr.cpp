@@ -7,13 +7,17 @@
 #include <fcntl.h>
 #include <system_error>
 #include <Constants.h>
+#include <sstream>
 
 
 ShareIdArchvr::ShareIdArchvr()
 {
-	shareFd = open("/home/ninan/data/shareId", O_RDWR|O_CREAT);
+	shareFd = open("/home/ninan/data/shareId", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (shareFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/shareId " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
+	}
 	int nRead = read(shareFd, &shareId, sizeof(long));
 	if (nRead )
 	{
@@ -24,9 +28,12 @@ ShareIdArchvr::ShareIdArchvr()
 		else if (nRead != sizeof(long))
 			shareId = SHARE_ID_START_VAL;
 	}
-	shareTrnFd = open("/home/ninan/data/shareTrnId", O_RDWR|O_CREAT);
+	shareTrnFd = open("/home/ninan/data/shareTrnId", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (shareTrnFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/shareTrnId " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
+	}
 }
 
 ShareIdArchvr::~ShareIdArchvr()

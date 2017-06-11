@@ -12,9 +12,12 @@
 
 FrndLstArchvr::FrndLstArchvr()
 {
-	frndFd = open("/home/ninan/data/frndLst", O_RDWR|O_CREAT);
+	frndFd = open("/home/ninan/data/frndLst", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (frndFd == -1)
+	{
+		std::cout << "Failed to open /home/ninan/data/frndLst " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
+	}
 }
 
 FrndLstArchvr::~FrndLstArchvr()

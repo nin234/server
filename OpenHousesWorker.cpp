@@ -1,6 +1,7 @@
 #include <OpenHousesWorker.h>
 #include <Constants.h>
 #include <OpenHousesMsgProcessor.h>
+#include <iostream>
 
 OpenHousesWorker::OpenHousesWorker()
 {
@@ -23,7 +24,9 @@ OpenHousesWorker::setMaxFd()
 void
 OpenHousesWorker::setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)
 {
+	std::cout << "Creating OpenHousesMsgProcessor " << __FILE__ << ":" << __LINE__ << std::endl;
 	OpenHousesMsgProcessor *pMsgPr = new OpenHousesMsgProcessor();
+	std::cout << "Setting OpenHousesMsgProcessor notification mechanisms " << __FILE__ << ":" << __LINE__ << std::endl;
 	pMsgPr->setAppleNotify(pAppleNtfy);
     pMsgPr->setFirebaseNotify(pFirebaseNotify);
 	Worker::setMsgProcessor(pMsgPr);

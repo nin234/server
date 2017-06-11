@@ -16,13 +16,14 @@
 
 ArchiveMgr::ArchiveMgr()
 {
-
+	std::cout << "Creating ArchiveMgr " << __FILE__ << ":"<< __LINE__ << std::endl;
 	epfd = epoll_create(100);
 	if (epfd < 0)
 	{
-		std::cout << "epoll_create failed " << std::endl;
+		std::cout << "epoll_create failed " << __FILE__ << ":"<< __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());	
 	}
+	std::cout << "ArchiveMgr epoll file descriptor opened " << __FILE__ << ":"<< __LINE__ << std::endl;
 
 	mq_name = 0;
 	pArchvrs[ARCHIVE_SHARE_ID_MSG] = std::make_shared<ShareIdArchvr>();
@@ -34,6 +35,7 @@ ArchiveMgr::ArchiveMgr()
     pArchvrs[ARCHIVE_ITM_MSG] = std::make_shared<CommonArchvr>();
     pArchvrs[ARCHIVE_TEMPL_ITM_MSG] = std::make_shared<CommonArchvr>();
     pArchvrs[ARCHIVE_SHARE_TEMPL_LST_MSG] = std::make_shared<CommonArchvr>();
+	std::cout << "Created ArchiveMgr " << __FILE__ << ":"<< __LINE__ << std::endl;
     
 }
 
@@ -138,7 +140,7 @@ ArchiveMgr::getNextName()
 	std::lock_guard<std::mutex> lock(mq_name_mutex);
 	++mq_name;
 	std::ostringstream ostr;
-	ostr << mq_name;
+	ostr <<"/mq" <<  mq_name;
 	return ostr.str();	
 	
 }
