@@ -8,21 +8,22 @@
 #include <ShareIdMgr.h>
 #include <ApplePush.h>
 #include <FirebaseConnHdlr.h>
+#include <Config.h>
 
 AppMgr::AppMgr()
 {
 	FirebaseConnHdlr::initialize();
 	std::cout << "Initialized FirebaseConnHdlr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	OpenHousesMgr *pOhMgr = new OpenHousesMgr();
-	pOhMgr->initialize(OPENHOUSES_THREADS);
+	pOhMgr->initialize(Config::Instance().getOpenHousesThrds());
 	wrkMgr.push_back(pOhMgr);
 	std::cout << "Initialized OpenHousesMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	AutoSpreeMgr *pAspreeMgr = new AutoSpreeMgr();
-	pAspreeMgr->initialize(AUTOSPREE_THREADS);
+	pAspreeMgr->initialize(Config::Instance().getAutoSpreeThrds());
 	wrkMgr.push_back(pAspreeMgr);
 	std::cout << "Initialized AutoSpreeMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	EasyGrocMgr *pEasy = new EasyGrocMgr();
-	pEasy->initialize(EASYGROC_THREADS);
+	pEasy->initialize(Config::Instance().getEasyGrocThrds());
 	wrkMgr.push_back(pEasy);
 	std::cout << "Initialized EasyGrocMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	ShareIdMgr::Instance().setShareIdStep(OPENHOUSES_THREADS+AUTOSPREE_THREADS+EASYGROC_THREADS);

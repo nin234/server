@@ -12,7 +12,7 @@ ArchiveSndr::ArchiveSndr()
 	mq_attr *mqa = new mq_attr;
 	mqa->mq_maxmsg = MQ_MAXMSG;
 	mqa->mq_msgsize = MQ_MSGSIZE;
-	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, mqa);
+	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, NULL);
 	if (sndfd == -1)
 	{
 		std::cerr << " Failed to open message queue name=" << name  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;

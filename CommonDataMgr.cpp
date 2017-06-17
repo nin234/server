@@ -3,6 +3,7 @@
 #include <string>
 #include <string.h>
 #include <sstream>
+#include <iostream>
 #include <sys/time.h>
 #include <unistd.h>
 #include <ArchiveMsgCreator.h>
@@ -10,18 +11,27 @@
 
 CommonDataMgr::CommonDataMgr()
 {
+	
 	std::shared_ptr<CommonArchvr> pCommonArch = ArchiveMgr::Instance().getCommonArchvr();
+	std::cout << "Populating data cache " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (pCommonArch)
 	{
+		std::cout << "Populating Archive Items " << __FILE__ << ":" << __LINE__ << std::endl;
 		pCommonArch->populateArchvItems([&](int appId, long shareId, const std::string& name, const std::string& templList){storeArchiveItem(appId, shareId, name, templList);});
+		std::cout << "Populating Items " << __FILE__ << ":" << __LINE__ << std::endl;
 		pCommonArch->populateItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeItem(appId, shareId, name, list);});
+		std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
 		
 		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn, devId);}); //devId here is platform ie ios or android
+		std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeTemplItem(appId, shareId, name, list);});
+   		std::cout << "Populating share list " << __FILE__ << ":" << __LINE__ << std::endl;
         
         pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeLstShareInfo(appId, shareId, name, shareIdLst);});
+   		std::cout << "Populating template share list " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeTemplLstShareInfo(appId, shareId, name, shareIdLst);});
 	}
+	std::cout << "Populated data cache " << __FILE__ << ":" << __LINE__ << std::endl;
 }
 
 void
@@ -51,6 +61,7 @@ CommonDataMgr::~CommonDataMgr()
 void
 CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name, const std::string& templList)
 {
+	std::cout << "Storing archive items " << __FILE__ << ":" << __LINE__ << std::endl;
   CommonElem& elem = commonElems[appId][shareId];
   elem.archvItems.insert(name, templList);
   return;                                

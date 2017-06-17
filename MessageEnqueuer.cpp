@@ -1,8 +1,9 @@
 #include <MessageEnqueuer.h>
+#include <iostream>
 
 MessageEnqueuer::MessageEnqueuer()
 {
-
+	std::cout << "Created MessageEnqueuer " << __FILE__ << ":" << __LINE__ << std::endl;
 }
 
 MessageEnqueuer::~MessageEnqueuer()

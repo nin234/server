@@ -75,11 +75,28 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 	int size;
 	int numread = read(deviceFd, &size, sizeof(int));
 	if (numread == -1)
+	{
+		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+		throw std::system_error(errno, std::system_category());
+	}
+	if (!numread)
+	{
+		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
+	}
 	int toread = size- sizeof(int);
 	numread = read(deviceFd, wrbuf, toread);
 	if (numread == -1)
+	{
+		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+		throw std::system_error(errno, std::system_category());
+	}
+	
+	if (!numread)
+	{
+		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
+	}
 	devTknArchv devLens;
 	memcpy(&devLens, wrbuf, sizeof(devTknArchv));
 	shareId = devLens.shareId;
@@ -106,7 +123,16 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
         int size;
         int numread = read(fd, &size, sizeof(int));
         if (numread == -1)
-            return false;
+	{
+		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+		throw std::system_error(errno, std::system_category());
+	}
+	
+	if (!numread)
+	{
+		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;
+	}
         int toread = size- sizeof(int);
         char *pBufPt;
         std::unique_ptr<char> pBuf;
@@ -123,9 +149,17 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
         }
         numread = read(fd, pBufPt, toread);
         if (numread == -1)
-            return false;
-        
-        
+	{
+		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+		throw std::system_error(errno, std::system_category());
+	}
+	
+	if (!numread)
+	{
+		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;
+	}
+
         shrdIdTemplSize templSize;
         memcpy(&templSize, pBufPt, sizeof(shrdIdTemplSize));
         shareId = templSize.shrId;
@@ -146,7 +180,17 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 		int size;
 		int numread = read(fd, &size, sizeof(int));
 		if (numread == -1)
+		{
+			std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw std::system_error(errno, std::system_category());
+		}
+		
+		if (!numread)
+		{
+			std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 			return false;
+		}
+
 		int toread = size- sizeof(int);
 		char *pBufPt;
 		std::unique_ptr<char> pBuf;
@@ -163,7 +207,16 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 		}
 		numread = read(fd, pBufPt, toread);
 		if (numread == -1)
+		{
+			std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw std::system_error(errno, std::system_category());
+		}
+		
+		if (!numread)
+		{
+			std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 			return false;
+		}
 
 		int valid;
 		memcpy(&valid, pBufPt, sizeof(int));
@@ -194,7 +247,16 @@ CommonArchvr::populateArchvItemsImpl(int& appId, long& shareId, std::string& nam
 		int size;
 		int numread = read(tmplFd, &size, sizeof(int));
 		if (numread == -1)
+		{
+			std::cout << "Failed to read from /home/ninan/data/archiveItems " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw std::system_error(errno, std::system_category());
+		}
+		if (!numread)
+		{
+			std::cout << "File read /home/ninan/data/archiveItems complete " << __FILE__ << ":" << __LINE__ << std::endl;
 			return false;
+		}
+		
 		int toread = size- sizeof(int);
 		char *pBufPt;
 		std::unique_ptr<char> pBuf;
@@ -211,12 +273,24 @@ CommonArchvr::populateArchvItemsImpl(int& appId, long& shareId, std::string& nam
 		}
 		numread = read(tmplFd, pBufPt, toread);
 		if (numread == -1)
+		{
+			std::cout << "Failed to read from /home/ninan/data/archiveItems " << __FILE__ << ":" << __LINE__ << std::endl;
+			throw std::system_error(errno, std::system_category());
+		}
+
+		if (!numread)
+		{
+			std::cout << "File read /home/ninan/data/archiveItems complete " << __FILE__ << ":" << __LINE__ << std::endl;
 			return false;
+		}
 
 		int valid;
 		memcpy(&valid, pBufPt, sizeof(int));
 		if (!valid)
+		{
+		//	std::cout << "invalid continuing " << __FILE__ << ":" << __LINE__ << std::endl;
 			continue;
+		}
 		shrdIdTemplSize templSize;
 		memcpy(&templSize, pBufPt+sizeof(int), sizeof(shrdIdTemplSize));
 		shareId = templSize.shrId;		
