@@ -1,6 +1,7 @@
 #include <ShareIdMgr.h>
 #include <ArchiveMgr.h>
 #include <Constants.h>
+#include <iostream>
 
 ShareIdMgr::ShareIdMgr()
 {
@@ -10,7 +11,7 @@ ShareIdMgr::ShareIdMgr()
 		shareId_Init = pShArch->getShareId();
 	}
 	else
-		shareId_Init =0;
+		shareId_Init =1000;
 	pShArch->populateTrnIdShrIdMp(trnIdShrIdMp);
 }
 
@@ -25,11 +26,12 @@ ShareIdMgr::initThreadShareId()
 	std::lock_guard<std::mutex> lock(shid_init_mutex);
 	++shareId_Init;
 	shareId = shareId_Init;
+	std::cout << "Setting shareId to " << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return;
 }
 
 thread_local long
-ShareIdMgr::shareId=0;
+ShareIdMgr::shareId=1000;
 
 ShareIdMgr&
 ShareIdMgr::Instance()
@@ -42,15 +44,9 @@ ShareIdMgr::Instance()
 long
 ShareIdMgr::getShareId(long trnId, bool& archive)
 {
-	long val;
-	if (trnIdShrIdMp.getValue(trnId, val))	
-	{	
-		archive = false;
-		return val;
-	}
 	archive = true;
 	shareId += shareIdStep;
-	trnIdShrIdMp[trnId] = shareId;
+	std::cout << "Returning new shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return shareId;
 }
 
@@ -80,5 +76,6 @@ void
 ShareIdMgr::setShareIdStep(int step)
 {
 	shareIdStep = step;
+	std::cout << "Setting shareIdStep to " << shareIdStep << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return;
 }

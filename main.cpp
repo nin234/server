@@ -6,6 +6,7 @@
 #include <sys/select.h>
 #include <AppMgr.h>
 #include <system_error>
+#include <ArchiveMgr.h>
 
 int
 main()
@@ -23,7 +24,11 @@ main()
 		std::cout << "Constructed ConnMgr " << " " << __FILE__ << ":"<< __LINE__ << std::endl;
 		appConns.initializeListeners();
 		std::cout << "Initialized listeners " << " " << __FILE__ << ":"<< __LINE__ << std::endl;
-		
+		pthread_t tid;
+		if (pthread_create(&tid, NULL, &ArchiveMgr::entry, &ArchiveMgr::Instance()) != 0)
+		{
+			std::cout << "Failed to create ArchiveMgr message processor thread exiting ... " << __FILE__ << ":" << __LINE__ << std::endl;
+		}
 
 		for(;;)
 		{

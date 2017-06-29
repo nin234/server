@@ -10,6 +10,7 @@
 #include <FrndLstArchvr.h>
 #include <CommonArchvr.h>
 #include <memory>
+#include <list>
 
 class ArchiveMgr
 {
@@ -20,6 +21,7 @@ class ArchiveMgr
 	void processMsgs();
 	std::map<int, std::shared_ptr<Archvr>> pArchvrs;
 	bool processMsg(const char *pBuf, int len);	
+	std::list<std::string> mqnames;
 
 	public:
 		ArchiveMgr();

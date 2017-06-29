@@ -26,7 +26,7 @@ AppMgr::AppMgr()
 	pEasy->initialize(Config::Instance().getEasyGrocThrds());
 	wrkMgr.push_back(pEasy);
 	std::cout << "Initialized EasyGrocMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
-	ShareIdMgr::Instance().setShareIdStep(OPENHOUSES_THREADS+AUTOSPREE_THREADS+EASYGROC_THREADS);
+	ShareIdMgr::Instance().setShareIdStep(Config::Instance().getOpenHousesThrds() + Config::Instance().getAutoSpreeThrds() + Config::Instance().getEasyGrocThrds());
 
 }
 

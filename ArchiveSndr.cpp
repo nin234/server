@@ -18,7 +18,6 @@ ArchiveSndr::ArchiveSndr()
 		std::cerr << " Failed to open message queue name=" << name  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());		 }
 
-	ArchiveMgr::Instance().registerFd(sndfd);
 	std::cout << " Created ArchiveSndr " << __FILE__ << ":" << __LINE__ << std::endl;
 	
 }
@@ -36,5 +35,6 @@ ArchiveSndr::sendMsg(const char *pMsg, size_t len, unsigned int msg_prio)
 		std::cout << "Failed to send message " << errno << " " << strerror(errno) << std::endl;
 		return false;
 	}
+	std::cout << "Sending message of len=" << len << " for archiving " << __FILE__ << " " << __LINE__ << std::endl;
 	return true;
 }

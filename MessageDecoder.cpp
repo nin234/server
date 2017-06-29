@@ -153,6 +153,7 @@ MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 	pMsg->setTrnId(tid);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
+	std::cout << "Creating shareId Obj fd=" << fd << " tid=" << tid << " appId=" << getAppId() << " " << __FILE__ << " " << __LINE__ << std::endl;
 	pMsgs.push_back(std::move(pMsg));
     return true;
 }

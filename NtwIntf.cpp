@@ -273,7 +273,8 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			throw std::system_error(errno, std::system_category());	
 		}
 	}
-
+	
+	std::cout << "File descriptors ready=" << ready << " in epoll_wait " << __FILE__ << " " << __LINE__ << std::endl;
 	for (auto j=0; j < ready; ++j)
 	{
 		if (evlist[j].events & EPOLLIN)

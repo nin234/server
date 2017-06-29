@@ -363,9 +363,6 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 			int archlen=0;
 			if (ArchiveMsgCreator::createShareIdMsg(archbuf, archlen, shareId))
 				pArch->sendMsg(archbuf, archlen, 10);
-			shrIdTrnId shtrId{shareId, pShObj->getTrnId()};
-			if (ArchiveMsgCreator::createTrnIdShrIdMsg(archbuf, archlen, shtrId))
-				pArch->sendMsg(archbuf, archlen, 10);
 		}
 		//send reply
 		char buf[512];
@@ -375,6 +372,7 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 			if (!pNtwIntf->sendMsg(buf, mlen, pShObj->getFd()))
 				std::cout << "Failed to send message for fd=" << pShObj->getFd() << std::endl;
 		}
+		std::cout << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	}
 	return;
 

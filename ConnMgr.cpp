@@ -1,4 +1,5 @@
 #include <ConnMgr.h>
+#include <iostream>
 
 ConnMgr::ConnMgr()
 {
@@ -37,14 +38,18 @@ ConnMgr::waitAndGetConnections()
 	}
 	
 
+	std::cout << "Waiting in select for new connections " << __FILE__ << " " << __LINE__ << std::endl;
 	int nReady =select(maxfd, &readfds, NULL, NULL, NULL);
-	//
+
+	std::cout << "select returns " << nReady << " file descriptors ready " << __FILE__ << " " << __LINE__ << std::endl;
+ 	
 	if (nReady>0)
 	{
 		for(int i=0; i<NO_OF_APPS; ++i)
 		{
 			if (FD_ISSET(apps[i].listenFd(), &readfds))
 			{
+				std::cout << "Accepting connection for app= " << i  << __FILE__ << " " << __LINE__ << std::endl;
 				//push into worker thread queue
 				struct 	sockaddr addr;
 				socklen_t addrlen;

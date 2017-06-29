@@ -118,6 +118,7 @@ ArchiveMgr::processMsg(const char *pBuf, int len)
 {
 	int msgTyp;
 	memcpy(&msgTyp, pBuf, sizeof(int));
+	std::cout << "Received message of type=" << msgTyp << " for archiving " << __FILE__ << " " << __LINE__ << std::endl;
 	auto pItr = pArchvrs.find(msgTyp);
 	if (pItr != pArchvrs.end())
 		return pItr->second->archiveMsg(pBuf, len);
@@ -141,6 +142,7 @@ ArchiveMgr::getNextName()
 	++mq_name;
 	std::ostringstream ostr;
 	ostr <<"/mq" <<  mq_name;
+	mqnames.push_back(ostr.str());
 	return ostr.str();	
 	
 }

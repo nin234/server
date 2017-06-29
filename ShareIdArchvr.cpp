@@ -12,6 +12,7 @@
 
 ShareIdArchvr::ShareIdArchvr()
 {
+	shareId = 1000;
 	shareFd = open("/home/ninan/data/shareId", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
 	if (shareFd == -1)
 	{
@@ -110,6 +111,11 @@ ShareIdArchvr::archiveShareIdMsg(const char *buf, int len)
 		std::cout << "write failed in shareId archive " << strerror(errno) << std::endl;
 		return false;
 	 }
+	char buf1[2*sizeof(long)];
+	memcpy(buf1, buf, sizeof(long));
+	buf1[sizeof(long)] = '\0';
+	std::cout << "Archiving shareId=" << atoi(buf1) << std::endl;
+	 fsync(shareFd);
 	return true;
 }
 
@@ -126,6 +132,7 @@ ShareIdArchvr::archiveTrnIdShrIdMsg(const char *buf, int len)
 		std::cout << "write failed in trnIdShrId archive " << strerror(errno) << std::endl;
 		return false;
 	 }
+	 fsync(shareTrnFd);
 	return true;
 }
 
