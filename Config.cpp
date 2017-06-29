@@ -35,6 +35,17 @@ Config::Config()
 		EasyGrocThrds = std::stoi(pItr->second);	
 	}	
 	std::cout <<"Config values OpenHousesThrds=" << OpenHousesThrds << " AutoSpreeThrds=" << AutoSpreeThrds << " EasyGrocThrds=" << EasyGrocThrds << std::endl;
+	pItr = keyvals.find("mq_maxmsg");
+	if (pItr != keyvals.end())
+	{
+		mq_maxmsg = std::stoi(pItr->second);
+	}
+	pItr = keyvals.find("mq_msgsize");
+	if (pItr != keyvals.end())
+	{
+		mq_msgsize = std::stoi(pItr->second);
+	}	
+	std::cout << "Config values contd mq_maxmsg=" << mq_maxmsg << " mq_msgsize=" << mq_msgsize << std::endl;
 }
 
 Config::~Config()
@@ -50,6 +61,17 @@ Config::Instance()
 
 }
 
+int 
+Config::getMqMaxMsg()
+{
+	return mq_maxmsg;
+}
+
+int 
+Config::getMqMsgSize()
+{
+	return mq_msgsize;
+}
 int
 Config::getOpenHousesThrds()
 {

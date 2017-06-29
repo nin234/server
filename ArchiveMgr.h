@@ -21,7 +21,6 @@ class ArchiveMgr
 	void processMsgs();
 	std::map<int, std::shared_ptr<Archvr>> pArchvrs;
 	bool processMsg(const char *pBuf, int len);	
-	std::list<std::string> mqnames;
 
 	public:
 		ArchiveMgr();
@@ -30,7 +29,7 @@ class ArchiveMgr
         	void *main();
 		static ArchiveMgr& Instance();
 		std::string getNextName();
-		bool registerFd(mqd_t fd);
+		bool registerFd(std::string mqn);
 		std::shared_ptr<ShareIdArchvr> getShareIdArchvr(int shidMsgTyp); 
 		std::shared_ptr<FrndLstArchvr> getFrndLstArchvr(int frndLstMsgTyp); 
 		std::shared_ptr<CommonArchvr> getCommonArchvr();

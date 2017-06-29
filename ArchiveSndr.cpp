@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string.h>
 #include <ArchiveMgr.h>
+#include <Config.h>
 
 ArchiveSndr::ArchiveSndr()
 {
@@ -10,14 +11,14 @@ ArchiveSndr::ArchiveSndr()
 	std::string name = ArchiveMgr::Instance().getNextName();
        std::cerr << " Open message queue name=" << name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	mq_attr *mqa = new mq_attr;
-	mqa->mq_maxmsg = MQ_MAXMSG;
-	mqa->mq_msgsize = MQ_MSGSIZE;
-	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, NULL);
+	mqa->mq_maxmsg = Config::Instance().getMqMaxMsg();
+	mqa->mq_msgsize = Config::Instance().getMqMsgSize();
+	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, mqa);
 	if (sndfd == -1)
 	{
 		std::cerr << " Failed to open message queue name=" << name  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());		 }
-
+	ArchiveMgr::Instance().registerFd(name);	
 	std::cout << " Created ArchiveSndr " << __FILE__ << ":" << __LINE__ << std::endl;
 	
 }

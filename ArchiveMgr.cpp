@@ -87,7 +87,7 @@ ArchiveMgr::processMsgs()
 			auto s = mq_receive(evlist[j].data.fd, buf , MAX_MQ_BUF, NULL);
 			if (s == -1)
 			{
-				std::cout << "error reading on socket " << errno << std::endl;
+				std::cout << "error reading on socket " << strerror(errno) << " j=" << j << " ready=" << ready << " " << __FILE__ << ":" << __LINE__ << std::endl;
 				if (errno == EBADF)
 					close(evlist[j].data.fd);
 				return ;
@@ -142,15 +142,20 @@ ArchiveMgr::getNextName()
 	++mq_name;
 	std::ostringstream ostr;
 	ostr <<"/mq" <<  mq_name;
-	mqnames.push_back(ostr.str());
 	return ostr.str();	
 	
 }
 
 bool
-ArchiveMgr::registerFd(mqd_t fd)
+ArchiveMgr::registerFd(std::string mqn)
 {
-	std::cout << "Received new message queue register request " << fd << std::endl;
+	std::cout << "Received new message queue register request " << mqn << std::endl;
+	mqd_t fd = mq_open(mqn.c_str(), O_RDONLY|O_NONBLOCK);
+	if (fd == -1)
+	{
+		std::cout << "Failed to open message queue " << __FILE__ << ":" << __LINE__ << std::endl;
+		throw std::system_error(errno, std::system_category());
+	}
 	int ret;
 	 struct epoll_event event;
         event.data.fd = fd;
