@@ -167,7 +167,7 @@ struct devTknArchv
 
 struct shareInfo;
 
-std::ostream& operator << (const std::ostream& os, const shareInfo& shInfo);
+std::ostream& operator << (std::ostream& os, const shareInfo& shInfo);
 
 struct shareInfo
 {
@@ -177,7 +177,7 @@ struct shareInfo
 	bool del;
 	int name_len;
 	int list_len;
-    friend std::ostream& operator << (const std::ostream& os, const shareInfo& shInfo);
+    friend std::ostream& operator << (std::ostream& os, const shareInfo& shInfo);
 };
 
 

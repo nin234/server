@@ -27,9 +27,9 @@ PicMetaDataObj::setName(const char *pName, int len)
 }
 
 std::ostream&
-operator << (const std::ostream& os, const shareInfo& shInfo)
+operator << (std::ostream& os, const shareInfo& shInfo)
 {
-    os << " appId=" << appId << " shrIdLst=" << shrIdLst << " shrId=" << shrId << " del=" << del << " name_len=" << name_len << " list_len=" << list_len;
+    os << " appId=" << shInfo.appId << " shrIdLst=" << shInfo.shrIdLst << " shrId=" << shInfo.shrId << " del=" << shInfo.del << " name_len=" << shInfo.name_len << " list_len=" << shInfo.list_len;
     return os;
 }
 
