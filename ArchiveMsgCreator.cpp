@@ -209,7 +209,7 @@ ArchiveMsgCreator::createCmnShareTemplAndLstMsg(char *pMsg, int& len, int appId,
     constexpr int nameoffset = sizeof(int) + sizeof(shareInfo);
     memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
     len = msglen;
-    
+    std::cout << "Archiving shareLstMsg" <<  templSize << " name=" << name << " "  << __FILE__ << ":" << __LINE__ << std::endl
     return true;
 
     

@@ -26,6 +26,15 @@ PicMetaDataObj::setName(const char *pName, int len)
 	return;
 }
 
+std::ostream&
+operator << (const std::ostream& os, const shareInfo& shInfo)
+{
+    os << " appId=" << appId << " shrIdLst=" << shrIdLst << " shrId=" << shrId << " del=" << del << " name_len=" << name_len << " list_len=" << list_len;
+    return os;
+}
+
+
+
 void
 PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
 {

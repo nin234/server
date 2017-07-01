@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <Constants.h>
+#include <iostream>
 
 
 class MsgObj
@@ -164,6 +165,10 @@ struct devTknArchv
     int platform;
 };
 
+struct shareInfo;
+
+std::ostream& operator << (const std::ostream& os, const shareInfo& shInfo);
+
 struct shareInfo
 {
 	int appId;
@@ -172,6 +177,7 @@ struct shareInfo
 	bool del;
 	int name_len;
 	int list_len;
+    friend std::ostream& operator << (const std::ostream& os, const shareInfo& shInfo);
 };
 
 
