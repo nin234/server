@@ -120,8 +120,8 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
     lseek(fd, 0, SEEK_CUR);
     while (true)
     {
-        int size;
-        int numread = read(fd, &size, sizeof(int));
+        shrdIdTemplSize templSize;
+        int numread = read(fd, &templSize, sizeof(shrdIdTemplSize));
         if (numread == -1)
 	{
 		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -133,7 +133,7 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
 		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
 	}
-        int toread = size- sizeof(int);
+        int toread = templSize.name_len + templSize.list_len;
         char *pBufPt;
         std::unique_ptr<char> pBuf;
         
@@ -144,7 +144,7 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
         else
         {
             
-            pBuf = std::unique_ptr<char>{new char[size]};
+            pBuf = std::unique_ptr<char>{new char[toread]};
             pBufPt = pBuf.get();
         }
         numread = read(fd, pBufPt, toread);
@@ -160,11 +160,11 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
 		return false;
 	}
 
-        shrdIdTemplSize templSize;
-        memcpy(&templSize, pBufPt, sizeof(shrdIdTemplSize));
         shareId = templSize.shrId;
-        name = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize);
-        lst = pBufPt+sizeof(int)+sizeof(shrdIdTemplSize) + templSize.name_len;
+        name = pBufPt;
+        lst = pBufPt+ templSize.name_len;
+	appId = templSize.appId;
+	std::cout << "Populating appId=" << appId << " shareId=" << shareId << " name=" << name << " lst=" << lst << std::endl;
         break;
     }
     return true;
@@ -397,7 +397,7 @@ CommonArchvr::archiveBuf(int fd, const char *buf, int len)
 		long shareId = templSize.shrId;
 		std::string name = buf+sizeof(shrdIdTemplSize);
 		std::string lst = buf+sizeof(shrdIdTemplSize) + templSize.name_len;
-		std::cout << "Archiving item msg shareId=" << shareId << " name=" << name << " lst=" << lst  << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		std::cout << "Archiving item msg shareId=" << shareId << " name=" << name << " lst=" << lst  << " len="  << len << " appId=" << templSize.appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	}
 	if (write(fd, buf, len) == -1)
 	{

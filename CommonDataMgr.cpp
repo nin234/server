@@ -37,6 +37,7 @@ CommonDataMgr::CommonDataMgr()
 void
 CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
 {
+	std::cout << "Storing item shareInfo appId=" << appId << " shareId=" << shareId << " name=" << name << " shareIdLst=" << shareIdLst << " " << __FILE__ << ":" << __LINE__ << std::endl;
     
   		CommonElem& elem = commonElems[appId][shareId];
     LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
@@ -70,6 +71,7 @@ CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name
 void
 CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
+	std::cout << "Storing item appId=" << appId << " shareId=" << shareId << " name=" << name << " list=" << list << " " << __FILE__ << ":" << __LINE__ << std::endl;
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.items.insert(name, list);
 	return;
@@ -218,6 +220,7 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 	for (const std::string& shareId : shareIds)
 	{
 		long shId = std::stol(shareId);
+		std::cout << "Storing item shareInfo shId=" << shId << " appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " " << __FILE__ << ":" << __LINE__ << std::endl;
   		CommonElem& elem = commonElems[appId][shId];
 		LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
 		std::string val = "NONE";
