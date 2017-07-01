@@ -35,6 +35,8 @@ FrndLstArchvr::archiveMsg(const char *buf, int len)
 	}
 	shrdIdSize shIdSize;
 	memcpy(&shIdSize, buf, sizeof(shIdSize));
+	std::string frndLst = buf+sizeof(shrdIdSize);
+	std::cout << "Archiving friendLst shareId=" << shIdSize.shrId << " frndLst=" << frndLst << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = frndLstIndx.find(shIdSize.shrId);
 
 	if (pItr == frndLstIndx.end())

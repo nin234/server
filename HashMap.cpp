@@ -184,7 +184,7 @@ long
 HashMap<key, val, N>::hash1(key k)
 {
 
-	return k%HASH_1_PRIME;
+	return k%N;
 }
 
 template<typename key, typename val, int N>
@@ -192,7 +192,7 @@ long
 HashMap<key, val, N>::hash2(key k)
 {
 
-	return k%HASH_1_PRIME;
+	return k%N;
 }
 
 template<typename key, typename val, int N>

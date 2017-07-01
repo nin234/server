@@ -254,6 +254,8 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		std::cout << "Invalid message received in MessageProcessor::processItemMsg " << std::endl;
 		return;
 	}
+	std::cout << "Received Item message appId="<< pLstObj->getAppId() << " shareId=" << pLstObj->getShrId() << " name=" << pLstObj->getName() << " item=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__  << std::endl;
+
 	dataStore.storeItem(pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList());	
 	
 	//int size= 
@@ -269,6 +271,8 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		dataStore.storeLstShareInfo(pLstObj->getAppId(),pLstObj->getShrId(), shareIds, pLstObj->getName());
 		for (const std::string& shareId : shareIds)
 		{
+			std::cout << "Archiving shareId=" << shareId << " in processItemMsg " << __FILE__ << ":" << __LINE__ << std::endl;
+		
 			if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pLstObj->getAppId(), false, std::stol(shareId), pLstObj->getShrId(), pLstObj->getName(),  32768))
 				sendArchiveMsg(archbuf, archlen, 10);	
 		}
@@ -412,6 +416,7 @@ MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	FrndLstObj *pFrndObj = dynamic_cast<FrndLstObj*>(pMsg.get());
 	if (!pFrndObj)
 		return;
+	std::cout << "Received friend list message shareId=" << pFrndObj->getShrId() << " friend list=" << pFrndObj->getFrndLst() <<  " " << __FILE__ << ":" << __LINE__  << std::endl;
 	FrndLstMgr::Instance().storeFrndLst(pFrndObj);
 	std::unique_ptr<char> pArchMsg;
 	char archbuf[8192];

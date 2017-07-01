@@ -313,7 +313,7 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 {
 	int msgTyp;
 	memcpy (&msgTyp, buf, sizeof(int));
-
+	std::cout << "Archiving message of type " << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	switch(msgTyp)
 	{
 
@@ -390,6 +390,15 @@ CommonArchvr::archiveBuf(int fd, const char *buf, int len)
 		return false;
 	}
 
+	if (fd == itemFd)
+	{
+		shrdIdTemplSize templSize;
+		memcpy(&templSize, buf, sizeof(shrdIdTemplSize));
+		long shareId = templSize.shrId;
+		std::string name = buf+sizeof(shrdIdTemplSize);
+		std::string lst = buf+sizeof(shrdIdTemplSize) + templSize.name_len;
+		std::cout << "Archiving item msg shareId=" << shareId << " name=" << name << " lst=" << lst  << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	}
 	if (write(fd, buf, len) == -1)
 	{
 		std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
