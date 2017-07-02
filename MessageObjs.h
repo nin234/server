@@ -157,6 +157,9 @@ struct shrdIdTemplSize
 	shrdIdTemplSize():del(false), name_len(0), list_len(0) {}
 };
 
+struct devTknArchv;
+
+std::ostream& operator << (std::ostream& os, const devTknArchv& devTkInfo);
 struct devTknArchv
 {
 	long shareId;

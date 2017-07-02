@@ -79,7 +79,7 @@ ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId
 	memcpy(pMsg+sizeof(int), &devLens, sizeof(devTknArchv));
 	constexpr int devTknoffset = sizeof(int) + sizeof(devTknArchv);
 	memcpy(pMsg+devTknoffset, devTkn.c_str(), devLens.tkn_len);
-
+	std::cout << "Created archive device token msg " << devLens << " devTkn=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	return true;
 }
 

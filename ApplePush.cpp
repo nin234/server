@@ -85,6 +85,7 @@ ApplePush::send(const std::vector<std::string>& tokenvec, const std::string& msg
 	
 	for (const std::string& token : tokenvec)
 	{
+		std::cout << "Adding token apn_array_t " << token << " " << __FILE__ << ":"<< __LINE__  << std::endl;
 		apn_array_insert(tokens, const_cast<char*>(token.c_str()));
 	}
 

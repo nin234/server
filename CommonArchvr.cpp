@@ -72,8 +72,8 @@ CommonArchvr::~CommonArchvr()
 bool
 CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn)
 {
-	int size;
-	int numread = read(deviceFd, &size, sizeof(int));
+	devTknArchv devLens;
+	int numread = read(deviceFd, &devLens, sizeof(devTknArchv));
 	if (numread == -1)
 	{
 		std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -84,7 +84,7 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
 	}
-	int toread = size- sizeof(int);
+	int toread = devLens.tkn_len;
 	numread = read(deviceFd, wrbuf, toread);
 	if (numread == -1)
 	{
@@ -97,10 +97,8 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
 	}
-	devTknArchv devLens;
-	memcpy(&devLens, wrbuf, sizeof(devTknArchv));
 	shareId = devLens.shareId;
-	devTkn = wrbuf + sizeof(devTknArchv);
+	devTkn = wrbuf;
     if (devLens.platform == 0)
     {
         devId = "ios";
@@ -331,7 +329,7 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 		break;
 
 		case ARCHIVE_DEVICE_TKN_MSG:
-			return archiveDeviceTkn(buf+sizeof(int), len-sizeof(int));
+			return archiveBuf(deviceFd, buf+sizeof(int), len-sizeof(int));
 
 		break;
             

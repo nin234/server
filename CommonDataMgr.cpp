@@ -90,6 +90,7 @@ CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, 
 void
 CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
+	std::cout << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.deviceToken = devTkn;
     elem.os = platform;
