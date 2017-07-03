@@ -90,19 +90,9 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 }
 
 bool
-MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst1, int msgId)
+MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst, int msgId, long shareId)
 {
-	std::string lst;
-	std::string::size_type xpos = lst1.find(":::");
-	if (xpos == std::string::npos)
-	{
-		lst = lst1;
-	}
-	else
-	{
-		lst = lst1.substr(xpos+3);
-	}
-	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2;
+	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2 + sizeof(long);
 	if (buflen < msglen)
 	{
 		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getListMsg " << std::endl;
@@ -112,12 +102,13 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 	
 	memcpy(pMsg, &msglen, sizeof(int));
 	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+	memcpy(pMsg +2*sizeof(int), &shareId, sizeof(long));
 	int namelen = name.size() + 1;
 	int lstlen = lst.size() + 1;
-	memcpy(pMsg+2*sizeof(int), &namelen, sizeof(int));
-	memcpy(pMsg+3*sizeof(int), &lstlen, sizeof(int));
-	memcpy(pMsg + 4*sizeof(int), name.c_str(), namelen);
-	int lstoffset = 4*sizeof(int) + namelen;
+	memcpy(pMsg+2*sizeof(int) + sizeof(long), &namelen, sizeof(int));
+	memcpy(pMsg+3*sizeof(int) + sizeof(long), &lstlen, sizeof(int));
+	memcpy(pMsg + 4*sizeof(int) + sizeof(long), name.c_str(), namelen);
+	int lstoffset = 4*sizeof(int) + sizeof(long) + namelen;
 	memcpy(pMsg+lstoffset, lst.c_str(), lstlen);
 	*mlen = msglen;
 	return true;

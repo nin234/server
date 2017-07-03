@@ -204,13 +204,11 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
 	{
 		std::cout << " Send item details " << pItr->first << " " << pItr->second << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		std::string itemName = std::to_string(pItr->first.shareId);
-		itemName += ":::";
-		itemName += pItr->first.lstName;
-		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_ITEM_MSG))
+		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first.lstName, pItr->second, SHARE_ITEM_MSG, pItr->first.shareId))
 		{
 			if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
 			{
+				std::cout << "Sent Item=" << pItr->first.lstName <<" to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 				dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName);
 				if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName, 32768))
 					sendArchiveMsg(archbuf, archlen, 10);	
@@ -228,7 +226,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
         std::string itemName = std::to_string(pItr->first.shareId);
         itemName += ":::";
         itemName += pItr->first.lstName;
-        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_TEMPL_ITEM_MSG))
+        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_TEMPL_ITEM_MSG, pItr->first.shareId))
         {
             if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
             {
@@ -259,14 +257,21 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		return;
 	}
 	std::cout << "Received Item message appId="<< pLstObj->getAppId() << " shareId=" << pLstObj->getShrId() << " name=" << pLstObj->getName() << " item=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__  << std::endl;
-
-	dataStore.storeItem(pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList());	
+	std::string lstToStore;
+	std::string::size_type xpos = pLstObj->getList().find(":::");
+	if (xpos == std::string::npos)
+	{
+		std::cout << "Invalid item received item=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	lstToStore = pLstObj->getList().substr(xpos+3);
+	dataStore.storeItem(pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), lstToStore);	
 	
 	//int size= 
 
 	char archbuf[32768];
 	int archlen = 0;
-	if (ArchiveMsgCreator::createItemMsg(archbuf, archlen, pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), pLstObj->getList(), 32768))
+	if (ArchiveMsgCreator::createItemMsg(archbuf, archlen, pLstObj->getAppId(), pLstObj->getShrId(), pLstObj->getName(), lstToStore, 32768))
 		sendArchiveMsg(archbuf , archlen, 10);	
 
 	std::vector<std::string>  shareIds;

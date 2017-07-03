@@ -272,9 +272,11 @@ CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, con
 	LckFreeLstSS lstSS;
 	if (elem.lstShareInfo.getValue(frndShareId, lstSS))
 	{
+		std::cout << "Erasing itemName=" << itemName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		lstSS.erase(itemName);
 		if (lstSS.isEmpty())
 		{
+			std::cout << "lstSS cleanUp " << __FILE__ << ":" << __LINE__ << std::endl;
 			lstSS.cleanUp();
 		}
 	}
