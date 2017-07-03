@@ -24,7 +24,10 @@ ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NU
 
 	apn_set_pkcs12_file(ctx, certfile.c_str(), "Kiev94'MICR");
 	if (bSandBox)
+	{
+		std::cout << "Setting sandbox mode in apns " << __FILE__ << ":" << __LINE__ << std::endl;
 		apn_set_mode(ctx,  APN_MODE_SANDBOX);
+	}
 	apn_set_log_level(ctx, APN_LOG_LEVEL_INFO | APN_LOG_LEVEL_ERROR | APN_LOG_LEVEL_DEBUG);
     	apn_set_log_callback(ctx, logCallback);
     	apn_set_invalid_token_callback(ctx, invalidTknCallback);
@@ -52,7 +55,7 @@ ApplePush::~ApplePush()
 void 
 ApplePush::logCallback(apn_log_levels level, const char * const message, uint32_t len)
 {
-	std::cout << "Apple push notification API logging message " << message << std::endl;
+	std::cout <<  message << " " << __FILE__ << ":" << __LINE__ <<  std::endl;
 	return;
 }
 
@@ -60,7 +63,7 @@ ApplePush::logCallback(apn_log_levels level, const char * const message, uint32_
 void 
 ApplePush::invalidTknCallback(const char * const token, uint32_t index)
 {
-	std::cout << "Apple push notification invalid token " << token << " index=" << index << std::endl; 
+	std::cout << "invalid token " << token << " index=" << index <<  " " << __FILE__ << ":" << __LINE__ << std::endl; 
 	return;
 }
 

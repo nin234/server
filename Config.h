@@ -11,6 +11,7 @@ class Config
 	int EasyGrocThrds;
 	int mq_maxmsg;
 	int mq_msgsize;
+	bool bSandbox;
 	std::unordered_map<std::string, std::string> keyvals;
 	public:
 		Config();
@@ -21,5 +22,6 @@ class Config
 		int getEasyGrocThrds();
 		int getMqMaxMsg();
 		int getMqMsgSize();
+		bool sandBox();
 };
 #endif

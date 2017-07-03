@@ -1,9 +1,11 @@
 #include <EasyGrocMgr.h>
 #include <EasyGrocWorker.h>
+#include <Config.h>
 
 EasyGrocMgr::EasyGrocMgr()
 {
-	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/AutoSpree.p12", true);
+	std::cout << "EasyGrocMgr constructor " << __FILE__ << ":" << __LINE__ << std::endl;
+	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/EasyGroc.p12", Config::Instance().sandBox());
     pFirebaseNotify = std::make_shared<FirebaseConnHdlr> ("Not Defined", "Not defined");
 }
 

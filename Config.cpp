@@ -46,11 +46,24 @@ Config::Config()
 		mq_msgsize = std::stoi(pItr->second);
 	}	
 	std::cout << "Config values contd mq_maxmsg=" << mq_maxmsg << " mq_msgsize=" << mq_msgsize << std::endl;
+
+	pItr = keyvals.find("apple_sandbox");
+	if (pItr != keyvals.end())
+	{
+		int sb = std::stoi(pItr->second);
+		bSandbox = sb?true:false;
+	}	
 }
 
 Config::~Config()
 {
 
+}
+
+bool
+Config::sandBox()
+{
+	return bSandbox;
 }
 
 Config&
