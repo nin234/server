@@ -39,7 +39,7 @@ MessageProcessor::process()
 {
 	for (;;)
 	{
-        pFirebaseNotify->getSendEvents();
+        //pFirebaseNotify->getSendEvents();
 		if (!pNtwIntf->waitAndGetMsg())	
 		{
 			--nFds;
@@ -194,12 +194,16 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		std::cout << "Invalid message received in MessageProcessor::processGetItemMsg " << std::endl;
 		return;
 	}
+
+	std::cout << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
+
 	std::map<shrIdLstName, std::string> lstNameMp;
 	dataStore.getShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), lstNameMp);
 	char archbuf[32768];
 	int archlen = 0;
 	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
 	{
+		std::cout << " Send item details " << pItr->first << " " << pItr->second << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		std::string itemName = std::to_string(pItr->first.shareId);
 		itemName += ":::";
 		itemName += pItr->first.lstName;

@@ -306,9 +306,8 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 	int indx = -1;
 	for (int i=0; i < SHARE_MAP_SIZE; ++i)
 	{
-		LckFreeLstSL lstSS;
 		long shrid_of_frndlst; 
-		isNext = elem.picShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
+		LckFreeLstSL& lstSS = elem.picShareInfo.getNext(shrid_of_frndlst, isNext, indx);
 		
 		if (!isNext)
 			break;
@@ -337,9 +336,8 @@ CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std
 	int indx = -1;
 	for (int i=0; i < SHARE_MAP_SIZE; ++i)
 	{
-		LckFreeLstSS lstSS;
 		long shrid_of_frndlst; 
-		isNext = elem.lstShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
+		LckFreeLstSS& lstSS = elem.lstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
 		
 		if (!isNext)
 			break;
@@ -347,14 +345,17 @@ CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std
 		lstSS.getKeys(itemNames);
 
 		CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
+		std::cout << "Number of keys=" << itemNames.size() << " " << __FILE__ << " " << __LINE__ << std::endl;
 		for (const std::string& itemName : itemNames)
 		{
 			std::string item;
-			shrelem.items.getVal(itemName, item);
+			if (!shrelem.items.getVal(itemName, item))
+				std::cout << "Failed to get item for itemName=" << itemName << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			std::cout << "Getting shareList i=" << i <<" appId=" << appId << " shareId=" << shareId << " shrid_of_frndlst=" << shrid_of_frndlst << " itemName=" << itemName << " item=" << item << " " << __FILE__ << " " << __LINE__ << std::endl;
 			shrIdLstName shlst;
 			shlst.shareId = shrid_of_frndlst;
 			shlst.lstName = itemName;
-			lstNameMp[shlst] = item.substr(2*sizeof(long));
+			lstNameMp[shlst] = item;
 		}
 	}
 	return;
@@ -368,9 +369,8 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
     int indx = -1;
     for (int i=0; i < SHARE_MAP_SIZE; ++i)
     {
-        LckFreeLstSS lstSS;
         long shrid_of_frndlst;
-        isNext = elem.templLstShareInfo.getNext(shrid_of_frndlst, lstSS, indx);
+	LckFreeLstSS& lstSS = elem.lstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
         if (!isNext)
             break;
         std::vector<std::string> itemNames;

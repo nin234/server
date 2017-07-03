@@ -1,5 +1,12 @@
 #include <Util.h>
 
+std::ostream&
+operator << (std::ostream& os, const shrIdLstName& shlnm)
+{
+	os << " shareId=" << shlnm.shareId << " lstName=" << shlnm.lstName << " picLen=" << shlnm.picLen << " appId=" << shlnm.appId << " fd=" << shlnm.fd;
+	return os;
+}
+
 Util::Util()
 {
 

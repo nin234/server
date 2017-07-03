@@ -2,6 +2,10 @@
 #define _UTIL_H_
 
 #include <string>
+#include <StorageElems.h>
+#include <iostream>
+
+std::ostream& operator << (std::ostream& os, const shrIdLstName& shlnm);
 
 class Util
 {

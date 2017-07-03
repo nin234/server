@@ -272,6 +272,7 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	constexpr int offset = 2*sizeof(int);
 	long shareId;
 	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
 	constexpr int devIdOffset = offset + sizeof(long);

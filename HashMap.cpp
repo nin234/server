@@ -196,18 +196,20 @@ HashMap<key, val, N>::hash2(key k)
 }
 
 template<typename key, typename val, int N>
-bool
-HashMap<key, val, N>::getNext(key& k, val& v, int &indx)
+val& 
+HashMap<key, val, N>::getNext(key& k, bool& isNext, int &indx)
 {
 	for (int i=indx+1; i < N; ++i)
 	{
 		if (!store[i].k)
 			continue;
 		k = store[i].k;
-		v = store[i].v;
-		return true;
+		indx =i;
+		isNext = true;
+		return store[i].v;
 	}
-	return false;
+	isNext = false;
+	return store[0].v;
 }
 
 

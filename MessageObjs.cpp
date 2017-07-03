@@ -41,6 +41,12 @@ operator << (std::ostream& os, const shareInfo& shInfo)
     return os;
 }
 
+std::ostream&
+operator << (std::ostream& os, const GetItemObj& getItem)
+{
+	os << " appId=" << getItem.getAppId() << " shrId=" << getItem.getShrId() << " devId=" << getItem.getDeviceId() << " fd=" << getItem.getFd();
+	return os;
+}
 
 
 void

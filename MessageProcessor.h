@@ -14,6 +14,7 @@
 #include <PictureSender.h>
 #include <MessageEnqueuer.h>
 #include <Observer.h>
+#include <Util.h>
 
 class MessageProcessor : public Observer
 {

@@ -233,9 +233,11 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::getKeys(std::vector<KeyType>& keys) const
 {
-	auto pItr = head;
+	auto pItr = head->next;
 	while (pItr != NULL)
 	{
+		if (pItr == tail)
+			break;
 		keys.push_back(pItr->key);	
 		pItr = pItr->next;
 	}
@@ -249,8 +251,9 @@ LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) cons
 	auto pItr = head;
 	while (pItr != NULL)
 	{
-		kvals[pItr->key] = pItr->val;
 		pItr = pItr->next;
+		if (pItr)
+			kvals[pItr->key] = pItr->val;
 	}
 	return;
 }
@@ -260,7 +263,7 @@ bool
 LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) const
 {
 
-	auto pItr = head;
+	auto pItr = head->next;
 	while (pItr != NULL)
 	{
 		if (key == pItr->key)

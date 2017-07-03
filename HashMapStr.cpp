@@ -1,4 +1,5 @@
 #include <HashMapStr.h>
+#include <iostream>
 
 
 int HashMapStr::T[256] = {
@@ -53,6 +54,7 @@ HashMapStr::insert(const std::string& key, const std::string& val)
 		if (!pHashStore)
 			 pHashStore = new std::array<LckFreeLstSS, STORE_ARRAY_SIZE>;
 	}
+	std::cout << "Inserting to HashMapStr hsh=" << hsh << " key=" << key << " val=" << val << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	(*pHashStore)[hsh].insert(key, val);
 	return true;
 }
@@ -63,7 +65,11 @@ HashMapStr::getVal(const std::string& key, std::string& val)
 	int hsh = hash(key.c_str());
 	hsh %= STORE_ARRAY_SIZE;
 	if (!pHashStore)
+	{
+		std::cout << "Failed to find hash store for key=" << key << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
+	}
+	std::cout << "Retrieving from HashMapStr hsh=" << hsh << " key=" << key << " val=" << val << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	return (*pHashStore)[hsh].getVal(key, val);	
 }
 

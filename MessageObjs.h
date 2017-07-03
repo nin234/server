@@ -201,6 +201,10 @@ class LstObj : public MsgObj
 
 };
 
+class GetItemObj;
+
+std::ostream& operator << (std::ostream& os, const GetItemObj& getItem);
+
 class GetItemObj : public MsgObj
 {
 	long shrId;
@@ -210,7 +214,7 @@ class GetItemObj : public MsgObj
 		GetItemObj() : shrId(0){}
 		long getShrId() const {return shrId;}	
 		void setShrId(long sid) {shrId = sid;}
-		const std::string& getDeviceId() {return devId;}
+		const std::string& getDeviceId() const {return devId;}
 		void setDeviceId(const std::string& dvId) {devId = dvId;}	
 };
 
