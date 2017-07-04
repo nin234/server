@@ -372,7 +372,7 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
     for (int i=0; i < SHARE_MAP_SIZE; ++i)
     {
         long shrid_of_frndlst;
-	LckFreeLstSS& lstSS = elem.lstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
+	LckFreeLstSS& lstSS = elem.templLstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
         if (!isNext)
             break;
         std::vector<std::string> itemNames;
@@ -385,7 +385,7 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
             shrIdLstName shlst;
             shlst.shareId = shrid_of_frndlst;
             shlst.lstName = itemName;
-            lstNameMp[shlst] = item.substr(2*sizeof(long));
+            lstNameMp[shlst] = item;
         }
         
     }

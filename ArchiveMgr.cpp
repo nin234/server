@@ -96,7 +96,7 @@ ArchiveMgr::processMsgs()
 			else
 			{
 				//TO DO process message
-				std::cout << "Received message=" << buf << std::endl;
+				std::cout << "Received message=" << buf << " " << __FILE__ << ":" << __LINE__ <<  std::endl;
 				processMsg(buf, s);
 				return ;
 			}
