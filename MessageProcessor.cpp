@@ -208,7 +208,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		{
 			if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
 			{
-				std::cout << "Sent Item=" << pItr->first.lstName <<" to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+				std::cout << "Sent Item=" << pItr->first.lstName << " from shareId=" << pItr->first.shareId <<" to shareId=" << pGetItemObj->getShrId() << " length=" << archlen << " " << __FILE__ << ":" << __LINE__ << std::endl;
 				dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName);
 				if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName, 32768))
 					sendArchiveMsg(archbuf, archlen, 10);	
