@@ -226,7 +226,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
         std::string itemName = std::to_string(pItr->first.shareId);
         itemName += ":::";
         itemName += pItr->first.lstName;
-        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, itemName, pItr->second, SHARE_TEMPL_ITEM_MSG, pItr->first.shareId))
+        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first.lstName, pItr->second, SHARE_TEMPL_ITEM_MSG, pItr->first.shareId))
         {
             if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
             {
@@ -287,7 +287,8 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 		}
 		std::vector<std::string> tokens;
 		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
-		sendApplePush(tokens, pLstObj->getName(), 1);
+		if (tokens.size())
+			sendApplePush(tokens, pLstObj->getName(), 1);
         std::vector<std::string> regIds;
         dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
         //sendFirebaseMsg(regIds, pLstObj->getName());

@@ -64,7 +64,16 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
         std::cout << "Invalid message received in  EasyGrocMsgProcessor::processTemplItemMsg" << std::endl;
         return;
     }
-    dataStore.storeTemplItem(pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList());
+   std::cout << "Received Templ Item message appId=" << pTmplObj->getAppId() << " shareId=" << pTmplObj->getShrId() << " name=" << pTmplObj->getName() << " item=" << pTmplObj->getTemplList() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::string tmplLstToStore;
+	std::string::size_type xpos = pTmplObj->getTemplList().find(":::");
+	if (xpos == std::string::npos)
+	{
+		std::cout << "Invalid templ item received item=" << pTmplObj->getTemplList() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	tmplLstToStore = pTmplObj->getTemplList().substr(xpos+3);
+    dataStore.storeTemplItem(pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), tmplLstToStore);
     char archbuf[32768];
     int archlen = 0;
     if (ArchiveMsgCreator::createTemplItemMsg(archbuf, archlen, pTmplObj->getAppId(), pTmplObj->getShrId(), pTmplObj->getName(), pTmplObj->getTemplList(), 32768))
@@ -79,10 +88,11 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
                 sendArchiveMsg(archbuf, archlen, 10);
             std::vector<std::string> tokens;
             dataStore.getDeviceTkns(pTmplObj->getAppId(), shareIds, tokens);
-            sendApplePush(tokens, pTmplObj->getName(), 1);
+	    if (tokens.size())
+            	sendApplePush(tokens, pTmplObj->getName(), 1);
             std::vector<std::string> regIds;
             dataStore.getAndroidDeviceTkns(pTmplObj->getAppId(), shareIds, regIds);
-            sendFirebaseMsg(regIds, pTmplObj->getName());
+            //sendFirebaseMsg(regIds, pTmplObj->getName());
             
         }
 
