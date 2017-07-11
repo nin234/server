@@ -147,7 +147,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 			std::cout << "Invalid picture file shareId=" << pItr1->second->getShrId() << " appId=" << pPicObj->getAppId() << " name=" << pItr1->second->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			return false;
 		}
-		fd = open(file.c_str(), O_CREAT|O_RDWR);
+		fd = open(file.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRWXU|S_IRGRP|S_IROTH);
 		std::cout << "Opened file=" << file << " to store picture " << __FILE__ << ":" << __LINE__ << std::endl;
 		
 		if (fd == -1)

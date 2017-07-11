@@ -297,7 +297,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			else
 			{
 				//TO DO process message
-				std::cout << "Received message= fd=" << evlist[j].data.fd  << " " << __FILE__<< ":" << __LINE__ <<  std::endl;
+				std::cout << "Received message= fd=" << evlist[j].data.fd << " length=" << s << " " << __FILE__<< ":" << __LINE__ <<  std::endl;
 				processMessage(buf, s, evlist[j].data.fd);
 			}
 		}
