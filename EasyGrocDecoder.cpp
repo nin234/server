@@ -29,7 +29,7 @@ EasyGrocDecoder::decodeMsg(char *buffer, ssize_t mlen, int fd)
     
     if (msgTyp > EASY_GROC_MSG_END || msgTyp < EASY_GROC_MSG_START)
     {
-        std::cout << "Invalid message received msgTyp=" << msgTyp << std::endl;
+        std::cout << "Invalid message received msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__  << std::endl;
         return false;
     }
         

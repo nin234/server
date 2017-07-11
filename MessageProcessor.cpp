@@ -153,6 +153,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 		std::cout << "Invalid message received in MessageProcessor::processPicMsg " << std::endl;
 		return;
 	}
+	std::cout << "Storing picture object " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (dataStore.storePic(pPicObj))
 	{
 		//send push notification

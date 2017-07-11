@@ -2,6 +2,7 @@
 #include <ArchiveMgr.h>
 #include <string>
 #include <string.h>
+#include <errno.h>
 #include <sstream>
 #include <iostream>
 #include <sys/time.h>
@@ -141,11 +142,17 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	else
 	{
 		std::string file = Util::constructPicFile(pItr1->second->getShrId(), pPicObj->getAppId(), pItr1->second->getName());
+		if (!file.size())
+		{
+			std::cout << "Invalid picture file shareId=" << pItr1->second->getShrId() << " appId=" << pPicObj->getAppId() << " name=" << pItr1->second->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			return false;
+		}
 		fd = open(file.c_str(), O_CREAT|O_RDWR);
+		std::cout << "Opened file=" << file << " to store picture " << __FILE__ << ":" << __LINE__ << std::endl;
 		
 		if (fd == -1)
 		{
-			std::cout << "Failed to open file " << file << std::endl;
+			std::cout << "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			fdPicMetaMp.erase(fd);
 			return false;
 		}
@@ -188,13 +195,17 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	long shareIdLst = pPicMetaObj->getShrId();
 	std::string name = pPicMetaObj->getName();
 	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
+	std::cout << "Storing picMetaData appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " picLen=" << pPicMetaObj->getPicLen();
 	for (const std::string& shareId : shareIds)
 	{
+		std::cout << " shareId=" << shareId;
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
 		LckFreeLstSL &lstSS = elem.picShareInfo[shareIdLst];
 		long val = pPicMetaObj->getPicLen();
 		lstSS.insertOrUpdate(name, val);
+		
 	}
+	std::cout << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
 	return;

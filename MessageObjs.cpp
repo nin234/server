@@ -58,9 +58,11 @@ PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
 	std::string s;
 	while(std::getline(ifs, s, ';'))
 	{
-		std::cout << s << std::endl;
-		frndLst.push_back(s);
+		std::cout << "friend shareId=" << s << " size=" << s.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		if (s.size() > 3)
+			frndLst.push_back(s);
 	}
+	std::cout << "frndLst size=" << frndLst.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	return;
 }
 

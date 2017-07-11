@@ -1,4 +1,5 @@
 #include <Util.h>
+#include <cstring>
 
 std::ostream&
 operator << (std::ostream& os, const shrIdLstName& shlnm)
@@ -30,7 +31,15 @@ Util::constructPicFile(int shareId, int appId, const std::string& name)
 		file += "/";
 		std::string filesuffx = std::to_string(shareId);
 		filesuffx += "_";
-		filesuffx += name;
-		file += filesuffx;
-		return file;
+		char buf[2048];
+		strncpy(buf, name.c_str(), 2048);
+		char *token = std::strtok(buf,";");
+		if (token != NULL)
+		{
+			filesuffx += token;
+			file += filesuffx;
+			return file;
+		}
+		std::string tmp;
+		return tmp;
 }
