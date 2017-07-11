@@ -92,18 +92,18 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
     {
         if (remaining < (ssize_t)sizeof(int))
         {
-		if (!bufinit)
-		{
-	  		 bufinit = aggrbufinit(fd);
+            if (!bufinit)
+            {
+                bufinit = aggrbufinit(fd);
     			 pItr = pAggrbufs.find(fd);
-		}
+            }
             memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
             pItr->second.bufIndx += remaining;
             bMore = true;
             break;
         }
         int len =0;
-        memcpy(&len, buffer, sizeof(int));
+        memcpy(&len, buffer+mlen-remaining, sizeof(int));
         if (remaining == len)
         {
             (*dcd)(buffer+mlen-remaining, remaining, fd);
@@ -111,18 +111,19 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
         }
         else if (remaining < len)
         {
-		if (!bufinit)
-		{
-			 bufinit = aggrbufinit(fd);
+            if (!bufinit)
+            {
+                bufinit = aggrbufinit(fd);
     			 pItr = pAggrbufs.find(fd);
-		}
+            }
+        
             if(bufferOverFlowCheck(remaining, fd))
-	    {
-		memcpy(pItr->second.aggrbuf, buffer+mlen-remaining, 2*sizeof(int));
+            {
+                memcpy(pItr->second.aggrbuf, buffer+mlen-remaining, 2*sizeof(int));
             	(*dcd)(buffer+mlen-remaining, remaining, fd);
-		pItr->second.bufIndx = 2*sizeof(int);
+                pItr->second.bufIndx = 2*sizeof(int);
                 break;
-	    }
+            }
             memcpy(pItr->second.aggrbuf+pItr->second.bufIndx, buffer+mlen-remaining, remaining);
             pItr->second.bufIndx += remaining;
             bMore = true;
