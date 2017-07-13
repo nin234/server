@@ -262,7 +262,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 {
 	struct epoll_event evlist[MAX_EVENTS];
 	char buf[MAX_BUF];
-	std::cout << "Waiting for epoll events in epoll_wait in thread=" << typeid(*this).name()  << std::endl;	
+	//std::cout << "Waiting for epoll events in epoll_wait in thread=" << typeid(*this).name()  << std::endl;	
 	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, -1);
 	if (ready == -1)
 	{
@@ -275,7 +275,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 		}
 	}
 	
-	std::cout << "File descriptors ready=" << ready << " in epoll_wait " << __FILE__ << " " << __LINE__ << std::endl;
+	//std::cout << "File descriptors ready=" << ready << " in epoll_wait " << __FILE__ << " " << __LINE__ << std::endl;
 	for (auto j=0; j < ready; ++j)
 	{
 		if (evlist[j].events & EPOLLIN)
