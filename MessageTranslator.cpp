@@ -86,6 +86,7 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 	memcpy(pMsg+picNameOffset, shidlst.lstName.c_str(), picNameLen);
 	int picLenOffset = picNameOffset+picNameLen;
 	memcpy(pMsg+picLenOffset, &shidlst.picLen, sizeof(long));
+	*mlen = msglen;
 	return true;
 }
 

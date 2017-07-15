@@ -7,6 +7,7 @@
 #include <Constants.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/time.h>
 
 std::ostream& 
 operator << (std::ostream& os, const PicFileDetails& pfd)
@@ -95,7 +96,23 @@ void
 PictureSender::sendPictures()
 {
 	sendPicMetaDat();	
-	sendPicData();
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	for (;;)
+	{
+		if (!picFdMp.size())
+		{
+			break;
+		}
+		sendPicData();
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		if (now.tv_sec > tv.tv_sec +6)
+		{
+			std::cout << "More than 6 seconds in sending picture data breaking now " << __FILE__ << ":" << __LINE__ << std::endl;
+			break;
+		}
+	}
 	return;
 }
 
@@ -113,7 +130,6 @@ PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails
 void
 PictureSender::sendPicData()
 {
-	std::cout << "Senting picture data " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = picFdMp.begin();
 	while (pItr != picFdMp.end())
 	{
