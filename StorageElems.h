@@ -5,6 +5,7 @@
 #include <map>
 #include <HashMapStr.h>
 #include <HashMap.h>
+#include <iostream>
 
 //create a lock free list/map of template lists and ordinary items
 

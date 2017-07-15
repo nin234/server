@@ -246,6 +246,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	for (auto& picNameShId : picNamesShIds)
 	{
 		picNameShId.fd = pGetItemObj->getFd();
+		std::cout << "Inserting into picNamesShIds " << picNameShId << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		m_pPicSndr->insertPicNameShid(picNameShId);
 	}
 	return;

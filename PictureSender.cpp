@@ -8,6 +8,12 @@
 #include <unistd.h>
 #include <string.h>
 
+std::ostream& 
+operator << (std::ostream& os, const PicFileDetails& pfd)
+{
+	os << " picFd=" << pfd.picFd << " picLen=" << pfd.picLen << " totWritten=" << pfd.totWritten;
+	return os;
+}
 PictureSender::PictureSender():m_pTrnsl(NULL), m_pObs(NULL)
 {
 
@@ -52,7 +58,7 @@ PictureSender::sendPicMetaDat()
 		struct stat sb;
 		if (stat(file.c_str(), &sb) == -1)
 		{
-			std::cout << "Cannot get file details for " << file << std::endl;
+			std::cout << "Cannot get file details for " << file << " shareId=" << picNameShId.shareId << " appId=" << picNameShId.appId << " name=" << picNameShId.lstName << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			pItr = picNamesShIds.erase(pItr);
 			continue;
 		}
@@ -68,12 +74,14 @@ PictureSender::sendPicMetaDat()
 		{
 			if (m_pObs && m_pObs->notify(archbuf, archlen, picNameShId.fd))
 			{
+				std::cout << "Sent picMetadataMsg for file=" << file << " " << __FILE__ << ":" << __LINE__ << std::endl;
 				PicFileDetails pfd;
 				pfd.picLen = picNameShId.picLen;
 				pfd.totWritten = 0;
 				pfd.picFd = open(file.c_str(), O_RDONLY);
 				if (pfd.picFd != -1)
 				{
+					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 					picFdMp[picNameShId.fd] = pfd;
 				}
 			}
@@ -105,6 +113,7 @@ PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails
 void
 PictureSender::sendPicData()
 {
+	std::cout << "Senting picture data " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = picFdMp.begin();
 	while (pItr != picFdMp.end())
 	{
@@ -115,22 +124,26 @@ PictureSender::sendPicData()
 		memcpy(buf, &msglen, sizeof(int));
 		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
 		int numread = read(pItr->second.picFd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
-		if (numread == -1)
+		if (!numread ||  numread == -1)
 		{
+			std::cout << "Finished reading file " << pItr->second << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
 		if (m_pObs && m_pObs->notify(buf, numread, pItr->first))
 		{
 			pItr->second.totWritten += numread;
+			std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
+				std::cout << "Finished reading file " << pItr->second <<  __FILE__ << ":" << __LINE__ << std::endl;
 				closeAndNotify(pItr->second.picFd, fd, pItr);
 				continue;
 			}
 		}
 		else
 		{
+			std::cout << "Failed to send file " << pItr->second << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
@@ -149,6 +162,7 @@ PictureSender::shouldEnqueMsg(int fd)
 void
 PictureSender::insertPicNameShid(const shrIdLstName& shidlst)
 {
+	std::cout << "Inserting into picNamesShIds size before insert=" << picNamesShIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	picNamesShIds.push_back(shidlst);
 	return;
 }

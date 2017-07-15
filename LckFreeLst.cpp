@@ -248,12 +248,14 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) const
 {
-	auto pItr = head;
+	auto pItr = head->next;
 	while (pItr != NULL)
 	{
-		pItr = pItr->next;
+		if (pItr == tail)
+			break;
 		if (pItr)
 			kvals[pItr->key] = pItr->val;
+		pItr = pItr->next;
 	}
 	return;
 }
