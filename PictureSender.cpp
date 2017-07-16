@@ -107,7 +107,8 @@ PictureSender::sendPictures()
 		sendPicData();
 		struct timeval now;
 		gettimeofday(&now, NULL);
-		if (now.tv_sec > tv.tv_sec +6)
+		//sleep(1);
+		if (now.tv_sec > tv.tv_sec +10)
 		{
 			std::cout << "More than 6 seconds in sending picture data breaking now " << __FILE__ << ":" << __LINE__ << std::endl;
 			break;
@@ -136,8 +137,6 @@ PictureSender::sendPicData()
 		char buf[MAX_BUF];
 		int fd = pItr->first;
 		constexpr int msgId = PIC_MSG;
-		int msglen = MAX_BUF;
-		memcpy(buf, &msglen, sizeof(int));
 		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
 		int numread = read(pItr->second.picFd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
 		if (!numread ||  numread == -1)
@@ -146,7 +145,9 @@ PictureSender::sendPicData()
 			closeAndNotify(pItr->second.picFd, fd, pItr);
 			continue;
 		}
-		if (m_pObs && m_pObs->notify(buf, numread, pItr->first))
+		int msglen = numread + 2*sizeof(int);
+		memcpy(buf, &msglen, sizeof(int));
+		if (m_pObs && m_pObs->notify(buf, msglen, pItr->first))
 		{
 			pItr->second.totWritten += numread;
 			std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
