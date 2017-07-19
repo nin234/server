@@ -6,7 +6,7 @@
 OpenHousesMgr::OpenHousesMgr()
 {
 	std::cout << "OpenHousesMgr constructor " << __FILE__ << ":" << __LINE__ << std::endl;
-	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/AutoSpree.p12", Config::Instance().sandBox());
+	pAppleNotify = std::make_shared<ApplePush>("/home/ninan/certs/OpenHouses.p12", Config::Instance().sandBox());
     pFirebaseNotify = std::make_shared<FirebaseConnHdlr> ("Not Defined", "Not defined");
 	std::cout << "Constructed OpenHousesMgr " << __FILE__ << ":" << __LINE__ << std::endl;
 }
