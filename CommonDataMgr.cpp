@@ -131,7 +131,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	auto pItr1 = fdPicMetaMp.find(pPicObj->getFd());
 	if (pItr1 == fdPicMetaMp.end())
 	{
-		std::cout << "Failed to find metadata for picture " << std::endl;
+		std::cout << "Failed to find metadata for picture fd=" << pPicObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
 	}
 	int fd  = -1;
@@ -186,8 +186,9 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 void 
 CommonDataMgr::eraseFdMp(int fd)
 {
-	fdFdMp.erase(fd);
-	fdPicMetaMp.erase(fd);
+	int cnt = fdFdMp.erase(fd);
+	int cnt1 = fdPicMetaMp.erase(fd);
+	std::cout << "Erased from fdFdMp=" << cnt << " and fdPicMetaMp=" << cnt1 << " fd=" << fd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 }
 void 
 CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
@@ -206,7 +207,7 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 		lstSS.insertOrUpdate(name, val);
 		
 	}
-	std::cout << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
 	return;

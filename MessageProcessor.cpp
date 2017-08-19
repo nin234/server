@@ -39,7 +39,7 @@ MessageProcessor::process()
 {
 	for (;;)
 	{
-        //pFirebaseNotify->getSendEvents();
+        	pFirebaseNotify->getSendEvents();
 		if (!pNtwIntf->waitAndGetMsg())	
 		{
 			--nFds;
@@ -166,8 +166,17 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 			dataStore.getDeviceTkns(pPicObj->getAppId(), shareIds, tokens);	
 			std::string picName = dataStore.getPicName(pPicObj->getFd());
 			std::cout << "Sending push notification to receive picture name=" << picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			sendApplePush(tokens, picName, 1);
+			if (tokens.size())
+			{
+				sendApplePush(tokens, picName, 1);
+			}
 			dataStore.eraseFdMp(pPicObj->getFd());
+			std::vector<std::string> regIds;
+			dataStore.getAndroidDeviceTkns(pPicObj->getAppId(), shareIds, regIds);
+			if (regIds.size())
+			{
+				sendFirebaseMsg(regIds, picName);
+			}
 		}
 	
 	}
@@ -296,7 +305,11 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 			sendApplePush(tokens, pLstObj->getName(), 1);
         std::vector<std::string> regIds;
         dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
-        //sendFirebaseMsg(regIds, pLstObj->getName());
+	std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	if (regIds.size())
+	{
+        	sendFirebaseMsg(regIds, pLstObj->getName());
+	}
         
 	}
 	char buf[1024];

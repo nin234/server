@@ -104,6 +104,7 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
         }
         int len =0;
         memcpy(&len, buffer+mlen-remaining, sizeof(int));
+	std::cout << "Message length=" << len << std::endl;	
         if (remaining == len)
         {
             (*dcd)(buffer+mlen-remaining, remaining, fd);

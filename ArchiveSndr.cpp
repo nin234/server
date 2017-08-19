@@ -4,6 +4,8 @@
 #include <string.h>
 #include <ArchiveMgr.h>
 #include <Config.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 ArchiveSndr::ArchiveSndr()
 {
@@ -13,7 +15,13 @@ ArchiveSndr::ArchiveSndr()
 	mq_attr *mqa = new mq_attr;
 	mqa->mq_maxmsg = Config::Instance().getMqMaxMsg();
 	mqa->mq_msgsize = Config::Instance().getMqMsgSize();
+	
 	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, mqa);
+	struct rlimit lm;
+	if (!getrlimit(RLIMIT_NOFILE, &lm))
+	{
+		std::cout << "No of open files " << lm.rlim_cur << " " << lm.rlim_max << " " << __FILE__ << ":" <<__LINE__ << std::endl;
+	}
 	if (sndfd == -1)
 	{
 		std::cerr << " Failed to open message queue name=" << name  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;

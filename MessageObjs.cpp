@@ -23,6 +23,9 @@ PicMetaDataObj::setName(const char *pName, int len)
 {
 	name.resize(len);
 	memcpy(&name[0], pName, len);
+	std::size_t fnd = name.find_first_of('\0');
+	if (fnd != std::string::npos)
+		name.resize(fnd);
 	return;
 }
 
@@ -48,6 +51,14 @@ operator << (std::ostream& os, const GetItemObj& getItem)
 	return os;
 }
 
+
+PicMetaDataObj::PicMetaDataObj()
+{
+	shrId=0;
+	picLen =0;
+	writtenLen =0;
+	std::cout << "created PicMetaDataObj " << __FILE__ << ":" << __LINE__ << std::endl;
+}
 
 void
 PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
@@ -83,6 +94,9 @@ TemplLstObj::setName(const char *pName, int len)
 {
 	name.resize(len);
 	memcpy(&name[0], pName, len);
+	std::size_t fnd = name.find_first_of('\0');
+	if (fnd != std::string::npos)
+		name.resize(fnd);
 	return;
 }
 
@@ -91,6 +105,9 @@ TemplLstObj::setTemplList(const char *pList, int len)
 {
 	templList.resize(len);
 	memcpy(&templList[0], pList, len);
+	std::size_t fnd = templList.find_first_of('\0');
+	if (fnd != std::string::npos)
+		templList.resize(fnd);
 	return;
 }
 
@@ -99,6 +116,9 @@ LstObj::setName(const char *pName, int len)
 {
 	name.resize(len);
 	memcpy(&name[0], pName, len);
+	std::size_t fnd = name.find_first_of('\0');
+	if (fnd != std::string::npos)
+		name.resize(fnd);
 	return;
 }
 
@@ -107,5 +127,8 @@ LstObj::setList(const char *pList, int len)
 {
 	list.resize(len);
 	memcpy(&list[0], pList, len);
+	std::size_t fnd = list.find_first_of('\0');
+	if (fnd != std::string::npos)
+		list.resize(fnd);
 	return;
 }

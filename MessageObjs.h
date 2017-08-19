@@ -55,7 +55,7 @@ class PicMetaDataObj : public MsgObj
 		int writtenLen;
 	public:
 		virtual ~PicMetaDataObj(){}
-		PicMetaDataObj(){}
+		PicMetaDataObj();
 		long  getShrId() {return shrId;}
 		void setShrId(long sid) {shrId = sid;}
 		std::string getName(){return name;}
