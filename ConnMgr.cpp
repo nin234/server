@@ -1,5 +1,9 @@
 #include <ConnMgr.h>
 #include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+
 
 ConnMgr::ConnMgr()
 {
@@ -54,6 +58,9 @@ ConnMgr::waitAndGetConnections()
 				struct 	sockaddr addr;
 				socklen_t addrlen;
 				int fd = accept(apps[i].listenFd(), &addr, &addrlen);
+				 int one = 1;
+
+				 setsockopt(fd, SOL_TCP, TCP_NODELAY, &one, sizeof(one));
 				readyFdsMp[i] = fd;
 			
 			}

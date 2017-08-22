@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <netinet/tcp.h>
 
 ServSocket::ServSocket()
 {
@@ -45,7 +46,9 @@ ServSocket::bindAndListen()
 		{
 			throw std::system_error(errno, std::system_category());
 		}
-		
+	 	int one = 1;
+
+		 setsockopt(lfd, SOL_TCP, TCP_NODELAY, &one, sizeof(one));	
 		if (bind(lfd, saddr->ai_addr, saddr->ai_addrlen) == 0)	
 			break;
 		close (lfd);

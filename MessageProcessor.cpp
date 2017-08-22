@@ -369,6 +369,7 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 	int mlen=0;
 	if (m_pTrnsl->getReply(buf, &mlen, STORE_DEVICE_TKN_RPLY_MSG))
 	{
+		std::cout << "Send reply STORE_DEVICE_TKN_RPLY_MSG" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		sendMsg(buf, mlen, pDevTknObj->getFd());
 	}
 		
