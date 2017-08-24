@@ -21,9 +21,11 @@ Node<KeyType, ValType>::Node(KeyType k, ValType v):key(k), val(v), next(NULL),  
 template<typename KeyType, typename ValType>
 LckFreeLst<KeyType, ValType>::LckFreeLst()
 {
+/*
 	head = new Node<KeyType, ValType> ();
 	tail = new Node<KeyType, ValType> ();
 	head->next = tail;
+*/
 
 }
 
@@ -31,6 +33,10 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::erase(KeyType search_key)
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	storage.erase(search_key);
+	return true;
+	/*
 	Node<KeyType, ValType> *right_node, *right_node_next, *left_node;
 	do 
 	{
@@ -52,12 +58,17 @@ LckFreeLst<KeyType, ValType>::erase(KeyType search_key)
 	else
 		delete right_node;
 	return true;
+	*/
 }
 
 template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::insert(KeyType key, ValType val)
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	storage[key] = val;
+	return true;
+/*
 	Node<KeyType, ValType> *new_node = new Node<KeyType, ValType>(key, val);
 	Node<KeyType, ValType> *right_node, *left_node;
 
@@ -74,12 +85,18 @@ LckFreeLst<KeyType, ValType>::insert(KeyType key, ValType val)
 			return true;
 	} 
 	while (true); 
+  */
+	return true;
 }
 
 template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::insertOrUpdate(KeyType key, ValType val)
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	storage[key] = val;
+	return true;
+/*
 	Node<KeyType, ValType> *new_node = new Node<KeyType, ValType>(key, val);
 	Node<KeyType, ValType> *right_node, *left_node;
 
@@ -97,12 +114,22 @@ LckFreeLst<KeyType, ValType>::insertOrUpdate(KeyType key, ValType val)
 			return true;
 	} 
 	while (true); 
+	*/
+	return true;
 }
 
 template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::find(KeyType key)
 {
+
+	std::lock_guard<std::mutex> lock(gcmutex);
+	auto pItr = storage.find(key);
+	if (pItr == storage.end())
+		return false;
+	return true;
+	
+/*
 	Node<KeyType, ValType> *right_node, *left_node;
 	
 	right_node = search(key, &left_node);
@@ -110,6 +137,7 @@ LckFreeLst<KeyType, ValType>::find(KeyType key)
 		return false;
 	else
 		return true;
+*/
 }
 
 
@@ -178,25 +206,34 @@ LckFreeLst<KeyType, ValType>::is_marked_reference(Node<KeyType, ValType> *pNode)
 template<typename KeyType, typename ValType>
 LckFreeLst<KeyType, ValType>::~LckFreeLst()
 {
-	delete head;
-	delete tail;
+//	delete head;
+//	delete tail;
 }
 
 template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::isEmpty()
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	return storage.empty();
+	/*
 	if (head->next == tail)
 	{
 		return true;
 	}
 	return false;
+	*/
 }
 
 template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::cleanUp()
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	storage.clear();
+	return;
+
+/*
 	time_t now = time(NULL);
 	std::lock_guard<std::mutex> lock(gcmutex);
 	for (auto pItr = garbageCollector.begin(); pItr != garbageCollector.end();  )
@@ -213,26 +250,41 @@ LckFreeLst<KeyType, ValType>::cleanUp()
 		}
 	}
 	return;
+	*/
 }
 
 
 template<typename KeyType, typename ValType>
 void
-LckFreeLst<KeyType, ValType>::getVals(std::vector<ValType>& vals) const
+LckFreeLst<KeyType, ValType>::getVals(std::vector<ValType>& vals)
 {
-	auto pItr = head;
+	std::lock_guard<std::mutex> lock(gcmutex);
+	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
+	{
+		vals.push_back(pItr->second);
+	}
+	return;
+	/*auto pItr = head;
 	while (pItr != NULL)
 	{
 		vals.push_back(pItr->val);	
 		pItr = pItr->next;
 	}
 	return;
+	*/
 }
 
 template<typename KeyType, typename ValType>
 void
-LckFreeLst<KeyType, ValType>::getKeys(std::vector<KeyType>& keys) const
+LckFreeLst<KeyType, ValType>::getKeys(std::vector<KeyType>& keys)
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
+	{
+		keys.push_back(pItr->first);
+	}
+	return;
+/*
 	auto pItr = head->next;
 	while (pItr != NULL)
 	{
@@ -242,12 +294,17 @@ LckFreeLst<KeyType, ValType>::getKeys(std::vector<KeyType>& keys) const
 		pItr = pItr->next;
 	}
 	return;
+*/
 }
 
 template<typename KeyType, typename ValType>
 void
-LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) const
+LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) 
 {
+	std::lock_guard<std::mutex> lock(gcmutex);
+	kvals = storage;
+	return;
+	/*
 	auto pItr = head->next;
 	while (pItr != NULL)
 	{
@@ -258,13 +315,21 @@ LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) cons
 		pItr = pItr->next;
 	}
 	return;
+	*/
 }
 
 template<typename KeyType, typename ValType>
 bool
-LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) const
+LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) 
 {
-
+	std::lock_guard<std::mutex> lock(gcmutex);
+	auto pItr = storage.find(key);
+	if (pItr == storage.end())
+		return false;
+	val = pItr->second;
+	return true;
+		
+/*
 	auto pItr = head->next;
 	while (pItr != NULL)
 	{
@@ -280,6 +345,7 @@ LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) const
 		pItr = pItr->next;
 	}
 	return false;
+*/
 }
 
 template class LckFreeLst<std::string, std::string>;

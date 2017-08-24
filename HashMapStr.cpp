@@ -28,8 +28,10 @@ HashMapStr::HashMapStr():pHashStore(NULL)
 
 HashMapStr::~HashMapStr()
 {
+	/*
 	if (pHashStore)
 		delete pHashStore;
+	*/
 }
 
 int
@@ -46,6 +48,9 @@ HashMapStr::hash(const char *pStr)
 bool
 HashMapStr::insert(const std::string& key, const std::string& val)
 {
+	std::lock_guard<std::mutex> lock(allcmtx);
+	storage[key] = val;
+	/*
 	int hsh = hash(key.c_str());
 	hsh %= STORE_ARRAY_SIZE;
 	if (!pHashStore)
@@ -56,12 +61,21 @@ HashMapStr::insert(const std::string& key, const std::string& val)
 	}
 	std::cout << "Inserting to HashMapStr hsh=" << hsh << " key=" << key << " val=" << val << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	(*pHashStore)[hsh].insert(key, val);
+	*/
 	return true;
 }
 
 bool
 HashMapStr::getVal(const std::string& key, std::string& val)
 {
+	std::lock_guard<std::mutex> lock(allcmtx);
+	auto pItr = storage.find(key);
+	if (pItr == storage.end())
+		return false;
+	val = pItr->second;
+	return true;
+
+/*
 	int hsh = hash(key.c_str());
 	hsh %= STORE_ARRAY_SIZE;
 	if (!pHashStore)
@@ -71,16 +85,24 @@ HashMapStr::getVal(const std::string& key, std::string& val)
 	}
 	std::cout << "Retrieving from HashMapStr hsh=" << hsh << " key=" << key << " val=" << val << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	return (*pHashStore)[hsh].getVal(key, val);	
+*/
 }
 
 bool
 HashMapStr::getVals(std::vector<std::string>& vals)
 {
+	std::lock_guard<std::mutex> lock(allcmtx);
+	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
+		vals.push_back(pItr->second);
+	return true;
+
+/*
 	if (!pHashStore)
 		return false;
 	for (const LckFreeLstSS& lst : *pHashStore)
 		lst.getVals(vals);	
 	return true;
+*/
 }
 
 

@@ -7,6 +7,7 @@
 #include <string>
 #include<vector>
 #include <mutex>
+#include <map>
 
 class HashMapStr
 {
@@ -16,6 +17,7 @@ class HashMapStr
 
 		int hash(const char *pStr);
 		std::mutex allcmtx;
+		std::map<std::string, std::string> storage;
 	public:
 		HashMapStr();
 		~HashMapStr();

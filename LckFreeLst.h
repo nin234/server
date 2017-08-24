@@ -30,6 +30,9 @@ class LckFreeLst
 	std::map<time_t, Node<KeyType, ValType>*> garbageCollector;
 	std::mutex gcmutex;
 
+
+	std::map<KeyType, ValType> storage;
+
 	public:
 		LckFreeLst();
 		~LckFreeLst();
@@ -39,10 +42,10 @@ class LckFreeLst
 		bool find (KeyType key);
 		bool erase (KeyType key);
 		void cleanUp();
-		void getVals(std::vector<ValType>& vals) const;
-		void getKeys(std::vector<KeyType>& keys) const;
-		void getKeyVals(std::map<KeyType, ValType>& kvals) const;
-		bool getVal(const KeyType& key, ValType& val) const;
+		void getVals(std::vector<ValType>& vals);
+		void getKeys(std::vector<KeyType>& keys);
+		void getKeyVals(std::map<KeyType, ValType>& kvals);
+		bool getVal(const KeyType& key, ValType& val);
 		//dummy fn to make compiler happy
 		const LckFreeLst& operator=(const LckFreeLst& rhs)
 		{ return *(new LckFreeLst());}
