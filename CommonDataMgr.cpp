@@ -40,19 +40,17 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& nam
 {
 	std::cout << "Storing item shareInfo appId=" << appId << " shareId=" << shareId << " name=" << name << " shareIdLst=" << shareIdLst << " " << __FILE__ << ":" << __LINE__ << std::endl;
     
-  		CommonElem& elem = commonElems[appId][shareId];
-    LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
-    std::string val = "NONE";
-    lstSS.insertOrUpdate(name, val);
+	CommonElem& elem = commonElems[appId][shareId];
+	std::string val = "NONE";
+	elem.lstShareInsert(shareIdLst, name, val);
 }
 
 void
 CommonDataMgr::storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
 {
     CommonElem& elem = commonElems[appId][shareId];
-    LckFreeLstSS &lstSS = elem.templLstShareInfo[shareIdLst];
     std::string val = "NONE";
-    lstSS.insertOrUpdate(name, val);
+    elem.templLstShareInsert(shareIdLst, name, val);
 }
 
 CommonDataMgr::~CommonDataMgr()
@@ -202,9 +200,8 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	{
 		std::cout << " shareId=" << shareId;
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-		LckFreeLstSL &lstSS = elem.picShareInfo[shareIdLst];
 		long val = pPicMetaObj->getPicLen();
-		lstSS.insertOrUpdate(name, val);
+		elem.picShareInsert(shareIdLst, name, val);
 		
 	}
 	std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -219,10 +216,9 @@ CommonDataMgr::storeTemplLstShareInfo(int appId, long shareIdLst, const std::vec
     for (const std::string& shareId : shareIds)
     {
         long shId = std::stol(shareId);
-        CommonElem& elem = commonElems[appId][shId];
-        LckFreeLstSS &lstSS = elem.templLstShareInfo[shareIdLst];
-        std::string val = "NONE";
-        lstSS.insertOrUpdate(name, val);
+	CommonElem& elem = commonElems[appId][shId];
+	std::string val = "NONE";
+	elem.templLstShareInsert(shareIdLst, name, val);
     }	
     return;
 }
@@ -236,9 +232,8 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 		long shId = std::stol(shareId);
 		std::cout << "Storing item shareInfo shId=" << shId << " appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " " << __FILE__ << ":" << __LINE__ << std::endl;
   		CommonElem& elem = commonElems[appId][shId];
-		LckFreeLstSS &lstSS = elem.lstShareInfo[shareIdLst];
 		std::string val = "NONE";
-		lstSS.insertOrUpdate(name, val);
+		elem.lstShareInsert(shareIdLst, name, val);
 	}	
 	return;
 }
@@ -281,18 +276,19 @@ void
 CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName)
 {
 		
+	std::cout << "Erasing itemName=" << itemName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	CommonElem& elem = commonElems[appId][shareId];
-	LckFreeLstSS lstSS;
-	if (elem.lstShareInfo.getValue(frndShareId, lstSS))
-	{
-		std::cout << "Erasing itemName=" << itemName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		lstSS.erase(itemName);
-		if (lstSS.isEmpty())
-		{
-			std::cout << "lstSS cleanUp " << __FILE__ << ":" << __LINE__ << std::endl;
-			lstSS.cleanUp();
-		}
-	}
+	elem.lstShareDel(frndShareId, itemName);
+	return;
+}
+
+void
+CommonDataMgr::updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName)
+{
+		
+	std::cout << "Erasing picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	CommonElem& elem = commonElems[appId][shareId];
+	elem.picShareDel(frndShareId, picName);
 	return;
 }
 
@@ -300,15 +296,7 @@ void
 CommonDataMgr::updateTemplLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName)
 {
     CommonElem& elem = commonElems[appId][shareId];
-    LckFreeLstSS lstSS;
-    if (elem.templLstShareInfo.getValue(frndShareId, lstSS))
-    {
-        lstSS.erase(itemName);
-        if (lstSS.isEmpty())
-        {
-            lstSS.cleanUp();
-        }
-    }
+    elem.templLstShareDel(frndShareId, itemName);
     return;
 }
 
@@ -317,24 +305,20 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 {
 	
   	CommonElem& elem = commonElems[appId][shareId];
-	bool isNext = true;
-	int indx = -1;
-	for (int i=0; i < SHARE_MAP_SIZE; ++i)
+	std::map<long, std::map<std::string, long>> shIdItemNames;
+	elem.getSharePics(shIdItemNames);
+	for (auto pItr = shIdItemNames.begin(); pItr != shIdItemNames.end(); ++pItr)
 	{
-		long shrid_of_frndlst; 
-		LckFreeLstSL& lstSS = elem.picShareInfo.getNext(shrid_of_frndlst, isNext, indx);
-		
-		if (!isNext)
-			break;
-		std::map<std::string, long> picNamesLens;
-		lstSS.getKeyVals(picNamesLens);
-		for (auto pItr = picNamesLens.begin(); pItr != picNamesLens.end(); ++pItr)
+		long shrid_of_frndlst = pItr->first; 
+		std::map<std::string, long>& picNamesLens = pItr->second;
+		for (auto pItr1 = picNamesLens.begin(); pItr1 != picNamesLens.end(); ++pItr1)
 		{
 			shrIdLstName shlst;
 			shlst.shareId = shrid_of_frndlst;
-			shlst.lstName = pItr->first;
-			shlst.picLen =  pItr->second;
+			shlst.lstName = pItr1->first;
+			shlst.picLen =  pItr1->second;
 			shlst.appId = appId;
+			shlst.shareIdElem = shareId;
 			picNamesShIds.push_back(shlst);
 
 		}
@@ -347,17 +331,12 @@ void
 CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
 	CommonElem& elem = commonElems[appId][shareId];
-	bool isNext = true;
-	int indx = -1;
-	for (int i=0; i < SHARE_MAP_SIZE; ++i)
+	std::map<long, std::vector<std::string>> shIdItemNames;
+	elem.getShareLists(shIdItemNames);
+	for (auto pItr = shIdItemNames.begin(); pItr != shIdItemNames.end(); ++pItr)
 	{
-		long shrid_of_frndlst; 
-		LckFreeLstSS& lstSS = elem.lstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
-		
-		if (!isNext)
-			break;
-		std::vector<std::string> itemNames;
-		lstSS.getKeys(itemNames);
+		long shrid_of_frndlst = pItr->first; 
+		std::vector<std::string>& itemNames= pItr->second;
 
 		CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
 		std::cout << "Number of keys=" << itemNames.size() << " " << __FILE__ << " " << __LINE__ << std::endl;
@@ -366,7 +345,7 @@ CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std
 			std::string item;
 			if (!shrelem.items.getVal(itemName, item))
 				std::cout << "Failed to get item for itemName=" << itemName << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			std::cout << "Getting shareList i=" << i <<" appId=" << appId << " shareId=" << shareId << " shrid_of_frndlst=" << shrid_of_frndlst << " itemName=" << itemName << " item=" << item << " " << __FILE__ << " " << __LINE__ << std::endl;
+			std::cout << "Getting shareList "  <<" appId=" << appId << " shareId=" << shareId << " shrid_of_frndlst=" << shrid_of_frndlst << " itemName=" << itemName << " item=" << item << " " << __FILE__ << " " << __LINE__ << std::endl;
 			shrIdLstName shlst;
 			shlst.shareId = shrid_of_frndlst;
 			shlst.lstName = itemName;
@@ -380,16 +359,12 @@ void
 CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
     CommonElem& elem = commonElems[appId][shareId];
-    bool isNext = true;
-    int indx = -1;
-    for (int i=0; i < SHARE_MAP_SIZE; ++i)
+    std::map<long, std::vector<std::string>> shIdItemNames;
+    elem.getTemplShareLists(shIdItemNames);
+    for (auto pItr = shIdItemNames.begin(); pItr != shIdItemNames.end(); ++pItr)
     {
-        long shrid_of_frndlst;
-	LckFreeLstSS& lstSS = elem.templLstShareInfo.getNext(shrid_of_frndlst, isNext, indx);
-        if (!isNext)
-            break;
-        std::vector<std::string> itemNames;
-        lstSS.getKeys(itemNames);
+	long shrid_of_frndlst = pItr->first; 
+	std::vector<std::string>& itemNames= pItr->second;
         CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
         for (const std::string& itemName : itemNames)
         {

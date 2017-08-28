@@ -80,6 +80,10 @@ PictureSender::sendPicMetaDat()
 				pfd.picLen = picNameShId.picLen;
 				pfd.totWritten = 0;
 				pfd.picFd = open(file.c_str(), O_RDONLY);
+				pfd.shareId = picNameShId.shareIdElem;
+				pfd.frndShareId = picNameShId.shareId;
+				pfd.appId = picNameShId.appId;
+				
 				if (pfd.picFd != -1)
 				{
 					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -154,6 +158,7 @@ PictureSender::sendPicData()
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
 				std::cout << "Finished reading file " << pItr->second <<  __FILE__ << ":" << __LINE__ << std::endl;
+				m_pObs->updatePicShareInfo(pItr->second.appId, pItr->second.shareId, pItr->second.frndShareId, pItr->second.picName);
 				closeAndNotify(pItr->second.picFd, fd, pItr);
 				continue;
 			}

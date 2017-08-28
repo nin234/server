@@ -21,7 +21,7 @@ int HashMapStr::T[256] = {
  51,  65,  28, 144, 254, 221,  93, 189, 194, 139, 112,  43,  71, 109, 184, 209
 };
 
-HashMapStr::HashMapStr():pHashStore(NULL)
+HashMapStr::HashMapStr()//:pHashStore(NULL)
 {
 
 }

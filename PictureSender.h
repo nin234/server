@@ -12,6 +12,10 @@ struct PicFileDetails
 	int picFd;
 	int picLen;
 	int totWritten;
+	int shareId;
+	int frndShareId;
+	int appId;
+	std::string picName;
 	
 };
 

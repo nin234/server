@@ -6,6 +6,8 @@
 #include <HashMapStr.h>
 #include <HashMap.h>
 #include <iostream>
+#include <mutex>
+#include <vector>
 
 //create a lock free list/map of template lists and ordinary items
 
@@ -16,9 +18,20 @@
         HashMapStr templItems;
           std::string deviceToken;
       std::string os;
-	  HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> lstShareInfo;
-      HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE> templLstShareInfo;
-	  HashMap<long, LckFreeLstSL, SHARE_MAP_SIZE> picShareInfo;
+	void lstShareInsert(long shareId, const std::string& name, const std::string& val);
+	void lstShareDel(long shareId, const std::string& name);
+	void getShareLists(std::map<long, std::vector<std::string>>& shIdItemNames);
+	void templLstShareInsert(long shareId, const std::string& name, const std::string& val);
+	void templLstShareDel(long shareId, const std::string& name);
+	void getTemplShareLists(std::map<long, std::vector<std::string>>& shIdItemNames);
+	void picShareInsert(long shareId, const std::string& name,  long val);
+	void picShareDel(long shareId, const std::string& name);
+	void getSharePics(std::map<long, std::map<std::string, long>>& shIdItemNames);
+	private:
+	  std::map<long, LckFreeLstSS> lstShareInfo;
+      	  std::map<long, LckFreeLstSS> templLstShareInfo;
+	  std::map<long, LckFreeLstSL> picShareInfo;
+	  std::mutex lstShareMtx, picShareMtx;
   };
 
  struct shrIdLstName
@@ -28,6 +41,7 @@
 	long picLen;
 	int fd;
 	int appId;
+	long shareIdElem;
 	bool operator < (const shrIdLstName& shlst) const
 	{
 		if (shareId != shlst.shareId)

@@ -63,6 +63,7 @@ class MessageProcessor : public Observer
         bool sendFirebaseMsg(const std::vector<std::string>& tokens, const std::string& msg);
 		bool notify (char *buf, int mlen, int fd);
 		bool picDone(int fd);
+		void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName); 
 };
 
 #endif

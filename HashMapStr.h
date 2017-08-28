@@ -13,7 +13,7 @@ class HashMapStr
 {
 	static int T[256];
 
-	std::array<LckFreeLstSS, STORE_ARRAY_SIZE> *pHashStore;
+//	std::array<LckFreeLstSS, STORE_ARRAY_SIZE> *pHashStore;
 
 		int hash(const char *pStr);
 		std::mutex allcmtx;

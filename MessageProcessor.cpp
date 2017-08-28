@@ -476,6 +476,13 @@ MessageProcessor::notify(char *buf, int mlen, int fd)
 	return sendMsg(buf, mlen , fd);
 }
 
+void
+MessageProcessor::updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName)
+{
+	dataStore.updatePicShareInfo(appId, shareId, frndShareId, picName);
+	return;
+}
+
 bool
 MessageProcessor::picDone(int fd)
 {
