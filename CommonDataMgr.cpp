@@ -10,6 +10,11 @@
 #include <ArchiveMsgCreator.h>
 #include <Util.h>
 
+thread_local std::unordered_map<int, int> 
+CommonDataMgr::fdFdMp;
+
+thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> CommonDataMgr::fdPicMetaMp;
+
 CommonDataMgr::CommonDataMgr()
 {
 	
@@ -39,7 +44,7 @@ void
 CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
 {
 	std::cout << "Storing item shareInfo appId=" << appId << " shareId=" << shareId << " name=" << name << " shareIdLst=" << shareIdLst << " " << __FILE__ << ":" << __LINE__ << std::endl;
-    
+   	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	std::string val = "NONE";
 	elem.lstShareInsert(shareIdLst, name, val);
@@ -48,6 +53,7 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& nam
 void
 CommonDataMgr::storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)
 {
+    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
     CommonElem& elem = commonElems[appId][shareId];
     std::string val = "NONE";
     elem.templLstShareInsert(shareIdLst, name, val);
@@ -62,6 +68,7 @@ void
 CommonDataMgr::storeArchiveItem(int appId, long shareId, const std::string& name, const std::string& templList)
 {
 	std::cout << "Storing archive items " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   CommonElem& elem = commonElems[appId][shareId];
   elem.archvItems.insert(name, templList);
   return;                                
@@ -71,6 +78,7 @@ void
 CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
 	std::cout << "Storing item appId=" << appId << " shareId=" << shareId << " name=" << name << " list=" << list << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.items.insert(name, list);
 	return;
@@ -79,6 +87,7 @@ CommonDataMgr::storeItem(int appId, long shareId, const std::string& name, const
 void
 CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list)
 {
+    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
     CommonElem& elem = commonElems[appId][shareId];
     elem.templItems.insert(name, list);
     return;
@@ -90,6 +99,7 @@ void
 CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
 	std::cout << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.deviceToken = devTkn;
     elem.os = platform;
@@ -199,6 +209,7 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	for (const std::string& shareId : shareIds)
 	{
 		std::cout << " shareId=" << shareId;
+    		std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
 		long val = pPicMetaObj->getPicLen();
 		elem.picShareInsert(shareIdLst, name, val);
@@ -216,6 +227,7 @@ CommonDataMgr::storeTemplLstShareInfo(int appId, long shareIdLst, const std::vec
     for (const std::string& shareId : shareIds)
     {
         long shId = std::stol(shareId);
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shId]); 
 	CommonElem& elem = commonElems[appId][shId];
 	std::string val = "NONE";
 	elem.templLstShareInsert(shareIdLst, name, val);
@@ -231,6 +243,7 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 	{
 		long shId = std::stol(shareId);
 		std::cout << "Storing item shareInfo shId=" << shId << " appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shId]); 
   		CommonElem& elem = commonElems[appId][shId];
 		std::string val = "NONE";
 		elem.lstShareInsert(shareIdLst, name, val);
@@ -253,6 +266,7 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
 {
 	for (const std::string& shareId : shareIds)
 	{
+    		std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
   		CommonElem& elem = commonElems[appId][std::stol(shareId)];
         if (elem.os == "ios")
             tokens.push_back(elem.deviceToken);
@@ -265,6 +279,7 @@ CommonDataMgr::getAndroidDeviceTkns(int appId, const std::vector<std::string>& s
 {
     for (const std::string& shareId : shareIds)
     {
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
         CommonElem& elem = commonElems[appId][std::stol(shareId)];
         if (elem.os == "android")
             tokens.push_back(elem.deviceToken);
@@ -277,6 +292,7 @@ CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, con
 {
 		
 	std::cout << "Erasing itemName=" << itemName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	elem.lstShareDel(frndShareId, itemName);
 	return;
@@ -287,6 +303,7 @@ CommonDataMgr::updatePicShareInfo(int appId, long shareId, long frndShareId, con
 {
 		
 	std::cout << "Erasing picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	elem.picShareDel(frndShareId, picName);
 	return;
@@ -295,6 +312,7 @@ CommonDataMgr::updatePicShareInfo(int appId, long shareId, long frndShareId, con
 void
 CommonDataMgr::updateTemplLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName)
 {
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
     CommonElem& elem = commonElems[appId][shareId];
     elem.templLstShareDel(frndShareId, itemName);
     return;
@@ -304,6 +322,7 @@ void
 CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNamesShIds)
 {
 	
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   	CommonElem& elem = commonElems[appId][shareId];
 	std::map<long, std::map<std::string, long>> shIdItemNames;
 	elem.getSharePics(shIdItemNames);
@@ -330,6 +349,7 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 void
 CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	std::map<long, std::vector<std::string>> shIdItemNames;
 	elem.getShareLists(shIdItemNames);
@@ -338,6 +358,7 @@ CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std
 		long shrid_of_frndlst = pItr->first; 
 		std::vector<std::string>& itemNames= pItr->second;
 
+    	     std::lock_guard<std::mutex> lock1(commonElemsMtx[appId][shrid_of_frndlst]); 
 		CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
 		std::cout << "Number of keys=" << itemNames.size() << " " << __FILE__ << " " << __LINE__ << std::endl;
 		for (const std::string& itemName : itemNames)
@@ -358,6 +379,7 @@ CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std
 void
 CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
+   std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
     CommonElem& elem = commonElems[appId][shareId];
     std::map<long, std::vector<std::string>> shIdItemNames;
     elem.getTemplShareLists(shIdItemNames);
@@ -365,6 +387,7 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
     {
 	long shrid_of_frndlst = pItr->first; 
 	std::vector<std::string>& itemNames= pItr->second;
+    	     std::lock_guard<std::mutex> lock1(commonElemsMtx[appId][shrid_of_frndlst]); 
         CommonElem& shrelem = commonElems[appId][shrid_of_frndlst];
         for (const std::string& itemName : itemNames)
         {

@@ -31,7 +31,6 @@
 	  std::map<long, LckFreeLstSS> lstShareInfo;
       	  std::map<long, LckFreeLstSS> templLstShareInfo;
 	  std::map<long, LckFreeLstSL> picShareInfo;
-	  std::mutex lstShareMtx, picShareMtx;
   };
 
  struct shrIdLstName

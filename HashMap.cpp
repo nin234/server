@@ -215,6 +215,5 @@ HashMap<key, val, N>::getNext(key& k, bool& isNext, int &indx)
 
 template class HashMap<long, long>;
 template class HashMap<long, std::string>;
-template class HashMap<long, CommonElem>;
 template class HashMap<long, LckFreeLstSS, SHARE_MAP_SIZE>;
 template class HashMap<long, LckFreeLstSL, SHARE_MAP_SIZE>;

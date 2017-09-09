@@ -5,6 +5,7 @@
 #include <HashMap.h>
 #include <Constants.h>
 #include <unordered_map>
+#include <FrndLstMgr.h>
 
 class FrndLstArchvr : public Archvr
 {
@@ -18,6 +19,6 @@ class FrndLstArchvr : public Archvr
 		FrndLstArchvr();
 		~FrndLstArchvr();
 		bool archiveMsg(const char *buf, int len);
-		void populateFrndLstShIdMp(HashMap<long, std::string>& frndLstShIdMp);
+		void populateFrndLstShIdMp(FrndLstMgr& frndMgr);
 };
 #endif

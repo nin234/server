@@ -12,7 +12,7 @@ ShareIdMgr::ShareIdMgr()
 	}
 	else
 		shareId_Init =1000;
-	pShArch->populateTrnIdShrIdMp(trnIdShrIdMp);
+	//pShArch->populateTrnIdShrIdMp(trnIdShrIdMp);
 }
 
 ShareIdMgr::~ShareIdMgr()
@@ -53,7 +53,7 @@ ShareIdMgr::getShareId(long trnId, bool& archive)
 void
 ShareIdMgr::storeTrndId(long trnId, long shrId, bool& archive)
 {
-	
+/*	
 	if (trnIdShrIdMp.getValue(trnId, shrId))		
 	{
 		archive = false;
@@ -61,6 +61,7 @@ ShareIdMgr::storeTrndId(long trnId, long shrId, bool& archive)
 	}
 	archive = true;
 	trnIdShrIdMp[trnId] = shrId;
+*/
 	return;
 }
 

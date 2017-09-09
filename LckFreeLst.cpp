@@ -33,7 +33,6 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::erase(KeyType search_key)
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	storage.erase(search_key);
 	return true;
 	/*
@@ -65,7 +64,6 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::insert(KeyType key, ValType val)
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	storage[key] = val;
 	return true;
 /*
@@ -93,7 +91,6 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::insertOrUpdate(KeyType key, ValType val)
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	storage[key] = val;
 	return true;
 /*
@@ -123,7 +120,6 @@ bool
 LckFreeLst<KeyType, ValType>::find(KeyType key)
 {
 
-	std::lock_guard<std::mutex> lock(gcmutex);
 	auto pItr = storage.find(key);
 	if (pItr == storage.end())
 		return false;
@@ -214,7 +210,6 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::isEmpty()
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	return storage.empty();
 	/*
 	if (head->next == tail)
@@ -229,7 +224,6 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::cleanUp()
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	storage.clear();
 	return;
 
@@ -258,7 +252,6 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::getVals(std::vector<ValType>& vals)
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
 	{
 		vals.push_back(pItr->second);
@@ -278,7 +271,6 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::getKeys(std::vector<KeyType>& keys)
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
 	{
 		keys.push_back(pItr->first);
@@ -301,7 +293,6 @@ template<typename KeyType, typename ValType>
 void
 LckFreeLst<KeyType, ValType>::getKeyVals(std::map<KeyType, ValType>& kvals) 
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	kvals = storage;
 	return;
 	/*
@@ -322,7 +313,6 @@ template<typename KeyType, typename ValType>
 bool
 LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val) 
 {
-	std::lock_guard<std::mutex> lock(gcmutex);
 	auto pItr = storage.find(key);
 	if (pItr == storage.end())
 		return false;

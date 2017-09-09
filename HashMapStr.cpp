@@ -48,7 +48,6 @@ HashMapStr::hash(const char *pStr)
 bool
 HashMapStr::insert(const std::string& key, const std::string& val)
 {
-	std::lock_guard<std::mutex> lock(allcmtx);
 	storage[key] = val;
 	/*
 	int hsh = hash(key.c_str());
@@ -68,7 +67,6 @@ HashMapStr::insert(const std::string& key, const std::string& val)
 bool
 HashMapStr::getVal(const std::string& key, std::string& val)
 {
-	std::lock_guard<std::mutex> lock(allcmtx);
 	auto pItr = storage.find(key);
 	if (pItr == storage.end())
 		return false;
@@ -91,7 +89,6 @@ HashMapStr::getVal(const std::string& key, std::string& val)
 bool
 HashMapStr::getVals(std::vector<std::string>& vals)
 {
-	std::lock_guard<std::mutex> lock(allcmtx);
 	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
 		vals.push_back(pItr->second);
 	return true;

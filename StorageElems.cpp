@@ -4,7 +4,6 @@
 void 
 CommonElem::lstShareInsert(long shareId, const std::string& name, const std::string& val)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
         LckFreeLstSS &lstSS = lstShareInfo[shareId];
         lstSS.insertOrUpdate(name, val);
 	return;
@@ -13,7 +12,6 @@ CommonElem::lstShareInsert(long shareId, const std::string& name, const std::str
 void 
 CommonElem::lstShareDel(long shareId, const std::string& name)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
 	auto pItr = lstShareInfo.find(shareId);
 	if (pItr != lstShareInfo.end())
 	{
@@ -27,7 +25,6 @@ CommonElem::lstShareDel(long shareId, const std::string& name)
 void
 CommonElem::getShareLists(std::map<long, std::vector<std::string>> & shIdItemNames)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
 	for(auto pItr = lstShareInfo.begin(); pItr != lstShareInfo.end(); ++pItr)
 	{
 		std::vector<std::string> itemNames;
@@ -41,7 +38,6 @@ CommonElem::getShareLists(std::map<long, std::vector<std::string>> & shIdItemNam
 void 
 CommonElem::templLstShareInsert(long shareId, const std::string& name, const std::string& val)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
         LckFreeLstSS &lstSS = templLstShareInfo[shareId];
         lstSS.insertOrUpdate(name, val);
 	return;
@@ -50,7 +46,6 @@ CommonElem::templLstShareInsert(long shareId, const std::string& name, const std
 void 
 CommonElem::templLstShareDel(long shareId, const std::string& name)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
 	auto pItr = templLstShareInfo.find(shareId);
 	if (pItr != templLstShareInfo.end())
 	{
@@ -64,7 +59,6 @@ CommonElem::templLstShareDel(long shareId, const std::string& name)
 void
 CommonElem::getTemplShareLists(std::map<long, std::vector<std::string>> & shIdItemNames)
 {
-	std::lock_guard<std::mutex> lock(lstShareMtx);
 	for(auto pItr = templLstShareInfo.begin(); pItr != templLstShareInfo.end(); ++pItr)
 	{
 		std::vector<std::string> itemNames;
@@ -77,7 +71,6 @@ CommonElem::getTemplShareLists(std::map<long, std::vector<std::string>> & shIdIt
 void 
 CommonElem::picShareInsert(long shareId, const std::string& name, long val)
 {
-	std::lock_guard<std::mutex> lock(picShareMtx);
         LckFreeLstSL &lstSL = picShareInfo[shareId];
         lstSL.insertOrUpdate(name, val);
 	return;
@@ -86,7 +79,6 @@ CommonElem::picShareInsert(long shareId, const std::string& name, long val)
 void 
 CommonElem::picShareDel(long shareId, const std::string& name)
 {
-	std::lock_guard<std::mutex> lock(picShareMtx);
 	auto pItr = picShareInfo.find(shareId);
 	if (pItr != picShareInfo.end())
 	{
@@ -100,7 +92,6 @@ CommonElem::picShareDel(long shareId, const std::string& name)
 void
 CommonElem::getSharePics(std::map<long, std::map<std::string, long>> & shIdItemNames)
 {
-	std::lock_guard<std::mutex> lock(picShareMtx);
 	for(auto pItr = picShareInfo.begin(); pItr != picShareInfo.end(); ++pItr)
 	{
 		std::map<std::string, long> picNamesLens;

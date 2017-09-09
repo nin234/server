@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <mutex>
+#include <array>
 #include <vector>
 #include <memory>
 #include <MessageObjs.h>
@@ -16,9 +17,10 @@
     
   class CommonDataMgr
   {               
-                  HashMap<long, CommonElem> commonElems[NO_OF_APPS];
-		  std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
-		  std::unordered_map<int, int> fdFdMp;
+                  std::array<CommonElem, HASH_MAP_SIZE> commonElems[NO_OF_APPS];
+                  std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
+		  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
+		  static thread_local std::unordered_map<int, int> fdFdMp;
 
           
           public: 

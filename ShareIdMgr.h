@@ -13,7 +13,7 @@ class ShareIdMgr
 		~ShareIdMgr();
 		ShareIdMgr(const ShareIdMgr& sMgr) = delete;
 		ShareIdMgr& operator=(const ShareIdMgr& sMgr) = delete;
-		HashMap<long, long> trnIdShrIdMp;
+//		HashMap<long, long> trnIdShrIdMp;
 		int shareIdStep;
 		static thread_local long shareId;
 		long shareId_Init;

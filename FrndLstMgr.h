@@ -4,6 +4,7 @@
 #include <string>
 #include <HashMap.h>
 #include <MessageObjs.h>
+#include <array>
 
 class FrndLstMgr
 {
@@ -11,11 +12,13 @@ class FrndLstMgr
 	~FrndLstMgr();
 	FrndLstMgr(const FrndLstMgr& fmgr) = delete;
 	FrndLstMgr& operator=(const FrndLstMgr& fmgr) = delete;
-	HashMap<long, std::string> frndLstShIdMp;
+	std::array<std::string, HASH_MAP_SIZE> frndLstShIdMp;
+	std::array<std::mutex, HASH_MAP_SIZE> frndLstShIdMpMtx;
 	
     public:
 	static FrndLstMgr& Instance();
 	void storeFrndLst(const FrndLstObj *pFrndObj);
+	void storeFrndLst(long shareId, const std::string& frndLst);
 	
 };
 #endif

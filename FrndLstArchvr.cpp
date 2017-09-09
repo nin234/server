@@ -110,7 +110,7 @@ FrndLstArchvr::appendLst(long shareId, const char *buf, int len)
 }
 
 void
-FrndLstArchvr::populateFrndLstShIdMp(HashMap<long, std::string>& frndLstShIdMp)
+FrndLstArchvr::populateFrndLstShIdMp(FrndLstMgr& frndMgr)
 {
 
 	if (lseek(frndFd, 0, SEEK_SET) == -1)
@@ -147,7 +147,7 @@ FrndLstArchvr::populateFrndLstShIdMp(HashMap<long, std::string>& frndLstShIdMp)
 		shrdIdSize shIdSize;
 		memcpy(&shIdSize, pBufPt+sizeof(int), sizeof(shrdIdSize));
 		std::string frndLst = pBufPt+sizeof(shrdIdSize)+sizeof(int);
-		frndLstShIdMp[shIdSize.shrId] = frndLst;
+		frndMgr.storeFrndLst(shIdSize.shrId, frndLst);
 	}
 
 	return;
