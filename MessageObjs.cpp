@@ -45,6 +45,14 @@ operator << (std::ostream& os, const shareInfo& shInfo)
 }
 
 std::ostream&
+operator << (std::ostream& os, const picShareInfo& shInfo)
+{
+	const shareInfo& base = shInfo;
+	os << base << " " << shInfo.pic_len;
+	return os;
+}
+
+std::ostream&
 operator << (std::ostream& os, const GetItemObj& getItem)
 {
 	os << " appId=" << getItem.getAppId() << " shrId=" << getItem.getShrId() << " devId=" << getItem.getDeviceId() << " fd=" << getItem.getFd();

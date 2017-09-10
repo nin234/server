@@ -25,14 +25,17 @@ class CommonArchvr : public Archvr
         int templLstFd;
 		int deviceFd;
 		int itemFd;
-        int templItemFd;
+        	int templItemFd;
+		int picMetaFd;
 		bool populateArchvItemsImpl(int& appId, long& shareId, std::string& name, std::string& tmplLst);
 		bool populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst);
-		bool populateshareLstImpl(int& appId, int fd, long& shareId, std::string& name, long& shareIdLst, std::map<IndxKey, long>& recIndx);
+		bool populateshareLstImpl(int& appId, int fd, long& shareId, std::string& name, long& shareIdLst, std::map<IndxKey, long>& picMetaRecIndx);
+		bool populatePicMetaLstImpl(int& appId, int fd, long& shareId, std::string& name, long& shareIdLst, int& pic_len, std::map<IndxKey, long>& recIndx);
 		bool populateDeviceTknImpl(int& appId, long& shareId, std::string& devId, std::string& devTkn);
 		std::map<IndxKey, long> listRecIndx;
 		std::map<IndxKey, long> tmplListRecIndx;
-        std::map<IndxKey, long> tmplShrlListRecIndx;
+        	std::map<IndxKey, long> tmplShrlListRecIndx;
+        	std::map<IndxKey, long> picMetaRecIndx;
 		char wrbuf[BUF_SIZE_32K];
 		bool appendLst(const IndxKey& iky , const char *buf, int len, int fd, std::map<IndxKey, long>& recIndx);
 		bool updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx, std::map<IndxKey, long>& recIndx);
@@ -44,6 +47,7 @@ class CommonArchvr : public Archvr
 		bool archiveArchvItems(const char *buf, int len);
 		bool archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey, long>& recIndx);
 		bool archiveBuf(int fd, const char *buf, int len);
+		bool archivePicMetaData(int fd, const char *buf, int len);
 		bool archiveDeviceTkn(const char *buf, int len);
 		template<class Op> void populateArchvItems(Op op)
 		{
@@ -118,6 +122,27 @@ class CommonArchvr : public Archvr
             op(appId, shareId, name, lst);
         }
     }
+
+template<class Op> void populatePicMetaLst(Op op)
+{
+	if(lseek(picMetaFd, 0, SEEK_SET) == -1)
+	{
+	    std::cout << "lseek failed in shareLst archive " << strerror(errno) << std::endl;
+	    return ;
+	}
+	while(true)
+	{
+	    long shareId;
+	    std::string name;
+	    int appId;
+	    long shareIdLst;
+	    int pic_len;
+	    if (!populatePicMetaLstImpl(appId, templLstFd, shareId, name, shareIdLst, pic_len, picMetaRecIndx))
+		break;
+	    op(appId, shareId, name, shareIdLst, pic_len);
+	}
+}
+
     
 template<class Op> void populateTemplShareLst(Op op)
 {

@@ -26,30 +26,6 @@ ArchiveMsgCreator::createTrnIdShrIdMsg(char *pMsg, int& len, shrIdTrnId shtrId)
 }
 
 bool 
-ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, long shareId, const std::string& name, const std::string& frndLst)
-{
-	constexpr int msgId = ARCHIVE_PIC_METADATA_MSG;
-	memcpy(pMsg, &msgId, sizeof(int));
-	shrdIdTemplSize frndLens;
-	frndLens.shrId = shareId;
-	frndLens.name_len = name.size() + 1;
-	frndLens.list_len = frndLst.size() + 1;
-
-	int msglen = sizeof(int) + sizeof(shrdIdTemplSize) + frndLens.name_len + frndLens.list_len ;
-
-	len = msglen;	
-
-	memcpy(pMsg+sizeof(int), &frndLens, sizeof(shrdIdTemplSize));
-	constexpr int nameoffset = sizeof(int) + sizeof(shrdIdTemplSize);
-	memcpy(pMsg+nameoffset, name.c_str(), frndLens.name_len);
-	int frndlstoffset = sizeof(int) + sizeof(shrdIdTemplSize) + frndLens.name_len;
-	memcpy(pMsg+frndlstoffset, frndLst.c_str(), frndLens.list_len);
-
-
-	return true;
-}
-
-bool 
 ArchiveMsgCreator::createDevTknMsg(char *pMsg, int& len, int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
 
@@ -188,6 +164,33 @@ ArchiveMsgCreator::createItemMsg(char *pMsg, int& len, int appId, long shareId, 
 
 }
 
+bool 
+ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, int appId, bool del, long shareId, long shareIdLst, const std::string& name, int maxlen, int pic_len)
+{
+    constexpr int msgId = ARCHIVE_PIC_METADATA_MSG;
+    picShareInfo templSize;
+    templSize.shrId = shareId;
+    templSize.shrIdLst = shareIdLst;
+    templSize.name_len = name.size()+1;
+    templSize.del = del;
+    templSize.appId = appId;
+    templSize.pic_len = pic_len; 
+    int msglen = sizeof(int) + sizeof(picShareInfo) + templSize.name_len;
+    if (msglen > maxlen)
+    {
+        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createShareLstMsg failed " << std::endl;
+        return false;
+    }
+    memcpy(pMsg, &msgId, sizeof(int));
+    memcpy(pMsg+sizeof(int), &templSize, sizeof(shareInfo));
+    constexpr int nameoffset = sizeof(int) + sizeof(shareInfo);
+    memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
+    len = msglen;
+    std::cout << "Archiving shareLstMsg" <<  templSize << " name=" << name << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+
+	return true;
+}
+
 bool
 ArchiveMsgCreator::createCmnShareTemplAndLstMsg(char *pMsg, int& len, int appId, bool del,   long shareId, long shareIdLst, const std::string& name, int maxlen, int msgId)
 {
@@ -197,7 +200,6 @@ ArchiveMsgCreator::createCmnShareTemplAndLstMsg(char *pMsg, int& len, int appId,
     templSize.name_len = name.size()+1;
     templSize.del = del;
     templSize.appId = appId;
-    
     int msglen = sizeof(int) + sizeof(shareInfo) + templSize.name_len;
     if (msglen > maxlen)
     {

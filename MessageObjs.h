@@ -184,6 +184,14 @@ struct shareInfo
 };
 
 
+struct picShareInfo : public shareInfo
+{
+	int pic_len;
+};
+
+std::ostream& operator << (std::ostream& os, const picShareInfo& shInfo);
+
+
 class LstObj : public MsgObj
 {
 		long shrId;

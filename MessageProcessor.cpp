@@ -194,6 +194,15 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 		return;
 	}
 	dataStore.storePicMetaData(pPicMetaObj);
+	const std::vector<std::string>&  shareIds = pPicMetaObj->getFrndLst();
+	for (const std::string& shareId : shareIds)
+	{
+		char archbuf[32768];
+		int archlen = 0;
+		std::cout << "Archiving shareId=" << shareId << " in processPicMetaDataMsg " << __FILE__ << ":" << __LINE__ << std::endl;
+		if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicMetaObj->getAppId(), false, std::stol(shareId), pPicMetaObj->getShrId(), pPicMetaObj->getName(),  32768, pPicMetaObj->getPicLen()))
+			sendArchiveMsg(archbuf, archlen, 10);	
+	}
 	return;
 }
 

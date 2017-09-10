@@ -34,6 +34,10 @@ CommonDataMgr::CommonDataMgr()
    		std::cout << "Populating share list " << __FILE__ << ":" << __LINE__ << std::endl;
         
         pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeLstShareInfo(appId, shareId, name, shareIdLst);});
+   		std::cout << "Populating pic meta list " << __FILE__ << ":" << __LINE__ << std::endl;
+        
+        pCommonArch->populatePicMetaLst([&](int appId, long shareId, const std::string& name, long& shareIdLst, int pic_len){storePicMetaInfo(appId, shareId, name, shareIdLst, pic_len);});
+
    		std::cout << "Populating template share list " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeTemplLstShareInfo(appId, shareId, name, shareIdLst);});
 	}
@@ -49,6 +53,16 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareId, const std::string& nam
 	std::string val = "NONE";
 	elem.lstShareInsert(shareIdLst, name, val);
 }
+
+void
+CommonDataMgr::storePicMetaInfo(int appId, long shareId, const std::string& name, long shareIdLst, int pic_len)
+{
+	std::cout << "Storing item picMetaInfo appId=" << appId << " shareId=" << shareId << " name=" << name << " shareIdLst=" << shareIdLst << " pic_len=" << pic_len << " " << __FILE__ << ":" << __LINE__ << std::endl;
+   	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
+	CommonElem& elem = commonElems[appId][shareId];
+	elem.picShareInsert(shareIdLst, name, pic_len);
+}
+
 
 void
 CommonDataMgr::storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst)

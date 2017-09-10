@@ -35,6 +35,7 @@ ArchiveMgr::ArchiveMgr()
     pArchvrs[ARCHIVE_ITM_MSG] = std::make_shared<CommonArchvr>();
     pArchvrs[ARCHIVE_TEMPL_ITM_MSG] = std::make_shared<CommonArchvr>();
     pArchvrs[ARCHIVE_SHARE_TEMPL_LST_MSG] = std::make_shared<CommonArchvr>();
+    pArchvrs[ARCHIVE_PIC_METADATA_MSG] = std::make_shared<CommonArchvr>();
 	std::cout << "Created ArchiveMgr " << __FILE__ << ":"<< __LINE__ << std::endl;
     
 }
