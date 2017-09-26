@@ -8,6 +8,13 @@
 #define AUTOSPREE_ID 1
 #define EASYGROCLIST_ID 2
 
+enum class AppName
+{
+        OPENHOUSES,
+        AUTOSPREE,
+        EASYGROCLIST
+}
+
 #define NO_OF_THREADS 3
 
 #define OPENHOUSES_THREADS 1
@@ -93,4 +100,6 @@
 #define MAX_MSG_ID 23
 
 #define LCKFREE_LST_TDIFF 10.0
+
+
 #endif

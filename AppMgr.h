@@ -4,15 +4,16 @@
 #include <WorkerMgr.h>
 #include <vector>
 #include <map>
+#include <Constants.h>
 
 class AppMgr
 {
-	std::vector<WorkerMgr*> wrkMgr;
+	std::map<AppName, WorkerMgr*> wrkMgr;
 
 	public:
 		AppMgr();
 		~AppMgr();
-		void setNewClientConnections(const std::map<int, int>& appIdFds);
+		void setNewClientConnections(const std::map<AppName, int>& appIdFds);
 };
 
 #endif
