@@ -18,7 +18,7 @@ ArchiveSndr::ArchiveSndr()
 	
 	sndfd = mq_open(name.c_str(), O_CREAT|O_NONBLOCK|O_RDWR, S_IRWXU|S_IRGRP|S_IROTH, mqa);
 	struct rlimit lm;
-	if (!getrlimit(RLIMIT_NOFILE, &lm))
+	if (!getrlimit(RLIMIT_MSGQUEUE, &lm))
 	{
 		std::cout << "No of open files " << lm.rlim_cur << " " << lm.rlim_max << " " << __FILE__ << ":" <<__LINE__ << std::endl;
 	}

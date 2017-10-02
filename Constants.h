@@ -13,7 +13,7 @@ enum class AppName
         OPENHOUSES,
         AUTOSPREE,
         EASYGROCLIST
-}
+};
 
 #define NO_OF_THREADS 3
 

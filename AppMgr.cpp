@@ -16,15 +16,15 @@ AppMgr::AppMgr()
 	std::cout << "Initialized FirebaseConnHdlr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	OpenHousesMgr *pOhMgr = new OpenHousesMgr();
 	pOhMgr->initialize(Config::Instance().getOpenHousesThrds());
-    wrkrMgr[AppName::OPENHOUSES] = pOhMgr;
+    	wrkMgr[AppName::OPENHOUSES] = pOhMgr;
 	std::cout << "Initialized OpenHousesMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	AutoSpreeMgr *pAspreeMgr = new AutoSpreeMgr();
 	pAspreeMgr->initialize(Config::Instance().getAutoSpreeThrds());
-    wrkrMgr[AppName::AUTOSPREE] = pAspreeMgr;
+    	wrkMgr[AppName::AUTOSPREE] = pAspreeMgr;
 	std::cout << "Initialized AutoSpreeMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	EasyGrocMgr *pEasy = new EasyGrocMgr();
 	pEasy->initialize(Config::Instance().getEasyGrocThrds());
-    wrkrMgr[AppName::EASYGROCLIST] = pEasy;
+    	wrkMgr[AppName::EASYGROCLIST] = pEasy;
 	std::cout << "Initialized EasyGrocMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	ShareIdMgr::Instance().setShareIdStep(Config::Instance().getOpenHousesThrds() + Config::Instance().getAutoSpreeThrds() + Config::Instance().getEasyGrocThrds());
 
@@ -43,13 +43,7 @@ AppMgr::setNewClientConnections(const std::map<AppName, int>& appIdFds)
 
 	for (const auto& x : appIdFds)
 	{
-		if (x.first >= NO_OF_APPS)
-		{
-			std::cout << "Invalid app number " << x.first << " " << __FILE__ << " " << __LINE__ << std::endl;
-			close(x.second);
-			continue;
-		}
-		wrkMgr[x.first].setNewClientConnection(x.second);
+		wrkMgr[x.first]->setNewClientConnection(x.second);
 	} 
 	return;
 }

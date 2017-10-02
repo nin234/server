@@ -7,10 +7,17 @@
 #include <AppMgr.h>
 #include <system_error>
 #include <ArchiveMgr.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 int
 main()
 {
+	struct rlimit lm;
+	if (!getrlimit(RLIMIT_NOFILE, &lm))
+	{
+		std::cout << "No of open files " << lm.rlim_cur << " " << lm.rlim_max << " " << __FILE__ << ":" <<__LINE__ << std::endl;
+	}
 	std::cout << "Starting up server " << std::endl;
 		//create threads and wait for socket connections	
 	//

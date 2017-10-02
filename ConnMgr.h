@@ -9,11 +9,13 @@
 class ConnMgr
 {
 	ServSocket apps[NO_OF_APPS];
+	void populateConnMp(std::map<AppName, int>& readyFdsMp, int i, int fd);
+
 	public:
 		ConnMgr();
 		~ConnMgr();
 		void initializeListeners();
-		std::map<int, int> waitAndGetConnections();		
+		std::map<AppName, int> waitAndGetConnections();		
 
 };
 

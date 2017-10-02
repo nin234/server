@@ -26,11 +26,35 @@ ConnMgr::initializeListeners()
 	}
 	return;
 }
+	
+void 
+ConnMgr::populateConnMp(std::map<AppName, int>& readyFdsMp, int i, int fd)
+{
+	switch(i)
+	{
+		case 0:
+			readyFdsMp[AppName::OPENHOUSES] = fd;
+		break;
+		
+		case 1:
+			readyFdsMp[AppName::AUTOSPREE] = fd;
+		break;
 
-std::map<int, int>
+		case 2:
+			readyFdsMp[AppName::EASYGROCLIST] = fd;
+		break;
+
+		default:
+			std::cout << "Invalid app id i=" << i << std::endl;
+		break;
+	}
+	return;
+}
+
+std::map<AppName, int>
 ConnMgr::waitAndGetConnections()
 {
-	std::map<int, int> readyFdsMp;
+	std::map<AppName, int> readyFdsMp;
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	int maxfd=1;
@@ -53,7 +77,7 @@ ConnMgr::waitAndGetConnections()
 		{
 			if (FD_ISSET(apps[i].listenFd(), &readfds))
 			{
-				std::cout << "Accepting connection for app= " << i  << __FILE__ << " " << __LINE__ << std::endl;
+				std::cout << "Accepting connection for app=" << i << " "  << __FILE__ << " " << __LINE__ << std::endl;
 				//push into worker thread queue
 				struct 	sockaddr addr;
 				socklen_t addrlen;
@@ -61,7 +85,7 @@ ConnMgr::waitAndGetConnections()
 				 int one = 1;
 
 				 setsockopt(fd, SOL_TCP, TCP_NODELAY, &one, sizeof(one));
-				readyFdsMp[i] = fd;
+				populateConnMp(readyFdsMp, i, fd);
 			
 			}
 		}
