@@ -84,17 +84,20 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
         dataStore.storeTemplLstShareInfo(pTmplObj->getAppId(),pTmplObj->getShrId(), shareIds, pTmplObj->getName());
         for (const std::string& shareId : shareIds)
         {
+		std::cout << "archiving shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;	
             if (ArchiveMsgCreator::createShareTemplLstMsg(archbuf, archlen, pTmplObj->getAppId(), false, std::stol(shareId), pTmplObj->getShrId(), pTmplObj->getName(),  32768))
                 sendArchiveMsg(archbuf, archlen, 10);
+        }
             std::vector<std::string> tokens;
             dataStore.getDeviceTkns(pTmplObj->getAppId(), shareIds, tokens);
 	    if (tokens.size())
             	sendApplePush(tokens, pTmplObj->getName(), 1);
             std::vector<std::string> regIds;
             dataStore.getAndroidDeviceTkns(pTmplObj->getAppId(), shareIds, regIds);
-            sendFirebaseMsg(regIds, pTmplObj->getName());
+	    if (regIds.size())
+            	sendFirebaseMsg(regIds, pTmplObj->getName());
+	    std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
             
-        }
 
     }
     char buf[1024];

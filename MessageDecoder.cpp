@@ -135,7 +135,7 @@ MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 	constexpr int nameoffset = 4*sizeof(int) + sizeof(long);
 	pMsg->setName(buffer + nameoffset, nameLen);	
 	int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
-	std::cout << "Creating list item lstoffset=" << lstoffset << " nameoffset=" << nameoffset << " nameLen=" << nameLen << " lstLen=" << lstLen << " msgLen=" << msgLen << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << "Creating list item lstoffset=" << lstoffset << " nameoffset=" << nameoffset << " nameLen=" << nameLen << " lstLen=" << lstLen << " msgLen=" << msgLen  << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (lstLen)
 		pMsg->setList(buffer+lstoffset, lstLen);	
 	else
