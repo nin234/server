@@ -15,6 +15,9 @@ NtwIntf<Decoder>::NtwIntf()
 		std::cout << "epoll_create failed " << std::endl;
 		throw std::system_error(errno, std::system_category());	
 	}
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	lastCheckTime = now.tv_sec;
 }
 
 template<typename Decoder>
@@ -23,10 +26,71 @@ NtwIntf<Decoder>::~NtwIntf()
 
 }
 
+template<typename Decoder>
+void
+NtwIntf<Decoder>::updateFdLastActiveMp(int fd)
+{
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	fdLastActiveMp[fd] = now.tv_sec;	
+	return;
+}
+
+template<typename Decoder>
+void
+NtwIntf<Decoder>::checkAndCleanUpIdleFds()
+{
+	addFdsQtoLastActiveMp();
+	struct timeval now;
+	gettimeofday(&now, NULL);
+	if (now.tv_sec < lastCheckTime + CHECK_INTERVAL)
+		return;
+	for (auto pItr = fdLastActiveMp.begin(); pItr != fdLastActiveMp.end();)
+	{
+		if (now.tv_sec > pItr->second + CHECK_INTERVAL)
+		{
+			struct epoll_event event;
+			event.data.fd = pItr->first;
+			event.events = EPOLLIN ;
+			int ret = epoll_ctl(epfd, EPOLL_CTL_DEL, pItr->first, &event);
+			if (ret)
+			{
+				std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+			}
+			std::cout << "Closing idle file descriptor "  << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+			close(pItr->first);
+			fdLastActiveMp.erase(pItr++);
+
+		}
+		else
+		{
+			++pItr;
+		}
+	}		
+		
+}
+
+template<typename Decoder>
+void
+NtwIntf<Decoder>::closeAndCleanUpFd(int fd)
+{
+	struct epoll_event event;
+	event.data.fd = fd;
+	event.events = EPOLLIN ;
+	int ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &event);
+	if (ret)
+	{
+		std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	}
+	close(fd);
+	fdLastActiveMp.erase(fd);
+}
+
 template<typename Decoder> 
 bool
 NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
 {
+    updateFdLastActiveMp(fd);
     bool bMore = false;
     auto pItr = pAggrbufs.find(fd);
     bool start = false;
@@ -226,6 +290,32 @@ NtwIntf<Decoder>::processFragmentedMessage(char *buffer, ssize_t mlen, ssize_t& 
 
 }
 
+template<typename Decoder>
+void
+NtwIntf<Decoder>::addFdToFdsQ(int fd)
+{
+	std::lock_guard<std::mutex> lock(fdsQMtx);
+	fdsQ.push_back(fd);
+}
+
+template<typename Decoder>
+void
+NtwIntf<Decoder>::addFdsQtoLastActiveMp()
+{
+	std::lock_guard<std::mutex> lock(fdsQMtx);
+	if (fdsQ.empty())
+	{
+		return;	
+	}
+	for (int fd : fdsQ)
+	{
+		struct timeval now;
+		gettimeofday(&now, NULL);
+		fdLastActiveMp[fd] =  now.tv_sec;
+	}
+	fdsQ.clear();
+
+}
 template<typename Decoder> 
 bool
 NtwIntf<Decoder>::addFd (int fd)
@@ -242,6 +332,7 @@ NtwIntf<Decoder>::addFd (int fd)
 		close(fd);
 		return false;
 	}
+	addFdToFdsQ(fd);
 	return true;
 }
 
@@ -261,10 +352,11 @@ template<typename Decoder>
 bool
 NtwIntf<Decoder>::waitAndGetMsg()
 {
+	checkAndCleanUpIdleFds();
 	struct epoll_event evlist[MAX_EVENTS];
 	char buf[MAX_BUF];
 	//std::cout << "Waiting for epoll events in epoll_wait in thread=" << typeid(*this).name()  << std::endl;	
-	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, 2);
+	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, 10);
 	if (ready == -1)
 	{
 		if (errno == EINTR)
@@ -285,14 +377,14 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			if (s == -1)
 			{
 				std::cout << "error reading on socket " << std::endl;
-				close(evlist[j].data.fd);
+				closeAndCleanUpFd(evlist[j].data.fd);
 				return false;
 
 			}
 			else if (!s)
 			{
 				std::cout << "remote peer closed socket=" << evlist[j].data.fd;
-				close(evlist[j].data.fd);
+				closeAndCleanUpFd(evlist[j].data.fd);
 				return false;
 
 			}
@@ -306,7 +398,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 		else if (evlist[j].events &(EPOLLHUP | EPOLLERR))
 		{
 			std::cout << "Closing file descriptor " << evlist[j].data.fd << std::endl;
-			close(evlist[j].data.fd);
+			closeAndCleanUpFd(evlist[j].data.fd);
 			return false;
 		}
 	}
@@ -331,6 +423,7 @@ NtwIntf<Decoder>::sendMsg(char *buf, int mlen, int fd)
 	{
 		return false;
 	}
+   	updateFdLastActiveMp(fd);
 	return true;
 }
 

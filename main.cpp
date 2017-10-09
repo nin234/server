@@ -9,10 +9,20 @@
 #include <ArchiveMgr.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <unistd.h>
 
 int
 main()
 {
+	if (!daemon(1, 1))
+	{
+		std::cout << "Created daemon " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	}
+	else
+	{
+		std::cout << "Failed to create daemon errno=" << errno << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	}
+	
 	struct rlimit lm;
 	if (!getrlimit(RLIMIT_NOFILE, &lm))
 	{

@@ -25,6 +25,7 @@ enum class AppName
 #define AUTOSPREE_MAX_FDS 100
 #define EASYGROC_MAX_FDS 1000
 #define MAX_FD 100
+#define CHECK_INTERVAL 120
 
 #define MAX_BUF 16384
 #define TMP_BUF 32768
