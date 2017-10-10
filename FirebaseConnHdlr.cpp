@@ -39,9 +39,11 @@ FirebaseConnHdlr::send(const std::vector<std::string>& tokens, const std::string
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 		std::string data = "{\"to\" : \"";
 		data += token;
-		data += "\", \"notification\": {\"title\": \"";
-		data += msg;
-		data += "\" }, \"data\": {\"title\": \"";
+		data += "\", ";
+		//data += "\"notification\": {\"title\": \"";
+		//data += msg;
+		//data += "\" }, "
+		data += "\"data\": {\"title\": \"";
 		data += msg;
 		data += "\"} }";
 		std::cout << "sending notification to firebase messaging auth=" << auth << " data=" << data << " " << __FILE__ << ":" << __LINE__ << std::endl; 

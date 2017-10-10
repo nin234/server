@@ -95,7 +95,7 @@ EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDe
             std::vector<std::string> regIds;
             dataStore.getAndroidDeviceTkns(pTmplObj->getAppId(), shareIds, regIds);
 	    if (regIds.size())
-            	sendFirebaseMsg(regIds, pTmplObj->getName());
+            	sendFirebaseMsg(pTmplObj->getAppId(), regIds, pTmplObj->getName());
 	    std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
             
 

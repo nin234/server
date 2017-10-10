@@ -60,7 +60,7 @@ class MessageProcessor : public Observer
 		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
         void setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
-        bool sendFirebaseMsg(const std::vector<std::string>& tokens, const std::string& msg);
+        bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg);
 		bool notify (char *buf, int mlen, int fd);
 		bool picDone(int fd);
 		void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName); 

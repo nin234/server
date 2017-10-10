@@ -175,7 +175,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 			dataStore.getAndroidDeviceTkns(pPicObj->getAppId(), shareIds, regIds);
 			if (regIds.size())
 			{
-				sendFirebaseMsg(regIds, picName);
+				sendFirebaseMsg(pPicObj->getAppId(), regIds, picName);
 			}
 		}
 	
@@ -317,7 +317,7 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 	std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (regIds.size())
 	{
-        	sendFirebaseMsg(regIds, pLstObj->getName());
+        	sendFirebaseMsg(pLstObj->getAppId(), regIds, pLstObj->getName());
 	}
         
 	}
@@ -556,9 +556,28 @@ MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& 
 }
 
 bool
-MessageProcessor::sendFirebaseMsg(const std::vector<std::string>& tokens, const std::string& msg)
+MessageProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg)
 {
-	return pFirebaseNotify->send(tokens, msg);
+	std::string fbmsg;
+	switch(appId)
+	{
+		case OPENHOUSES_ID:
+			fbmsg = "OpenHouses- ";
+		break;
+
+		case AUTOSPREE_ID:
+			fbmsg = "AutoSpree- ";
+		break;
+
+		case EASYGROCLIST_ID:
+			fbmsg = "EasyGrocList- ";
+		break;
+
+		default:
+		break;
+	}
+	fbmsg += msg; 
+	return pFirebaseNotify->send(tokens, fbmsg);
 }
 
 bool
