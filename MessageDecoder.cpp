@@ -277,6 +277,11 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	pMsg->setAppId(getAppId());
 	constexpr int devIdOffset = offset + sizeof(long);
 	pMsg->setDeviceId(buffer + devIdOffset);
+	int picrmngoffset = devIdOffset + pMsg->getDeviceId().size() +1;
+	int picRemaining=0;
+	memcpy(&picRemaining, buffer+picrmngoffset, sizeof(int));
+	pMsg->setPicRemaining(picRemaining);
+	pMsg->setPicName(buffer+picrmngoffset+sizeof(int));
 	pMsgs.push_back(std::move(pMsg));
 	return true;
 }

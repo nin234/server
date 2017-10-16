@@ -15,6 +15,7 @@ struct PicFileDetails
 	int shareId;
 	int frndShareId;
 	int appId;
+	int picSoFar;
 	std::string picName;
 	
 };

@@ -69,7 +69,7 @@ MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>&
 bool
 MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdLstName& shidlst)
 {
-	int msglen = 2*sizeof(long) + 3*sizeof(int) + shidlst.lstName.size() +1;
+	int msglen = 2*sizeof(long) + 4*sizeof(int) + shidlst.lstName.size() +1;
 	if (buflen < msglen)
 	{
 		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl;
@@ -86,6 +86,8 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 	memcpy(pMsg+picNameOffset, shidlst.lstName.c_str(), picNameLen);
 	int picLenOffset = picNameOffset+picNameLen;
 	memcpy(pMsg+picLenOffset, &shidlst.picLen, sizeof(long));
+	int picOffset = picLenOffset + sizeof(long);
+	memcpy(pMsg + picOffset, &shidlst.picSoFar, sizeof(int));
 	*mlen = msglen;
 	return true;
 }

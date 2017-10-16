@@ -41,6 +41,7 @@
 	int fd;
 	int appId;
 	long shareIdElem;
+	int picSoFar;
 	bool operator < (const shrIdLstName& shlst) const
 	{
 		if (shareId != shlst.shareId)
@@ -48,6 +49,11 @@
 		else
 			return lstName < shlst.lstName;
 
+	}
+
+	shrIdLstName()
+	{
+		picSoFar = 0;
 	}
 };
 //Each share_id will have an instance of CommonElem

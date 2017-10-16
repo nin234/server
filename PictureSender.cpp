@@ -84,8 +84,14 @@ PictureSender::sendPicMetaDat()
 				pfd.frndShareId = picNameShId.shareId;
 				pfd.appId = picNameShId.appId;
 				pfd.picName = picNameShId.lstName;	
+				pfd.picSoFar = picNameShId.picSoFar;
+				
 				if (pfd.picFd != -1)
 				{
+					if (pfd.picSoFar > 0)
+					{
+						lseek(pfd.picFd, pfd.picSoFar, SEEK_SET);
+					}
 					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 					picFdMp[picNameShId.fd] = pfd;
 				}

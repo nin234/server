@@ -263,6 +263,12 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
 	for (auto& picNameShId : picNamesShIds)
 	{
+		if (pGetItemObj->getPicName() == picNameShId.lstName)
+		{
+			picNameShId.picSoFar = picNameShId.picLen - pGetItemObj->getPicRemaining();
+			if (picNameShId.picSoFar < 0)
+				picNameShId.picSoFar = 0;
+		}
 		picNameShId.fd = pGetItemObj->getFd();
 		std::cout << "Inserting into picNamesShIds " << picNameShId << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		m_pPicSndr->insertPicNameShid(picNameShId);

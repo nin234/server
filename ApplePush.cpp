@@ -1,6 +1,7 @@
 #include <ApplePush.h>
 #include <stdexcept>
 #include <iostream>
+#include <stdio.h>
 
 ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NULL)
 {
@@ -28,6 +29,13 @@ ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NU
 		std::cout << "Setting sandbox mode in apns " << __FILE__ << ":" << __LINE__ << std::endl;
 		apn_set_mode(ctx,  APN_MODE_SANDBOX);
 	}
+	else
+	{
+		std::cout << "Setting production mode in apns " << __FILE__ << ":" << __LINE__ << std::endl;
+		apn_set_mode(ctx,  APN_MODE_PRODUCTION);
+	}
+
+	apn_set_behavior(ctx, APN_OPTION_RECONNECT);
 	apn_set_log_level(ctx, APN_LOG_LEVEL_INFO | APN_LOG_LEVEL_ERROR | APN_LOG_LEVEL_DEBUG);
     	apn_set_log_callback(ctx, logCallback);
     	apn_set_invalid_token_callback(ctx, invalidTknCallback);
@@ -77,8 +85,10 @@ ApplePush::send(const std::vector<std::string>& tokenvec, const std::string& msg
 		return false;
 	}
         apn_payload_set_badge(payload, badge);
+	apn_payload_set_content_available(payload, 1);
         apn_payload_set_body(payload, msg.c_str());
 	apn_payload_set_priority(payload, APN_NOTIFICATION_PRIORITY_HIGH);
+	
 	apn_array_t *tokens = apn_array_init(tokenvec.size(), NULL, NULL);
 	if (!tokens)
 	{
@@ -91,13 +101,21 @@ ApplePush::send(const std::vector<std::string>& tokenvec, const std::string& msg
 		std::cout << "Adding token apn_array_t " << token << " " << __FILE__ << ":"<< __LINE__  << std::endl;
 		apn_array_insert(tokens, const_cast<char*>(token.c_str()));
 	}
-
-	if(APN_ERROR == apn_send2(ctx, payload, tokens))
-	{
-		apn_payload_free(payload);
-        	apn_array_free(tokens);
-		return false;
-	}	
+	apn_array_t *invalid_tokens = NULL;
+    if (APN_ERROR == apn_send(ctx, payload, tokens, &invalid_tokens)) 
+    {
+        std::cout << "Could not send push:" <<  apn_error_string(errno) << " errno:" << errno << std::endl;
+	return false;
+    } 
+     else 
+    {
+        printf("Notification was successfully sent to %u device(s)\n",
+            apn_array_count(tokens) - ((invalid_tokens) ? apn_array_count(invalid_tokens) : 0));
+        if (invalid_tokens) {
+            printf("Invalid tokens:\n");
+            apn_array_free(invalid_tokens);
+        }
+    }
 
 	apn_payload_free(payload);
        	apn_array_free(tokens);
