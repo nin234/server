@@ -29,6 +29,8 @@ class MessageProcessor : public Observer
 	std::array<int, NO_COMMON_MSGS> msgTypPrcsrs;
 	std::shared_ptr<ApplePush> pAppleNotfy;
     std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
+    
+    void processGetItemPics(GetItemObj *pGetItemObj);
 
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <functional>
 #include <FrndLstMgr.h>
+#include <algorithm>
 
 using namespace std::placeholders;
 
@@ -258,22 +259,39 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
             }
         }
     }
+    processGetItemPics(pGetItemObj);
+    return;
+}
     
-	std::vector<shrIdLstName> picNamesShIds;
-	dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
-	for (auto& picNameShId : picNamesShIds)
-	{
-		if (pGetItemObj->getPicName() == picNameShId.lstName)
-		{
-			picNameShId.picSoFar = picNameShId.picLen - pGetItemObj->getPicRemaining();
-			if (picNameShId.picSoFar < 0)
-				picNameShId.picSoFar = 0;
-		}
-		picNameShId.fd = pGetItemObj->getFd();
-		std::cout << "Inserting into picNamesShIds " << picNameShId << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		m_pPicSndr->insertPicNameShid(picNameShId);
-	}
-	return;
+void
+MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
+{
+    std::vector<shrIdLstName> picNamesShIds;
+    dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
+    if (pGetItemObj->getPicRemaining())
+    {
+        auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName == pGetItemObj->getPicName();});
+        if (pItr != picNamesShIds.end())
+        {
+            (*pItr).picSoFar = (*pItr).picLen - pGetItemObj->getPicRemaining();
+            (*pItr).fd = pGetItemObj->getFd();
+            if ((*pItr).picSoFar < 0)
+                (*pItr).picSoFar = 0;
+            m_pPicSndr->insertPicNameShid(*pItr);
+        }
+    }
+    
+    for (auto& picNameShId : picNamesShIds)
+    {
+        if (pGetItemObj->getPicRemaining() && pGetItemObj->getPicName() == picNameShId.lstName)
+        {
+            continue;
+        }
+        picNameShId.fd = pGetItemObj->getFd();
+        std::cout << "Inserting into picNamesShIds " << picNameShId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+        m_pPicSndr->insertPicNameShid(picNameShId);
+    }
+    
 }
 
 void
