@@ -282,6 +282,10 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	memcpy(&picRemaining, buffer+picrmngoffset, sizeof(int));
 	pMsg->setPicRemaining(picRemaining);
 	pMsg->setPicName(buffer+picrmngoffset+sizeof(int));
+	int picshidoffset = picrmngoffset + sizeof(int) + pMsg->getPicName().size() + 1;
+	long picShareId = 0;
+	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
+	
 	pMsgs.push_back(std::move(pMsg));
 	return true;
 }

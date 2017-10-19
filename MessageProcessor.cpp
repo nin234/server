@@ -270,7 +270,7 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
     dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
     if (pGetItemObj->getPicRemaining())
     {
-        auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName == pGetItemObj->getPicName();});
+        auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName == pGetItemObj->getPicName() && shItem.shareId == pGetItemObj->getPicShareId();});
         if (pItr != picNamesShIds.end())
         {
             (*pItr).picSoFar = (*pItr).picLen - pGetItemObj->getPicRemaining();
@@ -283,7 +283,7 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
     
     for (auto& picNameShId : picNamesShIds)
     {
-        if (pGetItemObj->getPicRemaining() && pGetItemObj->getPicName() == picNameShId.lstName)
+        if (pGetItemObj->getPicRemaining() && pGetItemObj->getPicName() == picNameShId.lstName && pGetItemObj->getPicShareId() == picNameShId.shareId)
         {
             continue;
         }

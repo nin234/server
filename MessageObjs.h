@@ -219,6 +219,7 @@ class GetItemObj : public MsgObj
 	std::string devId;
 	int picRemaining;
 	std::string picName;
+	long picShareId;
 	public:
 		virtual ~GetItemObj(){}
 		GetItemObj() : shrId(0){}
@@ -230,6 +231,8 @@ class GetItemObj : public MsgObj
 		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
                 const std::string& getPicName() const {return picName;}
 		void setPicName(const std::string& pname) {picName = pname;}
+		long getPicShareId() const {return picShareId;}	
+		void setPicShareId(long sid) {picShareId = sid;}
 };
 
 #endif
