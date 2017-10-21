@@ -164,7 +164,6 @@ PictureSender::sendPicData()
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
 				std::cout << "Finished reading file " << pItr->second <<  __FILE__ << ":" << __LINE__ << std::endl;
-				m_pObs->updatePicShareInfo(pItr->second.appId, pItr->second.shareId, pItr->second.frndShareId, pItr->second.picName);
 				closeAndNotify(pItr->second.picFd, fd, pItr);
 				continue;
 			}
