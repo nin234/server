@@ -18,6 +18,7 @@ MessageDecoder::MessageDecoder()
 	msgTypPrcsrs[GET_ITEMS] = 6;
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
 	msgTypPrcsrs[PIC_MSG] = 8;
+	msgTypPrcsrs[PIC_DONE_MSG] = 9;
 }
 
 MessageDecoder::~MessageDecoder()
@@ -41,7 +42,8 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
     std::bind(std::mem_fn(&MessageDecoder::createDeviceTknObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createPicObj), this, _1, _2, _3)
+    std::bind(std::mem_fn(&MessageDecoder::createPicObj), this, _1, _2, _3),
+    std::bind(std::mem_fn(&MessageDecoder::createPicDoneObj), this, _1, _2, _3)
 }; 
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
@@ -263,6 +265,26 @@ MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 	return true;
 }
 
+bool
+MessageDecoder::createPicDoneObj(char *buffer, ssize_t mlen, int fd)
+{
+	std::unique_ptr<PicDoneObj, MsgObjDeltr> pMsg{new PicDoneObj(), MsgObjDeltr()};
+	pMsg->setMsgTyp(PIC_DONE_MSG);
+	constexpr int offset = 2*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	pMsg->setFd(fd);
+	pMsg->setAppId(getAppId());
+	long picShareId =0;
+	int picshidoffset = offset + sizeof(long);
+	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
+	int picnameoffset = picshidoffset + sizeof(long);
+	pMsg->setPicShareId(picShareId);
+	pMsg->setPicName(buffer + picnameoffset);	
+	pMsgs.push_back(std::move(pMsg));
+	return true;
+}
 
 bool
 MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
@@ -285,6 +307,7 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	int picshidoffset = picrmngoffset + sizeof(int) + pMsg->getPicName().size() + 1;
 	long picShareId = 0;
 	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
+	pMsg->setPicShareId(picShareId);
 	
 	pMsgs.push_back(std::move(pMsg));
 	return true;

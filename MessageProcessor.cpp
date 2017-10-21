@@ -25,6 +25,7 @@ MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NU
 	msgTypPrcsrs[GET_ITEMS] = 6;
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
 	msgTypPrcsrs[PIC_MSG] = 8;
+	msgTypPrcsrs[PIC_DONE_MSG] = 9;
 
 
 	
@@ -101,6 +102,7 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 	, std::bind(std::mem_fn(&MessageProcessor::processGetItemMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMetaDataMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
+	, std::bind(std::mem_fn(&MessageProcessor::processPicDoneMsg), this, _1)
 };
 	auto itr = processors.begin();
     if (nMsgTyp >= NO_COMMON_MSGS)
@@ -207,6 +209,25 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 	return;
 }
 
+void
+MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+{
+	PicDoneObj *pPicDoneObj = dynamic_cast<PicDoneObj*>(pMsg.get());
+	if (!pPicDoneObj)
+	{
+		std::cout << "Invalid message received in MessageProcessor::processPicDoneMsg " << std::endl;
+		return;
+	}
+	std::cout << "Received PicDone Msg=" << *pPicDoneObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	updatePicShareInfo(pPicDoneObj->getAppId(), pPicDoneObj->getShrId(), pPicDoneObj->getPicShareId(), pPicDoneObj->getPicName());
+	char archbuf[32768];
+	int archlen = 0;
+	std::cout << "Updating Archive with picDoneMsg in processPicDoneMsg " << __FILE__ << ":" << __LINE__ << std::endl;
+	if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicDoneObj->getAppId(), true, pPicDoneObj->getShrId(), pPicDoneObj->getPicShareId(), pPicDoneObj->getPicName(),  32768, 100))
+		sendArchiveMsg(archbuf, archlen, 10);	
+
+
+}
 
 void
 MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)

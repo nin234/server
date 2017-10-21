@@ -213,26 +213,36 @@ class GetItemObj;
 
 std::ostream& operator << (std::ostream& os, const GetItemObj& getItem);
 
-class GetItemObj : public MsgObj
+class PicDoneObj : public MsgObj
 {
 	long shrId;
-	std::string devId;
-	int picRemaining;
 	std::string picName;
 	long picShareId;
 	public:
-		virtual ~GetItemObj(){}
-		GetItemObj() : shrId(0){}
+		virtual ~PicDoneObj(){}
+		PicDoneObj() : shrId(0){}
 		long getShrId() const {return shrId;}	
 		void setShrId(long sid) {shrId = sid;}
-		const std::string& getDeviceId() const {return devId;}
-		void setDeviceId(const std::string& dvId) {devId = dvId;}	
-		int getPicRemaining() const {return picRemaining;}
-		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
                 const std::string& getPicName() const {return picName;}
 		void setPicName(const std::string& pname) {picName = pname;}
 		long getPicShareId() const {return picShareId;}	
 		void setPicShareId(long sid) {picShareId = sid;}
 };
+
+std::ostream& operator << (std::ostream& os, const PicDoneObj& picItem);
+
+class GetItemObj : public PicDoneObj
+{
+	std::string devId;
+	int picRemaining;
+	public:
+		virtual ~GetItemObj(){}
+		GetItemObj(){}
+		const std::string& getDeviceId() const {return devId;}
+		void setDeviceId(const std::string& dvId) {devId = dvId;}	
+		int getPicRemaining() const {return picRemaining;}
+		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
+};
+
 
 #endif

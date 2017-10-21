@@ -55,9 +55,17 @@ operator << (std::ostream& os, const picShareInfo& shInfo)
 std::ostream&
 operator << (std::ostream& os, const GetItemObj& getItem)
 {
-	os << " appId=" << getItem.getAppId() << " shrId=" << getItem.getShrId() << " devId=" << getItem.getDeviceId() << " fd=" << getItem.getFd();
+	os << " appId=" << getItem.getAppId() << " shrId=" << getItem.getShrId() << " devId=" << getItem.getDeviceId() << " fd=" << getItem.getFd() << " picName=" << getItem.getPicName() << " picRemaining=" << getItem.getPicRemaining() << " picShareId=" << getItem.getPicShareId();
 	return os;
 }
+
+std::ostream&
+operator << (std::ostream& os, const PicDoneObj& picItem)
+{
+	os << " appId=" << picItem.getAppId() << " shrId=" << picItem.getShrId() << " fd=" << picItem.getFd() << " picName=" << picItem.getPicName() << " picShareId=" << picItem.getPicShareId();
+	return os;
+}
+
 
 
 PicMetaDataObj::PicMetaDataObj()

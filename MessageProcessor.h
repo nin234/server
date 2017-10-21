@@ -41,6 +41,7 @@ class MessageProcessor : public Observer
 		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp);
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getReply(char *buf, int *mlen, int msgTyp);
