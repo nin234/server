@@ -56,9 +56,9 @@ class PicMetaDataObj : public MsgObj
 	public:
 		virtual ~PicMetaDataObj(){}
 		PicMetaDataObj();
-		long  getShrId() {return shrId;}
+		long  getShrId() const {return shrId;}
 		void setShrId(long sid) {shrId = sid;}
-		std::string getName(){return name;}
+		std::string getName() const {return name;}
 		void setName(const char *pName, int len);
 		const std::vector<std::string>& getFrndLst(){return frndLst;}
 		void setFrndLst(const std::vector<std::string>& fl){frndLst = fl;}

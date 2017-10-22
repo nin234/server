@@ -196,7 +196,7 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 		std::cout << "Invalid message received in MessageProcessor::processPicMetaDataMsg " << std::endl;
 		return;
 	}
-	dataStore.storePicMetaData(pPicMetaObj);
+	bool bShoulUpload = dataStore.storePicMetaData(pPicMetaObj);
 	const std::vector<std::string>&  shareIds = pPicMetaObj->getFrndLst();
 	for (const std::string& shareId : shareIds)
 	{
@@ -206,6 +206,14 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 		if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicMetaObj->getAppId(), false, std::stol(shareId), pPicMetaObj->getShrId(), pPicMetaObj->getName(),  32768, pPicMetaObj->getPicLen()))
 			sendArchiveMsg(archbuf, archlen, 10);	
 	}
+	char buf[32768];
+	int mlen=0;
+	if (m_pTrnsl->getShouldUploadMsg(buf, &mlen, pPicMetaObj, bShoulUpload))
+	{
+		sendMsg(buf, mlen, pPicMetaObj->getFd());
+	}
+
+
 	return;
 }
 

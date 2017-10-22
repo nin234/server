@@ -16,6 +16,7 @@ class MessageTranslator
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getListMsg(char *buf, int *mlen, int buflen, const std::string& name, const std::string& lst, int msgId, long shareId);
 		bool getPicMetaMsg(char *buf, int *mlen, int buflen, const shrIdLstName& shidlst);
+		bool getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataObj *pPicMetaObj, bool shoudUpload);
 		virtual bool translateMsg(char *buf, int *mlen, int msgTyp, MsgObj *pMsgObj)=0;		
 };
 #endif

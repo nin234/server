@@ -9,6 +9,9 @@
 #include <unistd.h>
 #include <ArchiveMsgCreator.h>
 #include <Util.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 thread_local std::unordered_map<int, int> 
 CommonDataMgr::fdFdMp;
@@ -146,6 +149,30 @@ CommonDataMgr::getPicShareIds(int fd)
 	return emptyVec;
 }
 
+bool 
+CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj)
+{
+	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
+	if (!file.size())
+	{
+		std::cout << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;
+	}
+	struct stat buf;
+	if (stat(file.c_str(), &buf) == 0)
+	{
+		if (pPicMetaObj->getPicLen() > buf.st_size)
+		{
+			std::cout << "Need to upload picture" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+			return true;
+		}
+		std::cout << "No need to upload picture" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		return false;
+	}
+	std::cout << "Need to upload picture" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	return true;
+}
+
 bool
 CommonDataMgr::storePic(PicObj *pPicObj)
 {
@@ -212,7 +239,8 @@ CommonDataMgr::eraseFdMp(int fd)
 	int cnt1 = fdPicMetaMp.erase(fd);
 	std::cout << "Erased from fdFdMp=" << cnt << " and fdPicMetaMp=" << cnt1 << " fd=" << fd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 }
-void 
+
+bool 
 CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 {
 	int appId = pPicMetaObj->getAppId();
@@ -229,10 +257,14 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 		elem.picShareInsert(shareIdLst, name, val);
 		
 	}
-	std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
-	std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
-	fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
-	return;
+	if (shouldUpload(pPicMetaObj))
+	{
+		std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
+		fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
+		return true;
+	}
+	return false;
 }
 
 void
