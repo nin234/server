@@ -32,6 +32,7 @@ class MessageProcessor : public Observer
     
     void processGetItemPics(GetItemObj *pGetItemObj);
 
+	void sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName);
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		bool sendMsg(char *buf, int mlen, int fd);

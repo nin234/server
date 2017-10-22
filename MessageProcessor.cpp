@@ -165,25 +165,32 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 		if (shareIds.size())
 		{
 			
-			std::vector<std::string> tokens;
-			dataStore.getDeviceTkns(pPicObj->getAppId(), shareIds, tokens);	
 			std::string picName = dataStore.getPicName(pPicObj->getFd());
 			std::cout << "Sending push notification to receive picture name=" << picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			if (tokens.size())
-			{
-				sendApplePush(tokens, picName, 1);
-			}
 			dataStore.eraseFdMp(pPicObj->getFd());
-			std::vector<std::string> regIds;
-			dataStore.getAndroidDeviceTkns(pPicObj->getAppId(), shareIds, regIds);
-			if (regIds.size())
-			{
-				sendFirebaseMsg(pPicObj->getAppId(), regIds, picName);
-			}
+			sendPicNotifications(shareIds, pPicObj->getAppId(), picName);
 		}
 	
 	}
 	return;
+}
+
+void
+MessageProcessor::sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName)
+{
+	std::vector<std::string> tokens;
+	dataStore.getDeviceTkns(appId, shareIds, tokens);	
+	std::cout << "Sending push notification to receive picture name=" << picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	if (tokens.size())
+	{
+		sendApplePush(tokens, picName, 1);
+	}
+	std::vector<std::string> regIds;
+	dataStore.getAndroidDeviceTkns(appId, shareIds, regIds);
+	if (regIds.size())
+	{
+		sendFirebaseMsg(appId, regIds, picName);
+	}
 }
 
 void
@@ -213,7 +220,10 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 		sendMsg(buf, mlen, pPicMetaObj->getFd());
 	}
 
-
+	if (!bShoulUpload && shareIds.size())
+	{
+		sendPicNotifications(shareIds, pPicMetaObj->getAppId(), pPicMetaObj->getName());
+	}
 	return;
 }
 
