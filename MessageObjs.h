@@ -244,5 +244,21 @@ class GetItemObj : public PicDoneObj
 		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
 };
 
+class shouldDownLoad : public MsgObj
+{
 
+	long shareId;
+	std::string name;
+	bool download;
+	
+	pubic:
+
+		virtual ~shouldDownLoad(){}
+		shouldDownLoad(){}
+		long getShrId const {return shareId;}
+		void setShrId(long sid) {shareId = sid;}
+		bool downLoad() {return download;}
+		void setDownLoad(bool dwld) {download = dwld;}
+
+};
 #endif
