@@ -112,13 +112,14 @@ PictureSender::sendPictures()
 	sendPicMetaDat();	
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	for (;;)
+	for (int i=0; i < 5; ++i)
 	{
 		if (!picFdMp.size())
 		{
 			break;
 		}
 		sendPicData();
+		/*
 		struct timeval now;
 		gettimeofday(&now, NULL);
 		//sleep(1);
@@ -127,6 +128,7 @@ PictureSender::sendPictures()
 			std::cout << "More than 6 seconds in sending picture data breaking now " << __FILE__ << ":" << __LINE__ << std::endl;
 			break;
 		}
+		*/
 	}
 	return;
 }
@@ -142,12 +144,48 @@ PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails
 	return;
 }
 
+void 
+PictureSender::updateWaitingInfo(const std::string& picName, long shareId, bool bDownLoad)
+{
+	std::cout << "updateWaitingInfo for picture=" << picName << " shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+	for (auto pItr = picFdMp.begin(); pItr != picFdMp.end(); ++pItr)
+	{
+		if (pItr->second.picName == picName && pItr->second.shareId == shareId)
+		{
+			if (bDownLoad)
+			{
+				std::cout << "Start picture download name=" << pItr->second.picName << " shareId=" << pItr->second.shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+				pItr->second.waiting = false;
+			}
+			else
+			{
+				std::cout << "No need to download picture name=" << pItr->second.picName << " shareId=" << pItr->second.shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+				closeAndNotify(pItr->second.picFd, pItr->first, pItr);
+			}
+			break;
+		}
+	}
+}
+
 void
 PictureSender::sendPicData()
 {
 	auto pItr = picFdMp.begin();
 	while (pItr != picFdMp.end())
 	{
+		if (pItr->second.waiting)
+		{
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			if (now.tv_sec > pItr->second.tv_sec +180)
+			{
+				std::cout << "More than 180 seconds waiting for should download response  name=" << pItr->second.picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
+				closeAndNotify(pItr->second.picFd, pItr->first, pItr);
+				continue;
+			}
+			++pItr;
+			continue;
+		}
 		char buf[MAX_BUF];
 		int fd = pItr->first;
 		constexpr int msgId = PIC_MSG;

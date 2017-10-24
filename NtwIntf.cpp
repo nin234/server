@@ -356,7 +356,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 	struct epoll_event evlist[MAX_EVENTS];
 	char buf[MAX_BUF];
 	//std::cout << "Waiting for epoll events in epoll_wait in thread=" << typeid(*this).name()  << std::endl;	
-	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, 10);
+	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, 0);
 	if (ready == -1)
 	{
 		if (errno == EINTR)

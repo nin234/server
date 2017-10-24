@@ -26,6 +26,7 @@ MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NU
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
 	msgTypPrcsrs[PIC_MSG] = 8;
 	msgTypPrcsrs[PIC_DONE_MSG] = 9;
+	msgTypPrcsrs[SHOULD_DOWNLOAD_MSG] = 10;
 
 
 	
@@ -103,6 +104,7 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMetaDataMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
 	, std::bind(std::mem_fn(&MessageProcessor::processPicDoneMsg), this, _1)
+	, std::bind(std::mem_fn(&MessageProcessor::processShouldDownLoadMsg), this, _1)
 };
 	auto itr = processors.begin();
     if (nMsgTyp >= NO_COMMON_MSGS)
@@ -157,6 +159,7 @@ MessageProcessor::processRequests()
             std::cout << "Invalid message received in MessageProcessor::processShouldDownLoadMsg " << std::endl;
             return;
         }
+	m_pPicSndr->updateWaitingInfo(pShouldDownLoad->getName(), pShouldDownLoad->getShrId(), pShouldDownLoad->downLoad());
     }
 
 void

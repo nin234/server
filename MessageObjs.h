@@ -251,11 +251,11 @@ class ShouldDownLoad : public MsgObj
 	std::string name;
 	bool download;
 	
-	pubic:
+	public:
 
 		virtual ~ShouldDownLoad(){}
 		ShouldDownLoad(){}
-		long getShrId const {return shareId;}
+		long getShrId() const {return shareId;}
 		void setShrId(long sid) {shareId = sid;}
 		bool downLoad() {return download;}
 		void setDownLoad(bool dwld) {download = dwld;}
