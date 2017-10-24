@@ -244,7 +244,7 @@ class GetItemObj : public PicDoneObj
 		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
 };
 
-class shouldDownLoad : public MsgObj
+class ShouldDownLoad : public MsgObj
 {
 
 	long shareId;
@@ -253,12 +253,14 @@ class shouldDownLoad : public MsgObj
 	
 	pubic:
 
-		virtual ~shouldDownLoad(){}
-		shouldDownLoad(){}
+		virtual ~ShouldDownLoad(){}
+		ShouldDownLoad(){}
 		long getShrId const {return shareId;}
 		void setShrId(long sid) {shareId = sid;}
 		bool downLoad() {return download;}
 		void setDownLoad(bool dwld) {download = dwld;}
+        const std::string& getName() const {return name;}
+    void setName(const std::string& nm) {name = nm;}
 
 };
 #endif

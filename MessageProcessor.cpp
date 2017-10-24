@@ -147,6 +147,18 @@ MessageProcessor::processRequests()
 	return;
 }
 
+    
+    void
+    MessageProcessor::processShouldDownLoadMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+    {
+        ShouldDownLoad  *pShouldDownLoad  = dynamic_cast<ShouldDownLoad *>(pMsg.get());
+        if (!pShouldDownLoad )
+        {
+            std::cout << "Invalid message received in MessageProcessor::processShouldDownLoadMsg " << std::endl;
+            return;
+        }
+    }
+
 void
 MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {

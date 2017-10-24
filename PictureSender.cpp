@@ -85,7 +85,10 @@ PictureSender::sendPicMetaDat()
 				pfd.appId = picNameShId.appId;
 				pfd.picName = picNameShId.lstName;	
 				pfd.picSoFar = picNameShId.picSoFar;
-				
+                pfd.waiting = true;
+                struct timeval tv;
+                gettimeofday(&tv, NULL);
+                pfd.tv_sec = tv.tv_sec;
 				if (pfd.picFd != -1)
 				{
 					if (pfd.picSoFar > 0)
@@ -95,6 +98,7 @@ PictureSender::sendPicMetaDat()
 					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 					picFdMp[picNameShId.fd] = pfd;
 				}
+                
 			}
 		}
 		pItr = picNamesShIds.erase(pItr);

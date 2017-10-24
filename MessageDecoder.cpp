@@ -19,6 +19,7 @@ MessageDecoder::MessageDecoder()
 	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
 	msgTypPrcsrs[PIC_MSG] = 8;
 	msgTypPrcsrs[PIC_DONE_MSG] = 9;
+    msgTypPrcsrs[SHOULD_DOWNLOAD_MSG] = 10;
 }
 
 MessageDecoder::~MessageDecoder()
@@ -43,7 +44,8 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
     std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3),
     std::bind(std::mem_fn(&MessageDecoder::createPicObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createPicDoneObj), this, _1, _2, _3)
+    std::bind(std::mem_fn(&MessageDecoder::createPicDoneObj), this, _1, _2, _3),
+    std::bind(std::mem_fn(&MessageDecoder::createShouldDownLoadObj), this, _1, _2, _3)
 }; 
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
@@ -284,6 +286,31 @@ MessageDecoder::createPicDoneObj(char *buffer, ssize_t mlen, int fd)
 	pMsg->setPicName(buffer + picnameoffset);	
 	pMsgs.push_back(std::move(pMsg));
 	return true;
+}
+
+bool
+MessageDecoder::createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd)
+{
+    std::unique_ptr<ShouldDownLoad, MsgObjDeltr> pMsg{new ShouldDownLoad(), MsgObjDeltr()};
+    constexpr int offset = 2*sizeof(int);
+    long shareId;
+    memcpy(&shareId, buffer+offset, sizeof(long));
+    pMsg->setShrId(shareId);
+    pMsg->setFd(fd);
+    pMsg->setAppId(getAppId());
+    int download;
+    memcpy(&download, buffer+offset+sizeof(long), sizeof(int));
+    if (download)
+    {
+        pMsg->setDownLoad(true);
+    }
+    else
+    {
+        pMsg->setDownLoad(false);
+    }
+    int nameoffset = offset + sizeof(long) + sizeof(int);
+    pMsg->setName(buffer + nameoffset);
+    return true;
 }
 
 bool

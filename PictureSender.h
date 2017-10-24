@@ -16,6 +16,8 @@ struct PicFileDetails
 	int frndShareId;
 	int appId;
 	int picSoFar;
+    bool waiting;
+    long tv_sec;
 	std::string picName;
 	
 };
@@ -37,6 +39,7 @@ class PictureSender
 		void insertPicNameShid(const shrIdLstName& shidlst);
 		void setTrnsl(MessageTranslator *pTrnsl);
 		void attach (Observer *pObs);
+    void updateWaitingInfo(const std::string& picName, long shareId, bool bDownLoad);
 	
 };
 #endif
