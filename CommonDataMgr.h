@@ -22,7 +22,7 @@
 		  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
 		  static thread_local std::unordered_map<int, int> fdFdMp;
 
-         	 bool shouldUpload(PicMetaDataObj *pPicMetaObj); 
+         	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();
@@ -36,7 +36,7 @@
       		void storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst);
       		void storeTemplLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
       		void storeLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
-                  bool storePicMetaData(PicMetaDataObj *pPicMetaObj);
+                  bool storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset);
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);
 		  void eraseFdMp(int fd);

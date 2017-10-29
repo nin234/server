@@ -150,8 +150,9 @@ CommonDataMgr::getPicShareIds(int fd)
 }
 
 bool 
-CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj)
+CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset)
 {
+	*picOffset = 0;
 	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
 	if (!file.size())
 	{
@@ -164,6 +165,7 @@ CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj)
 		if (pPicMetaObj->getPicLen() > buf.st_size)
 		{
 			std::cout << "Need to upload picture" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+			*picOffset = buf.st_size;
 			return true;
 		}
 		std::cout << "No need to upload picture" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
@@ -241,7 +243,7 @@ CommonDataMgr::eraseFdMp(int fd)
 }
 
 bool 
-CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
+CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset)
 {
 	int appId = pPicMetaObj->getAppId();
 	long shareIdLst = pPicMetaObj->getShrId();
@@ -257,7 +259,7 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 		elem.picShareInsert(shareIdLst, name, val);
 		
 	}
-	if (shouldUpload(pPicMetaObj))
+	if (shouldUpload(pPicMetaObj, picOffset))
 	{
 		std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);

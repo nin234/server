@@ -118,9 +118,9 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 }
 
 bool
-MessageTranslator::getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataObj *pPicMetaObj, bool shouldUpload)
+MessageTranslator::getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataObj *pPicMetaObj, bool shouldUpload, int picOffset)
 {
-	int msglen = 4*sizeof(int) + sizeof(long) + pPicMetaObj->getName().size() + 1;
+	int msglen = 5*sizeof(int) + sizeof(long) + pPicMetaObj->getName().size() + 1;
 	int msgId = SHOULD_UPLOAD_MSG;
 	memcpy(pMsg, &msglen, sizeof(int));
 	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
@@ -130,7 +130,8 @@ MessageTranslator::getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataOb
 	int upload = shouldUpload ? 1: 0; 
 	memcpy(pMsg+2*sizeof(int) + sizeof(long), &namelen, sizeof(int));
 	memcpy(pMsg+3*sizeof(int) + sizeof(long), &upload, sizeof(int));
-	memcpy(pMsg + 4*sizeof(int) + sizeof(long), pPicMetaObj->getName().c_str(), namelen);
+	memcpy(pMsg+4*sizeof(int) + sizeof(long), &picOffset, sizeof(int));
+	memcpy(pMsg + 5*sizeof(int) + sizeof(long), pPicMetaObj->getName().c_str(), namelen);
 	*mlen = msglen;
 	return true;
 }
