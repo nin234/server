@@ -291,11 +291,13 @@ MessageDecoder::createPicDoneObj(char *buffer, ssize_t mlen, int fd)
 bool
 MessageDecoder::createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd)
 {
+	std::cout << "Decoding createShouldDownLoadObj " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
     std::unique_ptr<ShouldDownLoad, MsgObjDeltr> pMsg{new ShouldDownLoad(), MsgObjDeltr()};
     constexpr int offset = 2*sizeof(int);
     long shareId;
     memcpy(&shareId, buffer+offset, sizeof(long));
     pMsg->setShrId(shareId);
+    pMsg->setMsgTyp(SHOULD_DOWNLOAD_MSG);
     pMsg->setFd(fd);
     pMsg->setAppId(getAppId());
     int download;
@@ -310,6 +312,7 @@ MessageDecoder::createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd)
     }
     int nameoffset = offset + sizeof(long) + sizeof(int);
     pMsg->setName(buffer + nameoffset);
+    pMsgs.push_back(std::move(pMsg));
     return true;
 }
 

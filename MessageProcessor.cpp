@@ -1,4 +1,4 @@
-#include <MessageProcessor.h>
+#include <MessageProcessor.h> 
 #include <ShareIdMgr.h>
 #include <ArchiveMsgCreator.h>
 #include <MessageObjs.h>
@@ -107,7 +107,7 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 	, std::bind(std::mem_fn(&MessageProcessor::processShouldDownLoadMsg), this, _1)
 };
 	auto itr = processors.begin();
-    if (nMsgTyp >= NO_COMMON_MSGS)
+    if (nMsgTyp > NO_COMMON_MSGS)
         return;
     int pindx =msgTypPrcsrs[nMsgTyp];
     
@@ -153,12 +153,13 @@ MessageProcessor::processRequests()
     void
     MessageProcessor::processShouldDownLoadMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
     {
-        ShouldDownLoad  *pShouldDownLoad  = dynamic_cast<ShouldDownLoad *>(pMsg.get());
+        ShouldDownLoad  *pShouldDownLoad  = dynamic_cast<ShouldDownLoad*>(pMsg.get());
         if (!pShouldDownLoad )
         {
-            std::cout << "Invalid message received in MessageProcessor::processShouldDownLoadMsg " << std::endl;
+            std::cout << "Invalid message received in MessageProcessor::processShouldDownLoadMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
             return;
         }
+	std::cout << "Received ShouldDownLoad message " << *pShouldDownLoad << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	m_pPicSndr->updateWaitingInfo(pShouldDownLoad->getName(), pShouldDownLoad->getShrId(), pShouldDownLoad->downLoad());
     }
 

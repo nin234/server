@@ -257,10 +257,12 @@ class ShouldDownLoad : public MsgObj
 		ShouldDownLoad(){}
 		long getShrId() const {return shareId;}
 		void setShrId(long sid) {shareId = sid;}
-		bool downLoad() {return download;}
+		bool downLoad() const {return download;}
 		void setDownLoad(bool dwld) {download = dwld;}
         const std::string& getName() const {return name;}
     void setName(const std::string& nm) {name = nm;}
 
 };
+
+std::ostream& operator << (std::ostream& os, const ShouldDownLoad& shldDwld);
 #endif

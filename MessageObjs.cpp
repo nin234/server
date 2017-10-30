@@ -36,6 +36,11 @@ operator << (std::ostream& os, const devTknArchv& devTkInfo)
 	return os;
 }
 
+std::ostream& operator << (std::ostream& os, const ShouldDownLoad& shldDwld)
+{
+	os << " appId=" << shldDwld.getAppId() << " shareId=" << shldDwld.getShrId() << " name=" << shldDwld.getName() << " download=" << shldDwld.downLoad();
+	return os;
+}
 
 std::ostream&
 operator << (std::ostream& os, const shareInfo& shInfo)
