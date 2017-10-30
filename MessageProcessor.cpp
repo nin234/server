@@ -107,7 +107,7 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 	, std::bind(std::mem_fn(&MessageProcessor::processShouldDownLoadMsg), this, _1)
 };
 	auto itr = processors.begin();
-    if (nMsgTyp > NO_COMMON_MSGS)
+    if (nMsgTyp >= NO_COMMON_MSGS)
         return;
     int pindx =msgTypPrcsrs[nMsgTyp];
     
@@ -140,7 +140,7 @@ MessageProcessor::processRequests()
 		}	
 		if (msgTypPrcsrs[nMsgTyp] == -1)
 			continue;
-		if (m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
+		if (nMsgTyp != SHOULD_DOWNLOAD_MSG && m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
 			pMsgEnq->enqMsg(std::move(pMsg));	
 		}

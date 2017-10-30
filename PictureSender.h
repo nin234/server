@@ -19,6 +19,7 @@ struct PicFileDetails
     bool waiting;
     long tv_sec;
 	std::string picName;
+	std::string picRealName;
 	
 };
 

@@ -19,6 +19,22 @@ Util::~Util()
 }
 
 std::string 
+Util::getPicRealName(const std::string& name)
+{
+		char buf[2048];
+		strncpy(buf, name.c_str(), 2048);
+		char *token = std::strtok(buf,";");
+		std::string realName;
+		if (token != NULL)
+		{
+			std::string realName(token);
+			return realName;
+		}
+		std::string tmp;
+		return tmp;
+}
+
+std::string 
 Util::constructPicFile(int shareId, int appId, const std::string& name)
 {
 	        std::string file = "/home/ninan/data/pictures/";

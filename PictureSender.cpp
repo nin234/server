@@ -84,6 +84,7 @@ PictureSender::sendPicMetaDat()
 				pfd.frndShareId = picNameShId.shareId;
 				pfd.appId = picNameShId.appId;
 				pfd.picName = picNameShId.lstName;	
+				pfd.picRealName = Util::getPicRealName(picNameShId.lstName);	
 				pfd.picSoFar = picNameShId.picSoFar;
                 pfd.waiting = true;
                 struct timeval tv;
@@ -95,7 +96,7 @@ PictureSender::sendPicMetaDat()
 					{
 						lseek(pfd.picFd, pfd.picSoFar, SEEK_SET);
 					}
-					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " " << __FILE__ << ":" << __LINE__ << std::endl;
+					std::cout << "Picture file opend " << picNameShId << " PicFileDetails " << pfd << " picRealName=" << pfd.picRealName << " " << __FILE__ << ":" << __LINE__ << std::endl;
 					picFdMp[picNameShId.fd] = pfd;
 				}
                 
@@ -150,7 +151,7 @@ PictureSender::updateWaitingInfo(const std::string& picName, long shareId, bool 
 	std::cout << "updateWaitingInfo for picture=" << picName << " shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl; 
 	for (auto pItr = picFdMp.begin(); pItr != picFdMp.end(); ++pItr)
 	{
-		if (pItr->second.picName == picName && pItr->second.shareId == shareId)
+		if (pItr->second.picRealName == picName && pItr->second.frndShareId == shareId)
 		{
 			if (bDownLoad)
 			{
