@@ -175,6 +175,30 @@ CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset)
 	return true;
 }
 
+int
+CommonDataMgr::openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj)
+{
+	int fd  = -1;
+	std::string file = Util::constructPicFile(shareId, appId, picName);
+	if (!file.size())
+	{
+		std::cout << "Invalid picture file shareId=" << shareId << " appId=" <<  appId<< " name=" <<  picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return fd;
+	}
+	fd = open(file.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRWXU|S_IRGRP|S_IROTH);
+	
+	if (fd == -1)
+	{
+		std::cout << "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		fdPicMetaMp.erase(fd);
+		return fd;
+	}
+	std::cout << "Opened file=" << file << " to store picture " << __FILE__ << ":" << __LINE__ << std::endl;
+	fdFdMp[pPicObj->getFd()] = fd;
+	return fd;
+
+}
+
 bool
 CommonDataMgr::storePic(PicObj *pPicObj)
 {
@@ -183,6 +207,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	if (pItr1 == fdPicMetaMp.end())
 	{
 		std::cout << "Failed to find metadata for picture fd=" << pPicObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		close(pPicObj->getFd());
 		return false;
 	}
 	int fd  = -1;
@@ -192,28 +217,19 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	}		
 	else
 	{
-		std::string file = Util::constructPicFile(pItr1->second->getShrId(), pPicObj->getAppId(), pItr1->second->getName());
-		if (!file.size())
-		{
-			std::cout << "Invalid picture file shareId=" << pItr1->second->getShrId() << " appId=" << pPicObj->getAppId() << " name=" << pItr1->second->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			return false;
-		}
-		fd = open(file.c_str(), O_CREAT|O_RDWR|O_TRUNC, S_IRWXU|S_IRGRP|S_IROTH);
-		std::cout << "Opened file=" << file << " to store picture " << __FILE__ << ":" << __LINE__ << std::endl;
-		
+		fd = openPicFile(pItr1->second->getShrId(), pPicObj->getAppId(), pItr1->second->getName(), pPicObj);
 		if (fd == -1)
 		{
-			std::cout << "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			fdPicMetaMp.erase(fd);
+			close(pPicObj->getFd());
 			return false;
 		}
-		fdFdMp[pPicObj->getFd()] = fd;
 	}
 	if (write(fd, pPicObj->getBuf(), pPicObj->getBufLen()) == -1)
 	{
 		fdFdMp.erase(pPicObj->getFd());
 		fdPicMetaMp.erase(fd);
 		std::cout << "Failed to store picture " << pItr1->second->getName() << std::endl;
+		close(pPicObj->getFd());
 		return false;
 	}
 	int lenWrittenSoFar = pItr1->second->getWrittenLen();
@@ -223,6 +239,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 	if (totLenWritten >= pItr1->second->getPicLen())
 	{
 		std::cout << "Picture " << pItr1->second->getName() << " stored picLen=" << pItr1->second->getPicLen() << " totalWritten=" << totLenWritten << std::endl;
+		storePicMetaData(pItr1->second.get());
 		close(fd);
 		fdFdMp.erase(fd);
 		fdPicMetaMp.erase(fd);
@@ -242,8 +259,8 @@ CommonDataMgr::eraseFdMp(int fd)
 	std::cout << "Erased from fdFdMp=" << cnt << " and fdPicMetaMp=" << cnt1 << " fd=" << fd << " " << __FILE__ << ":" << __LINE__ << std::endl;
 }
 
-bool 
-CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset)
+void 
+CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 {
 	int appId = pPicMetaObj->getAppId();
 	long shareIdLst = pPicMetaObj->getShrId();
@@ -259,12 +276,22 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset)
 		elem.picShareInsert(shareIdLst, name, val);
 		
 	}
+
+}
+
+bool 
+CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset)
+{
 	if (shouldUpload(pPicMetaObj, picOffset))
 	{
 		std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
 		fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
 		return true;
+	}
+	else
+	{
+		storePicMetaData(pPicMetaObj);
 	}
 	return false;
 }

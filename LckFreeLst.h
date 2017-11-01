@@ -41,6 +41,7 @@ class LckFreeLst
 		bool is_marked_reference(Node<KeyType, ValType> *pNode);
 		bool find (KeyType key);
 		bool erase (KeyType key);
+		bool erasepmatch (KeyType key);
 		void cleanUp();
 		void getVals(std::vector<ValType>& vals);
 		void getKeys(std::vector<KeyType>& keys);
@@ -60,7 +61,6 @@ struct timstr
 };
 typedef LckFreeLst<std::string, std::string> LckFreeLstSS;
 typedef LckFreeLst<std::string, long> LckFreeLstSL;
-typedef LckFreeLst<long, std::string> LckFreeLstLS;
 typedef LckFreeLst<std::string, timstr> LckFreeLstSTS;
 
 #endif

@@ -28,6 +28,19 @@ LckFreeLst<KeyType, ValType>::LckFreeLst()
 */
 
 }
+template<typename KeyType, typename ValType>
+bool
+LckFreeLst<KeyType, ValType>::erasepmatch(KeyType search_key)
+{
+	for (auto pItr = storage.begin(); pItr != storage.end(); ++pItr)
+	{
+		if (pItr->first.find(search_key) != std::string::npos)
+		{
+			storage.erase(pItr);
+		}
+	} 
+	return false;
+}
 
 template<typename KeyType, typename ValType>
 bool
@@ -341,4 +354,4 @@ LckFreeLst<KeyType, ValType>::getVal(const KeyType& key, ValType& val)
 template class LckFreeLst<std::string, std::string>;
 template class LckFreeLst<std::string, long>;
 template class LckFreeLst<std::string, timstr>;
-template class LckFreeLst<long, std::string>;
+//template class LckFreeLst<long, std::string>;

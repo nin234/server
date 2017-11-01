@@ -23,6 +23,9 @@
 		  static thread_local std::unordered_map<int, int> fdFdMp;
 
          	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
+		  int openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj);
+		  
+		 void storePicMetaData(PicMetaDataObj *pPicMetaObj);
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();

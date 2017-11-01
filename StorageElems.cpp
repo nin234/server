@@ -82,7 +82,7 @@ CommonElem::picShareDel(long shareId, const std::string& name)
 	auto pItr = picShareInfo.find(shareId);
 	if (pItr != picShareInfo.end())
 	{
-		pItr->second.erase(name);
+		pItr->second.erasepmatch(name);
 		if (pItr->second.isEmpty())
 			picShareInfo.erase(pItr);
 	}

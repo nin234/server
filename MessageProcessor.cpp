@@ -143,6 +143,7 @@ MessageProcessor::processRequests()
 		if (nMsgTyp != SHOULD_DOWNLOAD_MSG && m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
 			pMsgEnq->enqMsg(std::move(pMsg));	
+			continue;
 		}
 		processMsg(pMsg, nMsgTyp);						
 	}
