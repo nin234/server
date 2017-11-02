@@ -327,9 +327,10 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
     dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
     if (pGetItemObj->getPicRemaining())
     {
-        auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName == pGetItemObj->getPicName() && shItem.shareId == pGetItemObj->getPicShareId();});
+        auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName.find(pGetItemObj->getPicName()) != std::string::npos && shItem.shareId == pGetItemObj->getPicShareId();});
         if (pItr != picNamesShIds.end())
         {
+	    std::cout << "Found partially downloaded item=" << *pItr << " " << __FILE__ << ":" << __LINE__ << std::endl;	
             (*pItr).picSoFar = (*pItr).picLen - pGetItemObj->getPicRemaining();
             (*pItr).fd = pGetItemObj->getFd();
             if ((*pItr).picSoFar < 0)
@@ -340,12 +341,11 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
     
     for (auto& picNameShId : picNamesShIds)
     {
-        if (pGetItemObj->getPicRemaining() && pGetItemObj->getPicName() == picNameShId.lstName && pGetItemObj->getPicShareId() == picNameShId.shareId)
+        if (pGetItemObj->getPicRemaining() && picNameShId.lstName.find(pGetItemObj->getPicName()) != std::string::npos && pGetItemObj->getPicShareId() == picNameShId.shareId)
         {
             continue;
         }
         picNameShId.fd = pGetItemObj->getFd();
-        std::cout << "Inserting into picNamesShIds " << picNameShId << " " << __FILE__ << ":" << __LINE__ << std::endl;
         m_pPicSndr->insertPicNameShid(picNameShId);
     }
     

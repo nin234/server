@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/time.h>
-
+#include <algorithm>
 std::ostream& 
 operator << (std::ostream& os, const PicFileDetails& pfd)
 {
@@ -232,7 +232,13 @@ PictureSender::shouldEnqueMsg(int fd)
 void
 PictureSender::insertPicNameShid(const shrIdLstName& shidlst)
 {
-	std::cout << "Inserting into picNamesShIds size before insert=" << picNamesShIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [shidlst](const shrIdLstName& shItem){return shidlst.lstName == shItem.lstName && shidlst.shareId == shItem.shareId;});
+	if (pItr != picNamesShIds.end())
+	{
+		std::cout << "Found item shrIdLstName=" << *pItr << " in picNamesShIds not inserting" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		return;
+	}
+	std::cout << "Inserting shrIdLstName=" << shidlst<<" into picNamesShIds size before insert=" << picNamesShIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	picNamesShIds.push_back(shidlst);
 	return;
 }

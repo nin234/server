@@ -11,6 +11,19 @@
 
 //create a lock free list/map of template lists and ordinary items
 
+class picInfo
+{
+	int pic_len;
+	bool download;
+		public:
+			picInfo() {}
+			picInfo(bool dwld, int plen):pic_len(plen), download(dwld) {}
+			bool getDownload() const  {return download;}
+			int getPicLen() const  {return pic_len;}
+			void setDownload(bool dwld){download = dwld;}
+			void setPicLen(int plen) {pic_len = plen;}
+};
+
   struct CommonElem
   {       
           HashMapStr archvItems;
@@ -30,7 +43,7 @@
 	private:
 	  std::map<long, LckFreeLstSS> lstShareInfo;
       	  std::map<long, LckFreeLstSS> templLstShareInfo;
-	  std::map<long, LckFreeLstSL> picShareInfo;
+	  std::map<long, std::map<std::string, picInfo>> picShareInfo;
   };
 
  struct shrIdLstName

@@ -71,8 +71,9 @@ CommonElem::getTemplShareLists(std::map<long, std::vector<std::string>> & shIdIt
 void 
 CommonElem::picShareInsert(long shareId, const std::string& name, long val)
 {
-        LckFreeLstSL &lstSL = picShareInfo[shareId];
-        lstSL.insertOrUpdate(name, val);
+        std::map<std::string, picInfo> &lstSL = picShareInfo[shareId];
+	picInfo pic_detail(false, val);
+	lstSL[name] = pic_detail;	
 	return;
 }
 
@@ -82,8 +83,15 @@ CommonElem::picShareDel(long shareId, const std::string& name)
 	auto pItr = picShareInfo.find(shareId);
 	if (pItr != picShareInfo.end())
 	{
-		pItr->second.erasepmatch(name);
-		if (pItr->second.isEmpty())
+		for (auto pPicMpItr = pItr->second.begin(); pPicMpItr != pItr->second.end(); ++pPicMpItr)
+		{
+			if (pPicMpItr->first.find(name) != std::string::npos)
+			{
+				pItr->second.erase(pPicMpItr);
+					break;
+			}
+		}
+		if (pItr->second.empty())
 			picShareInfo.erase(pItr);
 	}
 	return;
@@ -95,7 +103,15 @@ CommonElem::getSharePics(std::map<long, std::map<std::string, long>> & shIdItemN
 	for(auto pItr = picShareInfo.begin(); pItr != picShareInfo.end(); ++pItr)
 	{
 		std::map<std::string, long> picNamesLens;
-		pItr->second.getKeyVals(picNamesLens);
+		for (auto pPicMpItr = pItr->second.begin(); pPicMpItr != pItr->second.end(); ++pPicMpItr)
+		{
+			if (!pPicMpItr->second.getDownload())
+			{
+				picNamesLens[pPicMpItr->first] = pPicMpItr->second.getPicLen();
+				pPicMpItr->second.setDownload(true);
+			}
+		}
+		
 		shIdItemNames[pItr->first] = picNamesLens;
 	}
 	return;
