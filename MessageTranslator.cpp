@@ -34,6 +34,7 @@ MessageTranslator::getStoreIdReply(char *buf, int* mlen)
 	memcpy(buf, &len, sizeof(int));
 	constexpr int msgId = STORE_TRNSCTN_ID_RPLY_MSG;
 	memcpy(buf+sizeof(int), &msgId, sizeof(int));
+	*mlen = len;
 	return true;
 }
 
@@ -45,6 +46,7 @@ MessageTranslator::getReply(char *buf, int* mlen, int msgTyp)
 	constexpr int len = 2*sizeof(int);
 	memcpy(buf, &len, sizeof(int));
 	memcpy(buf+sizeof(int), &msgTyp, sizeof(int));
+	*mlen = len;
 	return true;
 }
 
