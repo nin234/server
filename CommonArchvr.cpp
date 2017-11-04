@@ -47,7 +47,7 @@ CommonArchvr::CommonArchvr()
 		std::cout << "Failed to open /home/ninan/data/items " << __FILE__ << ":" << __LINE__ << std::endl;
 		throw std::system_error(errno, std::system_category());
 	}
-	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
+	deviceFd = open("/home/ninan/data/deviceTkns", O_RDWR|O_CREAT|O_APPEND, S_IRWXU|S_IRGRP|S_IROTH);
 	if (deviceFd == -1)
 	{
 		std::cout << "Failed to open /home/ninan/data/items " << __FILE__ << ":" << __LINE__ << std::endl;

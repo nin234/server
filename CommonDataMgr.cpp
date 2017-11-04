@@ -32,7 +32,7 @@ CommonDataMgr::CommonDataMgr()
 		std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
 		
 		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn, devId);}); //devId here is platform ie ios or android
-		std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
+		std::cout << "Populating Templ Items " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeTemplItem(appId, shareId, name, list);});
    		std::cout << "Populating share list " << __FILE__ << ":" << __LINE__ << std::endl;
         
