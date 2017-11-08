@@ -374,6 +374,15 @@ CommonDataMgr::updateLstShareInfo(int appId, long shareId, long frndShareId, con
 }
 
 void
+CommonDataMgr::updatePicShareStatus(int appId, long shareId, long frndShareId, const std::string& picName)
+{
+	std::cout << "Updating ready to download picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
+	//CommonElem& elem = commonElems[appId][shareId];
+
+}
+
+void
 CommonDataMgr::updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName)
 {
 		

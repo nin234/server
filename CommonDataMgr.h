@@ -52,6 +52,7 @@
 		  void getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNames);
 		  void updateLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
 		  void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName);
+		  void updatePicShareStatus(int appId, long shareId, long frndShareId, const std::string& picName);
             void updateTemplLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
             void storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list);
   };

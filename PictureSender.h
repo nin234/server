@@ -6,6 +6,7 @@
 #include <string>
 #include <MessageTranslator.h>
 #include <Observer.h>
+#include <vector>
 
 struct PicFileDetails
 {
@@ -41,7 +42,7 @@ class PictureSender
 		void setTrnsl(MessageTranslator *pTrnsl);
 		void attach (Observer *pObs);
    	    void updateWaitingInfo(const std::string& picName, long shareId, bool bDownLoad);
-		PicFileDetails* onCloseNtwFd(int ntwFd);
+		std::vector<PicFileDetails> onCloseNtwFd(int ntwFd);
 	
 };
 #endif

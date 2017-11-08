@@ -95,7 +95,11 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 void
 MessageProcessor::onCloseFd(int fd)
 {
-
+	std::vector<PicFileDetails> pfdVec = m_pPicSndr->onCloseNtwFd(fd);
+	for(const auto& pfd : pfdVec)
+	{
+		std::cout << "Updating picSharestatus for " << pfd.appId << std::endl;
+	}
 }
 
 

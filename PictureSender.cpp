@@ -134,15 +134,40 @@ PictureSender::sendPictures()
 	return;
 }
 
-PicFileDetails*
+std::vector<PicFileDetails>
 PictureSender::onCloseNtwFd(int ntwFd)
 {
+	std::vector<PicFileDetails> pfdVec;
 	auto pItr = picFdMp.find(ntwFd);
 	if (pItr != picFdMp.end())
 	{
-
+		pfdVec.push_back(pItr->second);
+		close(pItr->second.picFd);
+		picFdMp.erase(pItr);
 	}
-	return NULL;
+	auto pItr1 = picNamesShIds.begin();
+	while (pItr1 != picNamesShIds.end())
+	{
+		if ((*pItr1).fd == ntwFd)
+		{
+			PicFileDetails pfd;
+			pfd.picLen = (*pItr1).picLen;
+			pfd.totWritten = 0;
+			pfd.shareId = (*pItr1).shareIdElem;
+			pfd.frndShareId = (*pItr1).shareId;
+			pfd.appId = (*pItr1).appId;
+			pfd.picName = (*pItr1).lstName;	
+			pfd.picSoFar = (*pItr1).picSoFar;
+
+			pfdVec.push_back(pfd);
+			pItr1 = picNamesShIds.erase(pItr1);
+		}
+		else
+		{
+			++pItr1;
+		}	
+	}
+	return pfdVec;
 }
 
 void
