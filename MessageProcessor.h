@@ -14,9 +14,10 @@
 #include <PictureSender.h>
 #include <MessageEnqueuer.h>
 #include <Observer.h>
+#include <NtwIntfObserver.h>
 #include <Util.h>
 
-class MessageProcessor : public Observer
+class MessageProcessor : public Observer, public NtwIntfObserver
 {
 	std::shared_ptr<MessageDecoder> m_pDcd;
 	std::shared_ptr<MessageTranslator> m_pTrnsl;
@@ -68,6 +69,7 @@ class MessageProcessor : public Observer
         bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg);
 		bool notify (char *buf, int mlen, int fd);
 		bool picDone(int fd);
+		void onCloseFd(int fd);
 		void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName); 
 };
 

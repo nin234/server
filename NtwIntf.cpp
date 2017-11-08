@@ -58,6 +58,7 @@ NtwIntf<Decoder>::checkAndCleanUpIdleFds()
 				std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 			}
 			std::cout << "Closing idle file descriptor "  << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+			m_pObs->onCloseFd(pItr->first);
 			close(pItr->first);
 			fdLastActiveMp.erase(pItr++);
 
@@ -82,6 +83,7 @@ NtwIntf<Decoder>::closeAndCleanUpFd(int fd)
 	{
 		std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	}
+	m_pObs->onCloseFd(fd);
 	close(fd);
 	fdLastActiveMp.erase(fd);
 }
@@ -425,6 +427,13 @@ NtwIntf<Decoder>::sendMsg(char *buf, int mlen, int fd)
 	}
    	updateFdLastActiveMp(fd);
 	return true;
+}
+
+template<typename Decoder>
+void
+NtwIntf<Decoder>::attach(NtwIntfObserver *pObs)
+{
+	m_pObs = pObs;
 }
 
 template class NtwIntf<MessageDecoder>;

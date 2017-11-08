@@ -88,8 +88,16 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 	pNtwIntf->setDecoder(m_pDcd);
 	m_pPicSndr->setTrnsl(pTrnsl);
 	m_pPicSndr->attach(this);
+	pNtwIntf->attach(this);
 	return;
 }
+
+void
+MessageProcessor::onCloseFd(int fd)
+{
+
+}
+
 
 void
 MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp)

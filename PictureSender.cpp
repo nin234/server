@@ -134,6 +134,17 @@ PictureSender::sendPictures()
 	return;
 }
 
+PicFileDetails*
+PictureSender::onCloseNtwFd(int ntwFd)
+{
+	auto pItr = picFdMp.find(ntwFd);
+	if (pItr != picFdMp.end())
+	{
+
+	}
+	return NULL;
+}
+
 void
 PictureSender::closeAndNotify(int picFd, int ntwFd, std::map<int, PicFileDetails>::iterator& pItr)
 {

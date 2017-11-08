@@ -40,7 +40,8 @@ class PictureSender
 		void insertPicNameShid(const shrIdLstName& shidlst);
 		void setTrnsl(MessageTranslator *pTrnsl);
 		void attach (Observer *pObs);
-	    void updateWaitingInfo(const std::string& picName, long shareId, bool bDownLoad);
+   	    void updateWaitingInfo(const std::string& picName, long shareId, bool bDownLoad);
+		PicFileDetails* onCloseNtwFd(int ntwFd);
 	
 };
 #endif

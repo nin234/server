@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <vector>
 #include <mutex>
+#include <NtwIntfObserver.h>
 
 struct buf
 {
@@ -37,6 +38,8 @@ class NtwIntf
 	void updateFdLastActiveMp(int fd);	
 	void closeAndCleanUpFd(int fd);
 	void checkAndCleanUpIdleFds();
+	NtwIntfObserver *m_pObs;
+
 	public:
 		NtwIntf();
 		~NtwIntf();
@@ -45,5 +48,6 @@ class NtwIntf
 		bool addFd (int fd);
 		void setDecoder(std::shared_ptr<Decoder> pDcd);
 		bool sendMsg(char *buf, int mlen, int fd);
+		void attach(NtwIntfObserver *pObs);
 };
 #endif
