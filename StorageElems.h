@@ -39,6 +39,7 @@ class picInfo
 	void getTemplShareLists(std::map<long, std::vector<std::string>>& shIdItemNames);
 	void picShareInsert(long shareId, const std::string& name,  long val);
 	void picShareDel(long shareId, const std::string& name);
+      void picShareSetDwldFalse(long shareId, const std::string& name);
 	void getSharePics(std::map<long, std::map<std::string, long>>& shIdItemNames);
 	private:
 	  std::map<long, LckFreeLstSS> lstShareInfo;

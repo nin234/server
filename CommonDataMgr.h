@@ -43,7 +43,7 @@
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);
 		  void eraseFdMp(int fd);
-		  bool storePic(PicObj *pObj);
+		  bool storePic(PicObj *pObj, bool& cleanUpFd);
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
       void getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);

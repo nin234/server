@@ -200,14 +200,15 @@ CommonDataMgr::openPicFile(long shareId, int appId, const std::string& picName, 
 }
 
 bool
-CommonDataMgr::storePic(PicObj *pPicObj)
+CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
 {
+    cleanUpNtwFd = false;
 	auto pItr = fdFdMp.find(pPicObj->getFd());
 	auto pItr1 = fdPicMetaMp.find(pPicObj->getFd());
 	if (pItr1 == fdPicMetaMp.end())
 	{
 		std::cout << "Failed to find metadata for picture fd=" << pPicObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		close(pPicObj->getFd());
+        cleanUpNtwFd = true;
 		return false;
 	}
 	int fd  = -1;
@@ -220,7 +221,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 		fd = openPicFile(pItr1->second->getShrId(), pPicObj->getAppId(), pItr1->second->getName(), pPicObj);
 		if (fd == -1)
 		{
-			close(pPicObj->getFd());
+            cleanUpNtwFd = true;
 			return false;
 		}
 	}
@@ -229,7 +230,7 @@ CommonDataMgr::storePic(PicObj *pPicObj)
 		fdFdMp.erase(pPicObj->getFd());
 		fdPicMetaMp.erase(fd);
 		std::cout << "Failed to store picture " << pItr1->second->getName() << std::endl;
-		close(pPicObj->getFd());
+        cleanUpNtwFd = true;
 		return false;
 	}
 	int lenWrittenSoFar = pItr1->second->getWrittenLen();
@@ -378,7 +379,8 @@ CommonDataMgr::updatePicShareStatus(int appId, long shareId, long frndShareId, c
 {
 	std::cout << "Updating ready to download picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
     	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
-	//CommonElem& elem = commonElems[appId][shareId];
+	CommonElem& elem = commonElems[appId][shareId];
+    elem.picShareSetDwldFalse(frndShareId, picName);
 
 }
 

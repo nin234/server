@@ -9,12 +9,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <algorithm>
-std::ostream& 
-operator << (std::ostream& os, const PicFileDetails& pfd)
-{
-	os << " picFd=" << pfd.picFd << " picLen=" << pfd.picLen << " totWritten=" << pfd.totWritten;
-	return os;
-}
+
 PictureSender::PictureSender():m_pTrnsl(NULL), m_pObs(NULL)
 {
 
@@ -168,6 +163,16 @@ PictureSender::onCloseNtwFd(int ntwFd)
 		}	
 	}
 	return pfdVec;
+}
+
+
+std::ostream& operator << (std::ostream& os, const PicFileDetails& pfd)
+{
+    os << " PicFileDetail picFd=" << pfd.picFd << " picLen=" << pfd.picLen << " totWritten=" << pfd.totWritten
+    << " shareId=" << pfd.shareId << " frndShareId=" << pfd.frndShareId << " appId=" << pfd.appId << " picSoFar="
+    << pfd.picSoFar << " waiting=" << pfd.waiting << " tv_sec=" << pfd.tv_sec << " picName=" << pfd.picName
+    << " picRealName=" << pfd.picRealName;
+    return os;
 }
 
 void

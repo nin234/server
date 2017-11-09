@@ -35,8 +35,7 @@ class NtwIntf
 	bool aggrbufinit(int fd);
 	void addFdToFdsQ(int fd);
 	void addFdsQtoLastActiveMp();
-	void updateFdLastActiveMp(int fd);	
-	void closeAndCleanUpFd(int fd);
+	void updateFdLastActiveMp(int fd);
 	void checkAndCleanUpIdleFds();
 	NtwIntfObserver *m_pObs;
 
@@ -49,5 +48,6 @@ class NtwIntf
 		void setDecoder(std::shared_ptr<Decoder> pDcd);
 		bool sendMsg(char *buf, int mlen, int fd);
 		void attach(NtwIntfObserver *pObs);
+        void closeAndCleanUpFd(int fd);
 };
 #endif

@@ -7,6 +7,7 @@
 #include <MessageTranslator.h>
 #include <Observer.h>
 #include <vector>
+#include <iostream>
 
 struct PicFileDetails
 {
@@ -23,6 +24,8 @@ struct PicFileDetails
 	std::string picRealName;
 	
 };
+
+std::ostream& operator << (std::ostream& os, const PicFileDetails& pfd);
 
 class PictureSender
 {

@@ -1,4 +1,5 @@
 #include <StorageElems.h>
+#include <iostream>
 
 
 void 
@@ -77,7 +78,22 @@ CommonElem::picShareInsert(long shareId, const std::string& name, long val)
 	return;
 }
 
-void 
+void
+CommonElem::picShareSetDwldFalse(long shareId, const std::string& name)
+{
+    auto pItr = picShareInfo.find(shareId);
+    if (pItr != picShareInfo.end())
+    {
+        auto pPicMpItr = pItr->second.find(name);
+        if (pPicMpItr != pItr->second.end())
+        {
+            std::cout << "Setting set download false to shareId=" << shareId << " name=" << name << " " << __FILE__ << ":" << __LINE__ << std::endl;
+                pPicMpItr->second.setDownload(false);
+        }
+    }
+}
+
+void
 CommonElem::picShareDel(long shareId, const std::string& name)
 {
 	auto pItr = picShareInfo.find(shareId);

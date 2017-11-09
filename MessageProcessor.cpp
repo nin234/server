@@ -98,7 +98,9 @@ MessageProcessor::onCloseFd(int fd)
 	std::vector<PicFileDetails> pfdVec = m_pPicSndr->onCloseNtwFd(fd);
 	for(const auto& pfd : pfdVec)
 	{
-		std::cout << "Updating picSharestatus for " << pfd.appId << std::endl;
+		std::cout << "Updating picSharestatus for " << pfd<< std::endl;
+        dataStore.updatePicShareStatus(pfd.appId, pfd.shareId, pfd.frndShareId, pfd.picName)
+        
 	}
 }
 
@@ -186,7 +188,8 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 		return;
 	}
 	std::cout << "Storing picture object " << __FILE__ << ":" << __LINE__ << std::endl;
-	if (dataStore.storePic(pPicObj))
+    bool cleanUpFd;
+	if (dataStore.storePic(pPicObj, cleanUpFd))
 	{
 		std::cout << "Stored picture object " << __FILE__ << ":" << __LINE__ << std::endl;
 		//send push notification
@@ -201,6 +204,13 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 		}
 	
 	}
+    else
+    {
+        if (cleanUpFd)
+        {
+            pNtwIntf->closeAndCleanUpFd(pPicObj->getFd());
+        }
+    }
 	return;
 }
 
