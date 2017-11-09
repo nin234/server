@@ -99,7 +99,7 @@ MessageProcessor::onCloseFd(int fd)
 	for(const auto& pfd : pfdVec)
 	{
 		std::cout << "Updating picSharestatus for " << pfd<< std::endl;
-        dataStore.updatePicShareStatus(pfd.appId, pfd.shareId, pfd.frndShareId, pfd.picName)
+        dataStore.updatePicShareStatus(pfd.appId, pfd.shareId, pfd.frndShareId, pfd.picName);
         
 	}
 }
