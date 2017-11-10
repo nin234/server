@@ -41,7 +41,7 @@ CommonArchvr::CommonArchvr()
 		throw std::system_error(errno, std::system_category());
 	}
 
-	itemFd = open("/home/ninan/data/items", O_RDWR|O_CREAT, S_IRWXU|S_IRGRP|S_IROTH);
+	itemFd = open("/home/ninan/data/items", O_RDWR|O_CREAT|O_APPEND, S_IRWXU|S_IRGRP|S_IROTH);
 	if (itemFd == -1)
 	{
 		std::cout << "Failed to open /home/ninan/data/items " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -154,7 +154,6 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 bool
 CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst)
 {
-    lseek(fd, 0, SEEK_CUR);
     while (true)
     {
         shrdIdTemplSize templSize;
@@ -169,6 +168,11 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
 	{
 		std::cout << "EOF for  file " << __FILE__ << ":" << __LINE__ << std::endl;
 		return false;
+	}
+	if (numread != sizeof(shrdIdTemplSize))
+	{
+		std::cout << "Invalid numread=" << numread << " not equal to sizeof(shrdIdTemplSize)" << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;	
 	}
         int toread = templSize.name_len + templSize.list_len;
         char *pBufPt;
@@ -197,6 +201,11 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
 		return false;
 	}
 
+	if (numread != toread)
+	{
+		std::cout << "Invalid numread=" << numread << " toread=" << toread << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;	
+	}
         shareId = templSize.shrId;
         name = pBufPt;
         lst = pBufPt+ templSize.name_len;
