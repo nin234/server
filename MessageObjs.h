@@ -45,6 +45,10 @@ class PicObj : public MsgObj
 		const char *getBuf() {return buf;}
 };
 
+class PicMetaDataObj;
+
+std::ostream& operator << (std::ostream& os, const PicMetaDataObj& picMetaData);
+
 class PicMetaDataObj : public MsgObj
 {
 		std::string name;
@@ -56,6 +60,7 @@ class PicMetaDataObj : public MsgObj
 	public:
 		virtual ~PicMetaDataObj(){}
 		PicMetaDataObj();
+		friend std::ostream& operator << (std::ostream& os, const PicMetaDataObj& picMetaData);
 		long  getShrId() const {return shrId;}
 		void setShrId(long sid) {shrId = sid;}
 		std::string getName() const {return name;}

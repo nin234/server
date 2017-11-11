@@ -18,6 +18,13 @@ MsgObjDeltr::operator () (MsgObj *pMsg)
 }
 
 
+std::ostream& 
+operator << (std::ostream& os, const PicMetaDataObj& picMetaData)
+{
+	os << " PicMetaDataObj appId=" << picMetaData.getAppId()  << " name=" << picMetaData.name << " frndLstStr=" << picMetaData.frndLstStr << " shrId=" << picMetaData.shrId << " pic_len=" << picMetaData.picLen << " writtenLen=" << picMetaData.writtenLen << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	return os;
+}
+
 void
 PicMetaDataObj::setName(const char *pName, int len)
 {
@@ -53,7 +60,7 @@ std::ostream&
 operator << (std::ostream& os, const picShareInfo& shInfo)
 {
 	const shareInfo& base = shInfo;
-	os << base << " " << shInfo.pic_len;
+	os << base << " pic_len=" << shInfo.pic_len;
 	return os;
 }
 

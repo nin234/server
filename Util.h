@@ -15,6 +15,7 @@ class Util
 		~Util();
 	        static std::string constructPicFile(int shareId, int appId, const std::string& name);
 	        static std::string getPicRealName(const std::string& name);
+		static std::string stripSuffix(const std::string& name, const std::string& pattern);
 };
 
 #endif

@@ -137,7 +137,7 @@ template<class Op> void populatePicMetaLst(Op op)
 	    int appId;
 	    long shareIdLst;
 	    int pic_len;
-	    if (!populatePicMetaLstImpl(appId, templLstFd, shareId, name, shareIdLst, pic_len, picMetaRecIndx))
+	    if (!populatePicMetaLstImpl(appId, picMetaFd, shareId, name, shareIdLst, pic_len, picMetaRecIndx))
 		break;
 	    op(appId, shareId, name, shareIdLst, pic_len);
 	}

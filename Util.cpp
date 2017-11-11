@@ -18,6 +18,16 @@ Util::~Util()
 
 }
 
+std::string
+Util::stripSuffix(const std::string& name, const std::string& pattern)
+{
+	std::size_t posn = name.find_first_of(pattern);
+	if (posn == std::string::npos)
+		return name;
+	std::string strippedStr = name.substr(0, posn);
+	return strippedStr;
+}
+
 std::string 
 Util::getPicRealName(const std::string& name)
 {

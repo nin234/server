@@ -168,6 +168,7 @@ bool
 ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, int appId, bool del, long shareId, long shareIdLst, const std::string& name, int maxlen, int pic_len)
 {
     constexpr int msgId = ARCHIVE_PIC_METADATA_MSG;
+
     picShareInfo templSize;
     templSize.shrId = shareId;
     templSize.shrIdLst = shareIdLst;
@@ -178,15 +179,15 @@ ArchiveMsgCreator::createPicMetaDataMsg(char *pMsg, int &len, int appId, bool de
     int msglen = sizeof(int) + sizeof(picShareInfo) + templSize.name_len;
     if (msglen > maxlen)
     {
-        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createShareLstMsg failed " << std::endl;
+        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createPicMetaDataMsg failed " << std::endl;
         return false;
     }
     memcpy(pMsg, &msgId, sizeof(int));
-    memcpy(pMsg+sizeof(int), &templSize, sizeof(shareInfo));
-    constexpr int nameoffset = sizeof(int) + sizeof(shareInfo);
+    memcpy(pMsg+sizeof(int), &templSize, sizeof(picShareInfo));
+    constexpr int nameoffset = sizeof(int) + sizeof(picShareInfo);
     memcpy(pMsg+nameoffset, name.c_str(), templSize.name_len);
     len = msglen;
-    std::cout << "Archiving shareLstMsg" <<  templSize << " name=" << name << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+    std::cout << "Archiving picMetaDataMsg " <<  templSize << " name=" << name << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 
 	return true;
 }
@@ -203,7 +204,7 @@ ArchiveMsgCreator::createCmnShareTemplAndLstMsg(char *pMsg, int& len, int appId,
     int msglen = sizeof(int) + sizeof(shareInfo) + templSize.name_len;
     if (msglen > maxlen)
     {
-        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createShareLstMsg failed " << std::endl;
+        std::cout << "msglen=" << msglen << " greater than maxlen=" << maxlen << " ArchiveMsgCreator::createCmnShareTemplAndLstMsg failed " << std::endl;
         return false;
     }
     memcpy(pMsg, &msgId, sizeof(int));

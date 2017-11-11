@@ -9,13 +9,20 @@
 #include <Constants.h>
 #include <MessageObjs.h>
 #include <memory>
+#include <Util.h>
 
 
 bool
 IndxKey::operator < (const IndxKey& rhs) const
 {
-	if (shareId < rhs.shareId && name < rhs.name)
-		return true;
+	if (shareId != rhs.shareId) 
+	{
+		return shareId < rhs.shareId;
+	}
+	else
+	{
+		return name < rhs.name;
+	}
 	return false;
 }
 
@@ -78,11 +85,11 @@ CommonArchvr::archivePicMetaData(int fd, const char *buf, int len)
 	}
 
 	picShareInfo templSize;
-	memcpy(&templSize, buf, sizeof(shareInfo));
+	memcpy(&templSize, buf, sizeof(picShareInfo));
 	IndxKey iky;
-	iky.shareId = templSize.shrId;
-    	iky.name = std::to_string(templSize.shrIdLst);
-    	iky.name += buf + sizeof(shareInfo);
+	iky.shareId = templSize.shrIdLst;
+	
+    	iky.name = Util::stripSuffix(buf + sizeof(picShareInfo), ";");
     
     std::cout << "Archiving picMetaData=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = picMetaRecIndx.find(iky);
@@ -93,7 +100,10 @@ CommonArchvr::archivePicMetaData(int fd, const char *buf, int len)
 	}
 	else
 	{
-		return updateLst(iky, buf, len, fd, pItr->second, picMetaRecIndx);
+		if (templSize.del)
+		{
+			return updateLst(iky, buf, len, fd, pItr->second, picMetaRecIndx);
+		}
 	}
 	
 	return true;
@@ -154,8 +164,6 @@ CommonArchvr::populateDeviceTknImpl(int& appId, long& shareId, std::string& devI
 bool
 CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& name, std::string& lst)
 {
-    while (true)
-    {
         shrdIdTemplSize templSize;
         int numread = read(fd, &templSize, sizeof(shrdIdTemplSize));
         if (numread == -1)
@@ -210,10 +218,7 @@ CommonArchvr::populateItemImpl(int& appId, int fd, long& shareId, std::string& n
         name = pBufPt;
         lst = pBufPt+ templSize.name_len;
 	appId = templSize.appId;
-	std::cout << "Populating appId=" << appId << " shareId=" << shareId << " name=" << name << " lst=" << lst << std::endl;
-        break;
-    }
-    return true;
+    	return true;
 }
 
 bool
@@ -239,7 +244,7 @@ CommonArchvr::populatePicMetaLstImpl(int& appId, int fd, long& shareId, std::str
 		int toread = size- sizeof(int);
 		char *pBufPt;
 		std::unique_ptr<char> pBuf;
-
+		std::cout << "pic meta size=" << toread + sizeof(int) << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		if (toread <= BUF_SIZE_32K)
 		{
 			pBufPt = wrbuf;
@@ -253,7 +258,7 @@ CommonArchvr::populatePicMetaLstImpl(int& appId, int fd, long& shareId, std::str
 		numread = read(fd, pBufPt, toread);
 		if (numread == -1)
 		{
-			std::cout << "Failed to read from file " << __FILE__ << ":" << __LINE__ << std::endl;
+			std::cout << "Failed to read from file toread=" << toread << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			throw std::system_error(errno, std::system_category());
 		}
 		
@@ -266,20 +271,23 @@ CommonArchvr::populatePicMetaLstImpl(int& appId, int fd, long& shareId, std::str
 		int valid;
 		memcpy(&valid, pBufPt, sizeof(int));
 		if (!valid)
+		{
+			std::cout << "valid =" << valid  << " continuing" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 			continue;
+		}
 		picShareInfo templSize;
 		memcpy(&templSize, pBufPt+sizeof(int), sizeof(picShareInfo));
 		shareId = templSize.shrId;
 	        appId = templSize.appId;
 		pic_len = templSize.pic_len;
-		name = pBufPt+sizeof(int)+sizeof(shareInfo);
+		name = pBufPt+sizeof(int)+sizeof(picShareInfo);
        		 shareIdLst = templSize.shrIdLst;
 		IndxKey iky;
-		iky.shareId = templSize.shrId;
-        	iky.name = std::to_string(templSize.shrIdLst);
-		iky.name += name;
-        recIndx[iky] = offset;
-        offset +=size;
+		iky.shareId = templSize.shrIdLst;
+    		iky.name = Util::stripSuffix(name, ";");
+        	recIndx[iky] = offset;
+        	offset +=size;
+		std::cout << "Populating picmeta appId=" << appId << " shareId=" << shareId << " name=" << name << " shareIdLst=" << shareIdLst << " pic_len=" << pic_len << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		break;
 	}
 	return true;
@@ -344,11 +352,10 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 		name = pBufPt+sizeof(int)+sizeof(shareInfo);
        		 shareIdLst = templSize.shrIdLst;
 		IndxKey iky;
-		iky.shareId = templSize.shrId;
-        	iky.name = std::to_string(templSize.shrIdLst);
-		iky.name += name;
-        recIndx[iky] = offset;
-        offset +=size;
+		iky.shareId = shareIdLst;
+		iky.name = name;
+        	recIndx[iky] = offset;
+        	offset +=size;
 		break;
 	}
 	return true;
@@ -473,7 +480,7 @@ CommonArchvr::archiveMsg(const char *buf, int len)
 bool
 CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd, std::map<IndxKey, long>& recIndx)
 {
-		long offset = lseek(lstFd, 0, SEEK_END);
+		long offset = lseek(fd, 0, SEEK_END);
 		int size= len*2 + 2*sizeof(int);
 		char *pBufPt;
 		std::unique_ptr<char> pBuf;
@@ -496,7 +503,7 @@ CommonArchvr::appendLst(const IndxKey& iky , const char *buf, int len, int fd, s
 			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 			return false;
 		}
-        recIndx[iky] = offset;
+        	recIndx[iky] = offset;
 
         return true;
 }
@@ -530,33 +537,12 @@ CommonArchvr::archiveBuf(int fd, const char *buf, int len)
 bool
 CommonArchvr::updateLst(const IndxKey& iky , const char *buf, int len, int fd, long indx, std::map<IndxKey, long>& recIndx)
 {
-	lseek(fd, indx, SEEK_SET);
-	int size;
-	int nbytes = read(fd, &size, sizeof(int));
-	if (nbytes == -1)
+	lseek(fd, indx+sizeof(int), SEEK_SET);
+	int valid = 0;
+	if (write(fd, &valid, sizeof(int)) == -1)
 	{
-		std::cout << "read failed to lstFd " << std::endl;
+		std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
 		return false;
-	}
-	int datalen = size - 2*sizeof(int);
-	if (len <= datalen)
-	{
-		lseek(fd, sizeof(int), SEEK_CUR);
-		if (write(fd, buf,len) ==-1)
-		{
-			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
-			return false;
-		}
-	}
-	else
-	{
-		int valid = 0;
-		if (write(fd, &valid, sizeof(int)) == -1)
-		{
-			std::cout << "Write failed to shareLst archive" << strerror(errno) << std::endl;
-			return false;
-		}
-		return appendLst(iky, buf, len, fd, recIndx);
 	}
 	return true;
 }
@@ -573,9 +559,8 @@ CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey
 	 shareInfo templSize;
 	memcpy(&templSize, buf, sizeof(shareInfo));
 	IndxKey iky;
-	iky.shareId = templSize.shrId;
-    iky.name = std::to_string(templSize.shrIdLst);
-    iky.name += buf + sizeof(shareInfo);
+	iky.shareId = templSize.shrIdLst;
+    	iky.name = buf + sizeof(shareInfo);
     
     std::cout << "Archiving shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = recIndx.find(iky);
@@ -586,7 +571,10 @@ CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey
 	}
 	else
 	{
-		return updateLst(iky, buf, len, fd, pItr->second, recIndx);
+		if (templSize.del)
+		{
+			return updateLst(iky, buf, len, fd, pItr->second, recIndx);
+		}
 	}
 	
 	return true;
