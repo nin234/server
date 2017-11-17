@@ -27,7 +27,6 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 	std::unique_ptr<MessageEnqueuer> pMsgEnq;
 	int maxFd;
 	int nFds;
-	std::array<int, NO_COMMON_MSGS> msgTypPrcsrs;
 	std::shared_ptr<ApplePush> pAppleNotfy;
     std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     

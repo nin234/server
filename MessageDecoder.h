@@ -8,6 +8,7 @@
 #include <memory>
 #include <array>
 #include <map>
+#include <functional>
 
 class MessageDecoder
 {
@@ -15,7 +16,6 @@ class MessageDecoder
 	bool createStoreIdObj(char *buffer,  ssize_t mlen, int fd);
 	bool createFrndLstObj(char *buffer, ssize_t mlen, int fd);
 	std::list<std::unique_ptr<MsgObj, MsgObjDeltr>> pMsgs;
-	std::array<int, NO_COMMON_MSGS> msgTypPrcsrs;
 	bool createTemplLstObj(char *buffer,  ssize_t mlen, int fd);
 	bool createLstObj(char *buffer,  ssize_t mlen, int fd);
 	bool createDeviceTknObj(char *buffer, ssize_t mlen, int fd);
@@ -24,6 +24,7 @@ class MessageDecoder
 	bool createPicMetaDataObj(char *buffer, ssize_t mlen, int fd);
 	bool createPicObj(char *buffer, ssize_t mlen, int fd);
     bool createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd);
+
 	std::map<int, PicObj*> picObjs;
 	protected:
 		void addMsgObj(std::unique_ptr<MsgObj, MsgObjDeltr> pMsg);

@@ -13,11 +13,6 @@ using namespace std::placeholders;
 EasyGrocMsgProcessor::EasyGrocMsgProcessor()
 {
 	MessageProcessor::setDcdTransl(new EasyGrocDecoder(), new EasyGrocTranslator());
-    for (auto &msgTypPrc : msgTypPrcsrs)
-        msgTypPrc = -1;
-    
-    msgTypPrcsrs[SHARE_TEMPL_ITEM_MSG%NO_EASYGROC_MSGS] = 0;
-    
     
 }
 
@@ -29,29 +24,15 @@ EasyGrocMsgProcessor::~EasyGrocMsgProcessor()
 void
 EasyGrocMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
-    static auto processors = {std::bind(std::mem_fn(&EasyGrocMsgProcessor::processTemplItemMsg), this, _1)
-    };
-
 	int msgTyp = pMsg->getMsgTyp();
-	
-	if (msgTyp < EASY_GROC_MSG_START || msgTyp > EASY_GROC_MSG_END)
+	switch(msgTyp)
 	{
-		std::cout << "Invalid message type " << msgTyp << "received in EasyGrocMsgProcessor " << std::endl;
-		return;
+		case SHARE_TEMPL_ITEM_MSG:
+			return processTemplItemMsg(pMsg);
+		default:
+			std::cout << "Unhandled message type=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+		break;
 	}
-    
-       
-    auto itr = processors.begin();
-    int pindx = msgTyp%NO_EASYGROC_MSGS;
-    
-    if (pindx == -1)
-    {
-        std::cout << "No handler found for msgTyp=" << msgTyp << std::endl;
-        return;
-    }
-
-    itr[msgTypPrcsrs[pindx]](pMsg);
-
 	return;
 }
 

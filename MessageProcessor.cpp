@@ -13,21 +13,6 @@ using namespace std::placeholders;
 
 MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
 {
-	std::cout << "Setting MessageProcessor message to member function mapping " << __FILE__ << ":" << __LINE__ << std::endl;
-	for (auto &msgTypPrc : msgTypPrcsrs)
-		msgTypPrc = -1;
-	msgTypPrcsrs[GET_SHARE_ID_MSG] = 0;
-	msgTypPrcsrs[STORE_TRNSCTN_ID_MSG] = 1;
-	msgTypPrcsrs[STORE_FRIEND_LIST_MSG] = 2;
-	msgTypPrcsrs[ARCHIVE_ITEM_MSG] = 3;
-	msgTypPrcsrs[SHARE_ITEM_MSG] = 4;
-	msgTypPrcsrs[STORE_DEVICE_TKN_MSG] = 5;
-	msgTypPrcsrs[GET_ITEMS] = 6;
-	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
-	msgTypPrcsrs[PIC_MSG] = 8;
-	msgTypPrcsrs[PIC_DONE_MSG] = 9;
-	msgTypPrcsrs[SHOULD_DOWNLOAD_MSG] = 10;
-
 
 	
 }
@@ -108,30 +93,39 @@ MessageProcessor::onCloseFd(int fd)
 void
 MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp)
 {
-	static auto processors = {std::bind(std::mem_fn(&MessageProcessor::processShareIdMsg), this, _1)
-	,std::bind(std::mem_fn(&MessageProcessor::processStoreIdMsg), this, _1)
-	,std::bind(std::mem_fn(&MessageProcessor::processFrndLstMsg), this, _1)
-       ,std::bind(std::mem_fn(&MessageProcessor::processArchvItemMsg), this, _1)
-	,std::bind(std::mem_fn(&MessageProcessor::processItemMsg), this, _1) 
-	,std::bind(std::mem_fn(&MessageProcessor::processDeviceTknMsg), this, _1)
-	, std::bind(std::mem_fn(&MessageProcessor::processGetItemMsg), this, _1)
-	, std::bind(std::mem_fn(&MessageProcessor::processPicMetaDataMsg), this, _1)
-	, std::bind(std::mem_fn(&MessageProcessor::processPicMsg), this, _1)
-	, std::bind(std::mem_fn(&MessageProcessor::processPicDoneMsg), this, _1)
-	, std::bind(std::mem_fn(&MessageProcessor::processShouldDownLoadMsg), this, _1)
-};
-	auto itr = processors.begin();
     if (nMsgTyp >= NO_COMMON_MSGS)
         return;
-    int pindx =msgTypPrcsrs[nMsgTyp];
-    
-    if (pindx == -1)
-    {
-        std::cout << "No handler found for msgTyp=" << nMsgTyp << std::endl;
-        return;
-    }
 
-	itr[pindx](pMsg);
+	switch(nMsgTyp)
+	{
+		case GET_SHARE_ID_MSG:
+			return processShareIdMsg(pMsg);	
+
+		case STORE_TRNSCTN_ID_MSG:
+			return processStoreIdMsg(pMsg);
+		case STORE_FRIEND_LIST_MSG:
+			return processFrndLstMsg(pMsg);
+		case ARCHIVE_ITEM_MSG:
+			return processArchvItemMsg(pMsg);
+		case SHARE_ITEM_MSG:
+			return processItemMsg(pMsg);
+		case STORE_DEVICE_TKN_MSG:
+			return processDeviceTknMsg(pMsg);
+		case GET_ITEMS:
+			return processGetItemMsg(pMsg);
+		case PIC_METADATA_MSG:
+			return processPicMetaDataMsg(pMsg);
+		case PIC_MSG:
+			return processPicMsg(pMsg);
+		case PIC_DONE_MSG:
+			return processPicDoneMsg(pMsg);
+		case SHOULD_DOWNLOAD_MSG:
+			return processShouldDownLoadMsg(pMsg);
+	
+		default:
+			std::cout << "Unhandled message type=" << nMsgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		break;
+	}	
 
 	return;
 }
@@ -152,8 +146,6 @@ MessageProcessor::processRequests()
 			processMsg(pMsg);
 			continue;
 		}	
-		if (msgTypPrcsrs[nMsgTyp] == -1)
-			continue;
 		if (nMsgTyp != SHOULD_DOWNLOAD_MSG && m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
 			pMsgEnq->enqMsg(std::move(pMsg));	
@@ -606,8 +598,6 @@ MessageProcessor::picDone(int fd)
 			break;
 		int nMsgTyp = pMsg->getMsgTyp();
 		if (nMsgTyp < 0)
-			continue;
-		if (msgTypPrcsrs[nMsgTyp] == -1)
 			continue;
 		if (m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{

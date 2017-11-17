@@ -7,10 +7,6 @@ using namespace std::placeholders;
 
 EasyGrocDecoder::EasyGrocDecoder()
 {
-    for (auto &msgTypPrc : msgTypPrcsrs)
-        msgTypPrc = -1;
-    
-    msgTypPrcsrs[SHARE_TEMPL_ITEM_MSG%NO_EASYGROC_MSGS] = 0;
 }
 
 EasyGrocDecoder::~EasyGrocDecoder()
@@ -23,24 +19,15 @@ EasyGrocDecoder::decodeMsg(char *buffer, ssize_t mlen, int fd)
 {
     int msgTyp;
     memcpy(&msgTyp, buffer+sizeof(int), sizeof(int));
-    static auto processors = {
-        std::bind(std::mem_fn(&EasyGrocDecoder::createShareTemplLstObj), this, _1, _2, _3)
-    };
-    
-    if (msgTyp > EASY_GROC_MSG_END || msgTyp < EASY_GROC_MSG_START)
+    switch(msgTyp)
     {
-        std::cout << "Invalid message received msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__  << std::endl;
-        return false;
+	case SHARE_TEMPL_ITEM_MSG:
+		return createShareTemplLstObj(buffer, mlen, fd);
+	default:
+		std::cout << "Unhandled MsgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	break;
     }
-        
-    int pindx = msgTypPrcsrs[msgTyp];
-    if (pindx == -1)
-    {
-        std::cout << "No handler found for msgTyp=" << msgTyp << std::endl;
-        return false;
-    }
-    auto itr = processors.begin();
-    return itr[pindx](buffer, mlen, fd);
+    return false;
 
 }
 

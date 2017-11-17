@@ -1,4 +1,4 @@
-#include <MessageDecoder.h>
+#include <MessageDecoder.h> 
 #include <string.h>
 #include <iostream>
 #include <functional>
@@ -7,19 +7,7 @@ using namespace std::placeholders;
 
 MessageDecoder::MessageDecoder()
 {
-	for (int i=0; i < NO_COMMON_MSGS; ++i)
-		msgTypPrcsrs[i] = -1;
-	msgTypPrcsrs[GET_SHARE_ID_MSG] = 0;
-	msgTypPrcsrs[STORE_TRNSCTN_ID_MSG] = 1;
-	msgTypPrcsrs[STORE_FRIEND_LIST_MSG] = 2;
-	msgTypPrcsrs[ARCHIVE_ITEM_MSG] = 3;
-	msgTypPrcsrs[SHARE_ITEM_MSG] = 4;
-	msgTypPrcsrs[STORE_DEVICE_TKN_MSG] = 5;
-	msgTypPrcsrs[GET_ITEMS] = 6;
-	msgTypPrcsrs[PIC_METADATA_MSG] = 7;
-	msgTypPrcsrs[PIC_MSG] = 8;
-	msgTypPrcsrs[PIC_DONE_MSG] = 9;
-    msgTypPrcsrs[SHOULD_DOWNLOAD_MSG] = 10;
+
 }
 
 MessageDecoder::~MessageDecoder()
@@ -32,33 +20,40 @@ MessageDecoder::~MessageDecoder()
 bool 
 MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 {
-    int msgTyp;
-    memcpy(&msgTyp, buffer+sizeof(int), sizeof(int));
-    static auto processors = {
-    std::bind(std::mem_fn(&MessageDecoder::createShareIdObj), this, _1, _2, _3), 
-    std::bind(std::mem_fn(&MessageDecoder::createStoreIdObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createFrndLstObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createTemplLstObj), this, _1, _2, _3), 
-    std::bind(std::mem_fn(&MessageDecoder::createLstObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createDeviceTknObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createGetItemObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createPicMetaDataObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createPicObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createPicDoneObj), this, _1, _2, _3),
-    std::bind(std::mem_fn(&MessageDecoder::createShouldDownLoadObj), this, _1, _2, _3)
-}; 
+    	int msgTyp;
+    	memcpy(&msgTyp, buffer+sizeof(int), sizeof(int));
 	if (msgTyp > NO_COMMON_MSGS)
 		return decodeMsg(buffer, mlen, fd);
-	int pindx = msgTypPrcsrs[msgTyp];
-    if (pindx == -1)
-    {
-        std::cout << "No handler found for msgTyp=" << msgTyp << std::endl;
-        return false;
-    }
-
-	auto itr = processors.begin();
-	return itr[pindx](buffer, mlen, fd);
-    
+	
+	switch(msgTyp)
+	{
+		case GET_SHARE_ID_MSG:
+		 	return createShareIdObj(buffer, mlen, fd);
+		case STORE_TRNSCTN_ID_MSG:
+			return createStoreIdObj(buffer, mlen, fd);
+		case STORE_FRIEND_LIST_MSG:
+			return createFrndLstObj(buffer, mlen, fd);
+		case ARCHIVE_ITEM_MSG:
+			return createTemplLstObj(buffer, mlen, fd);
+		case SHARE_ITEM_MSG:
+			return createLstObj(buffer, mlen, fd);
+		case STORE_DEVICE_TKN_MSG:
+			return createDeviceTknObj(buffer, mlen, fd);
+		case GET_ITEMS:
+			return createGetItemObj(buffer, mlen, fd);
+		case PIC_METADATA_MSG:
+			return createPicMetaDataObj(buffer, mlen, fd);
+		case PIC_MSG:
+			return createPicObj(buffer, mlen, fd);
+		case PIC_DONE_MSG:
+			return createPicDoneObj(buffer, mlen, fd);
+		case SHOULD_DOWNLOAD_MSG:
+			return createShouldDownLoadObj(buffer, mlen, fd);
+		default:
+			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+		break;
+	}	
+   	return false; 
 }
 
 bool
@@ -338,6 +333,7 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	long picShareId = 0;
 	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
 	pMsg->setPicShareId(picShareId);
+	std::cout << "Create getItemObj " << *pMsg << " appId=" << getAppId() << __FILE__ << ":" << __LINE__ << std::endl;	
 	
 	pMsgs.push_back(std::move(pMsg));
 	return true;

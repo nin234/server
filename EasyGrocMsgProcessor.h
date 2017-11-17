@@ -8,8 +8,6 @@
 class EasyGrocMsgProcessor : public MessageProcessor
 {
 
-	std::array<int, NO_EASYGROC_MSGS> msgTypPrcsrs;
-
 
 	public:
 	
