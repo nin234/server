@@ -9,9 +9,11 @@
 #include <ApplePush.h>
 #include <FirebaseConnHdlr.h>
 #include <Config.h>
+#include <FrndLstMgr.h>
 
 AppMgr::AppMgr()
 {
+	FrndLstMgr::Instance();
 	FirebaseConnHdlr::initialize();
 	std::cout << "Initialized FirebaseConnHdlr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	OpenHousesMgr *pOhMgr = new OpenHousesMgr();

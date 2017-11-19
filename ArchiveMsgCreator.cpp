@@ -80,7 +80,7 @@ ArchiveMsgCreator::createFrndLstMsg(char *pMsgStatic, int& len, long shareId, co
 	constexpr int msgId = ARCHIVE_FRND_LST_MSG;
 	memcpy(pMsg, &msgId, sizeof(int));
 	shrdIdSize shIdSize;
-	shIdSize.size = frndLst.size();
+	shIdSize.size = frndLst.size()+1;
 	shIdSize.shrId = shareId;
 	memcpy (pMsg+sizeof(int), &shIdSize, sizeof(shrdIdSize));
 	memcpy (pMsg+shLen, frndLst.c_str(), frndLst.size()+1);

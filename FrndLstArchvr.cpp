@@ -34,14 +34,14 @@ FrndLstArchvr::archiveMsg(const char *buf, int len)
 		return false;
 	}
 	shrdIdSize shIdSize;
-	memcpy(&shIdSize, buf, sizeof(shIdSize));
-	std::string frndLst = buf+sizeof(shrdIdSize);
+	memcpy(&shIdSize, buf+sizeof(int), sizeof(shIdSize));
+	std::string frndLst = buf+sizeof(shrdIdSize) + sizeof(int);
 	std::cout << "Archiving friendLst shareId=" << shIdSize.shrId << " frndLst=" << frndLst << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = frndLstIndx.find(shIdSize.shrId);
 
 	if (pItr == frndLstIndx.end())
 	{
-		return appendLst(shIdSize.shrId, buf, len);	
+		return appendLst(shIdSize.shrId, buf+sizeof(int), len-sizeof(int));	
 	}
 	else
 	{
@@ -52,7 +52,7 @@ FrndLstArchvr::archiveMsg(const char *buf, int len)
 		if (len <= datalen)
 		{
 			lseek(frndFd, sizeof(int), SEEK_CUR);	
-			if (write(frndFd, buf, len) == -1)
+			if (write(frndFd, buf+sizeof(int), len-sizeof(int)) == -1)
 			{
 				std::cout << "Write failed to frndLst archive" << strerror(errno) << std::endl;
 				return false;
@@ -66,7 +66,7 @@ FrndLstArchvr::archiveMsg(const char *buf, int len)
 				std::cout << "Write failed to frndLst archive" << strerror(errno) << std::endl;
 				return false;
 			}
-			return appendLst(shIdSize.shrId, buf, len);	
+			return appendLst(shIdSize.shrId, buf+sizeof(int), len-sizeof(int));	
 		}
 	}
 
