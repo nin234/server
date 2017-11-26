@@ -154,13 +154,13 @@ template<typename KeyType, typename ValType>
 Node<KeyType, ValType> *
 LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType> **left_node)
 {
+/*
 	Node<KeyType, ValType> *left_node_next = nullptr, *right_node;
     search_again:
         do 
 	{
     		Node<KeyType, ValType> *t = head;
     		Node<KeyType, ValType> *t_next = head->next;
-		/* 1: Find left_node and right_node */ 
 		do 
 		{
 			if (!is_marked_reference(t)) 
@@ -176,7 +176,6 @@ LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType>
 		} 
 		while (is_marked_reference(t) || (t->key < search_key)); 
 		right_node = t;
-		/* 2: Check nodes are adjacent */ 
 		if (left_node_next == right_node)
 		{
 			if ((right_node != tail) && is_marked_reference(right_node)) 
@@ -188,7 +187,6 @@ LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType>
 				return right_node;
 			}
 		}
-		/* 3: Remove one or more marked nodes */
 		if (__sync_bool_compare_and_swap (&((*left_node)->next), left_node_next, right_node))
 		{
 			if ((right_node != tail) && is_marked_reference(right_node)) 
@@ -202,6 +200,8 @@ LckFreeLst<KeyType, ValType>::search (KeyType search_key, Node<KeyType, ValType>
 		}
 	} 
 	while (true);
+	return NULL;
+*/
 	return NULL;
 }
 

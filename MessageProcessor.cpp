@@ -13,8 +13,7 @@ using namespace std::placeholders;
 
 MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
 {
-
-	
+	nFds = 0;
 }
 
 MessageProcessor::~MessageProcessor()
@@ -28,11 +27,7 @@ MessageProcessor::process()
 	for (;;)
 	{
         	pFirebaseNotify->getSendEvents();
-		if (!pNtwIntf->waitAndGetMsg())	
-		{
-			--nFds;
-		}
-		else
+		if (pNtwIntf->waitAndGetMsg())	
 		{
 			processRequests();
 			m_pPicSndr->sendPictures();
@@ -46,7 +41,7 @@ MessageProcessor::addFd(int fd)
 {
 	if (nFds > maxFd)	
 	{
-		std::cout << "Exceeded max capacity in worker fds" << std::endl;
+		std::cout << "Exceeded max capacity in worker fds nFds=" << nFds << " maxFd=" << maxFd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		close(fd);
 		return false;
 	}
@@ -87,6 +82,7 @@ MessageProcessor::onCloseFd(int fd)
         dataStore.updatePicShareStatus(pfd.appId, pfd.shareId, pfd.frndShareId, pfd.picName);
         
 	}
+	--nFds;
 }
 
 

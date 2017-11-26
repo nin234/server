@@ -24,11 +24,7 @@ template<typename KeyType, typename ValType>
 class LckFreeLst
 {
 
-	Node<KeyType, ValType> *head;
-	Node<KeyType, ValType> *tail;
 	Node<KeyType, ValType> *search(KeyType search_key, Node<KeyType, ValType> **left_node);
-	std::map<time_t, Node<KeyType, ValType>*> garbageCollector;
-	std::mutex gcmutex;
 
 
 	std::map<KeyType, ValType> storage;
