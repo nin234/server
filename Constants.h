@@ -34,7 +34,7 @@ enum class AppName
 #define RCV_BUF_LEN 4096
 
 #define SHARE_ID_START_VAL 1000
-#define MAX_MQ_BUF 32768
+#define MAX_MQ_BUF 128000
 #define MAX_MQ_EVENTS 10
 
 //The following two definitions are for mq_attr used in mq_open
