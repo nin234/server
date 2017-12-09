@@ -244,7 +244,7 @@ PictureSender::sendPicData()
 		if (m_pObs && m_pObs->notify(buf, msglen, pItr->first))
 		{
 			pItr->second.totWritten += numread;
-			std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+			//std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
 				std::cout << "Finished reading file " << pItr->second <<  __FILE__ << ":" << __LINE__ << std::endl;

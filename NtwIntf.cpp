@@ -170,7 +170,7 @@ NtwIntf<Decoder>::processFreshMessage(char *buffer, ssize_t mlen, int fd)
         }
         int len =0;
         memcpy(&len, buffer+mlen-remaining, sizeof(int));
-	std::cout << "Decoding Message length=" << len << " remaining=" << remaining << " appId=" << (*dcd).getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	//std::cout << "Decoding Message length=" << len << " remaining=" << remaining << " appId=" << (*dcd).getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
         if (remaining == len)
         {
             (*dcd)(buffer+mlen-remaining, remaining, fd);
@@ -393,7 +393,7 @@ NtwIntf<Decoder>::waitAndGetMsg()
 			else
 			{
 				//TO DO process message
-				std::cout << "Received message= fd=" << evlist[j].data.fd << " length=" << s << " appId=" << dcd->getAppId()<< " " << __FILE__<< ":" << __LINE__ <<  std::endl;
+				//std::cout << "Received message= fd=" << evlist[j].data.fd << " length=" << s << " appId=" << dcd->getAppId()<< " " << __FILE__<< ":" << __LINE__ <<  std::endl;
 				processMessage(buf, s, evlist[j].data.fd);
 			}
 		}
