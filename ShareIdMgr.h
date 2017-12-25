@@ -15,7 +15,7 @@ class ShareIdMgr
 		ShareIdMgr& operator=(const ShareIdMgr& sMgr) = delete;
 //		HashMap<long, long> trnIdShrIdMp;
 		int shareIdStep;
-		static thread_local long shareId;
+		long shareId;
 		long shareId_Init;
 		std::mutex shid_init_mutex;
 

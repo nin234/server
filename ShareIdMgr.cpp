@@ -13,6 +13,7 @@ ShareIdMgr::ShareIdMgr()
 	else
 		shareId_Init =1000;
 	//pShArch->populateTrnIdShrIdMp(trnIdShrIdMp);
+	++shareId_Init;
 }
 
 ShareIdMgr::~ShareIdMgr()
@@ -24,14 +25,10 @@ void
 ShareIdMgr::initThreadShareId()
 {
 	std::lock_guard<std::mutex> lock(shid_init_mutex);
-	++shareId_Init;
 	shareId = shareId_Init;
 	std::cout << "Setting shareId to " << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return;
 }
-
-thread_local long
-ShareIdMgr::shareId=1000;
 
 ShareIdMgr&
 ShareIdMgr::Instance()
@@ -44,8 +41,9 @@ ShareIdMgr::Instance()
 long
 ShareIdMgr::getShareId(long trnId, bool& archive)
 {
+	std::lock_guard<std::mutex> lock(shid_init_mutex);
 	archive = true;
-	shareId += shareIdStep;
+	++shareId;
 	std::cout << "Returning new shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return shareId;
 }
