@@ -7,12 +7,14 @@
 #define OPENHOUSES_ID 0
 #define AUTOSPREE_ID 1
 #define EASYGROCLIST_ID 2
+#define SMARTMSG_ID 3
 
 enum class AppName
 {
         OPENHOUSES,
         AUTOSPREE,
-        EASYGROCLIST
+        EASYGROCLIST,
+	SMARTMSG
 };
 
 #define NO_OF_THREADS 3
@@ -20,10 +22,12 @@ enum class AppName
 #define OPENHOUSES_THREADS 1
 #define AUTOSPREE_THREADS 1
 #define EASYGROC_THREADS 1
+#define SMARTMSG_THREADS 1
 
 #define OPENHOUSES_MAX_FDS 100
 #define AUTOSPREE_MAX_FDS 100
 #define EASYGROC_MAX_FDS 100
+#define SMARTMSG_MAX_FDS 100
 #define MAX_FD 100
 #define CHECK_INTERVAL 120
 
