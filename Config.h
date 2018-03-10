@@ -9,6 +9,7 @@ class Config
 	int OpenHousesThrds;
 	int AutoSpreeThrds;
 	int EasyGrocThrds;
+	int SmartMsgThrds;
 	int mq_maxmsg;
 	int mq_msgsize;
 	bool bSandbox;
@@ -20,6 +21,7 @@ class Config
 		int getOpenHousesThrds();
 		int getAutoSpreeThrds();
 		int getEasyGrocThrds();
+		int getSmartMsgThrds();
 		int getMqMaxMsg();
 		int getMqMsgSize();
 		bool sandBox();

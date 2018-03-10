@@ -8,6 +8,7 @@ Config::Config()
 	OpenHousesThrds=3;
 	AutoSpreeThrds=3;
 	EasyGrocThrds=3;
+	SmartMsgThrds=3;
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile("/home/ninan/config/config.xml") != tinyxml2::XML_SUCCESS)
 	{
@@ -34,7 +35,12 @@ Config::Config()
 	{
 		EasyGrocThrds = std::stoi(pItr->second);	
 	}	
-	std::cout <<"Config values OpenHousesThrds=" << OpenHousesThrds << " AutoSpreeThrds=" << AutoSpreeThrds << " EasyGrocThrds=" << EasyGrocThrds << std::endl;
+	pItr = keyvals.find("smartmsg_threads");
+	if (pItr != keyvals.end())
+	{
+		SmartMsgThrds = std::stoi(pItr->second);	
+	}
+	std::cout <<"Config values OpenHousesThrds=" << OpenHousesThrds << " AutoSpreeThrds=" << AutoSpreeThrds << " EasyGrocThrds=" << EasyGrocThrds  << " SmartMsgThrds=" << SmartMsgThrds << std::endl;
 	pItr = keyvals.find("mq_maxmsg");
 	if (pItr != keyvals.end())
 	{
@@ -101,6 +107,12 @@ int
 Config::getEasyGrocThrds()
 {
 	return EasyGrocThrds;
+}
+
+int 
+Config::getSmartMsgThrds()
+{
+	return SmartMsgThrds;
 }
 
 
