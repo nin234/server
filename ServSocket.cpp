@@ -29,6 +29,7 @@ ServSocket::bindAndListen()
 
 	char portstr[64];
 	sprintf(portstr, "%d", port);
+	std::cout << "bindAndListen to port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	int ret = getaddrinfo(NULL, portstr, &hintaddr, &servaddr);
 	if (ret !=0)
 	{
@@ -64,6 +65,7 @@ ServSocket::bindAndListen()
 		throw std::system_error(errno, std::system_category());
 	}
 
+	std::cout << "Listening socket created for port=" << port << " listen fd=" << lfd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	freeaddrinfo(servaddr);
 
 

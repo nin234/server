@@ -2,7 +2,7 @@
 #define _CONSTANTS_H_
 
 
-#define NO_OF_APPS 3
+#define NO_OF_APPS 4
 
 #define OPENHOUSES_ID 0
 #define AUTOSPREE_ID 1
@@ -17,7 +17,7 @@ enum class AppName
 	SMARTMSG
 };
 
-#define NO_OF_THREADS 3
+#define NO_OF_THREADS 4
 
 #define OPENHOUSES_THREADS 1
 #define AUTOSPREE_THREADS 1
@@ -45,10 +45,10 @@ enum class AppName
 #define MQ_MAXMSG 10
 #define MQ_MSGSIZE 32768
 
-#define HASH_MAP_SIZE 900000
-#define MAX_ELEMENTS_MAP 900000
-//#define HASH_MAP_SIZE 1601
-//#define MAX_ELEMENTS_MAP 997
+//#define HASH_MAP_SIZE 900000
+//#define MAX_ELEMENTS_MAP 900000
+#define HASH_MAP_SIZE 1601
+#define MAX_ELEMENTS_MAP 997
 #define HASH_1_PRIME 960259
 #define STORE_ARRAY_SIZE 255
 #define SHARE_MAP_SIZE 11

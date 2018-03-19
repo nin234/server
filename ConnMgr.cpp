@@ -43,6 +43,10 @@ ConnMgr::populateConnMp(std::map<AppName, int>& readyFdsMp, int i, int fd)
 		case 2:
 			readyFdsMp[AppName::EASYGROCLIST] = fd;
 		break;
+		
+		case 3:
+			readyFdsMp[AppName::SMARTMSG] = fd;
+		break;
 
 		default:
 			std::cout << "Invalid app id i=" << i << std::endl;
@@ -61,12 +65,13 @@ ConnMgr::waitAndGetConnections()
 	for (int i=0; i < NO_OF_APPS; ++i)
 	{
 		FD_SET(apps[i].listenFd(), &readfds);
-		if (apps[i].listenFd() > maxfd)
+		std::cout << "Setting listenFd in readfds of select listenFd=" << apps[i].listenFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		if (apps[i].listenFd() +1 > maxfd)
 			maxfd = apps[i].listenFd() + 1;		
 	}
 	
 
-	std::cout << "Waiting in select for new connections " << __FILE__ << " " << __LINE__ << std::endl;
+	std::cout << "Waiting in select for new connections maxfd=" << maxfd << " "<< __FILE__ << " " << __LINE__ << std::endl;
 	int nReady =select(maxfd, &readfds, NULL, NULL, NULL);
 
 	std::cout << "select returns " << nReady << " file descriptors ready " << __FILE__ << " " << __LINE__ << std::endl;
