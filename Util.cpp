@@ -1,5 +1,7 @@
 #include <Util.h>
 #include <cstring>
+#include <string>
+#include <ctime>
 
 std::ostream&
 operator << (std::ostream& os, const shrIdLstName& shlnm)
@@ -16,6 +18,20 @@ Util::Util()
 Util::~Util()
 {
 
+}
+
+std::string
+Util::now()
+{
+ 	char buf[256];
+        time_t ctt = time(0);
+        struct tm result;
+        localtime_r(&ctt, &result);
+        asctime_r(&result, buf);
+        std::string strnow = buf;
+        strnow.pop_back();
+	strnow += " ";
+	return strnow;
 }
 
 std::string

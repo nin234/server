@@ -26,16 +26,18 @@ ArchiveMgr::ArchiveMgr()
 	std::cout << "ArchiveMgr epoll file descriptor opened " << __FILE__ << ":"<< __LINE__ << std::endl;
 
 	mq_name = 0;
-	pArchvrs[ARCHIVE_SHARE_ID_MSG] = std::make_shared<ShareIdArchvr>();
-	pArchvrs[ARCHIVE_SHARE_TRN_ID_MSG] = std::make_shared<ShareIdArchvr>();
+	auto pSharedIdArchvr = std::make_shared<ShareIdArchvr>();
+	pArchvrs[ARCHIVE_SHARE_ID_MSG] = pSharedIdArchvr;
+	pArchvrs[ARCHIVE_SHARE_TRN_ID_MSG] = pSharedIdArchvr;
 	pArchvrs[ARCHIVE_FRND_LST_MSG] = std::make_shared<FrndLstArchvr>();
-	pArchvrs[ARCHIVE_ARCHIVE_ITEM_MSG] = std::make_shared<CommonArchvr>();
-	pArchvrs[ARCHIVE_DEVICE_TKN_MSG] = std::make_shared<CommonArchvr>();
-    pArchvrs[ARCHIVE_SHARE_LST_MSG] = std::make_shared<CommonArchvr>();
-    pArchvrs[ARCHIVE_ITM_MSG] = std::make_shared<CommonArchvr>();
-    pArchvrs[ARCHIVE_TEMPL_ITM_MSG] = std::make_shared<CommonArchvr>();
-    pArchvrs[ARCHIVE_SHARE_TEMPL_LST_MSG] = std::make_shared<CommonArchvr>();
-    pArchvrs[ARCHIVE_PIC_METADATA_MSG] = std::make_shared<CommonArchvr>();
+	auto pCommonArchvr = std::make_shared<CommonArchvr>();
+	pArchvrs[ARCHIVE_ARCHIVE_ITEM_MSG] = pCommonArchvr;
+	pArchvrs[ARCHIVE_DEVICE_TKN_MSG] = pCommonArchvr;
+    pArchvrs[ARCHIVE_SHARE_LST_MSG] = pCommonArchvr;
+    pArchvrs[ARCHIVE_ITM_MSG] = pCommonArchvr;
+    pArchvrs[ARCHIVE_TEMPL_ITM_MSG] = pCommonArchvr;
+    pArchvrs[ARCHIVE_SHARE_TEMPL_LST_MSG] = pCommonArchvr;
+    pArchvrs[ARCHIVE_PIC_METADATA_MSG] = pCommonArchvr;
 	std::cout << "Created ArchiveMgr " << __FILE__ << ":"<< __LINE__ << std::endl;
     
 }

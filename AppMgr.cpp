@@ -29,12 +29,13 @@ AppMgr::AppMgr()
 	pEasy->initialize(Config::Instance().getEasyGrocThrds());
     	wrkMgr[AppName::EASYGROCLIST] = pEasy;
 	std::cout << "Initialized EasyGrocMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
-	SmartMsgMgr *pSmart = new SmartMsgMgr();
-	pSmart->initialize(Config::Instance().getSmartMsgThrds());
-    	wrkMgr[AppName::SMARTMSG] = pSmart;
-	std::cout << "Initialized SmartMsgMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
+//	SmartMsgMgr *pSmart = new SmartMsgMgr();
+//	pSmart->initialize(Config::Instance().getSmartMsgThrds());
+ //   	wrkMgr[AppName::SMARTMSG] = pSmart;
+//	std::cout << "Initialized SmartMsgMgr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 
-	ShareIdMgr::Instance().setShareIdStep(Config::Instance().getOpenHousesThrds() + Config::Instance().getAutoSpreeThrds() + Config::Instance().getEasyGrocThrds() + Config::Instance().getSmartMsgThrds());
+//	ShareIdMgr::Instance().setShareIdStep(Config::Instance().getOpenHousesThrds() + Config::Instance().getAutoSpreeThrds() + Config::Instance().getEasyGrocThrds() + Config::Instance().getSmartMsgThrds());
+	ShareIdMgr::Instance().setShareIdStep(Config::Instance().getOpenHousesThrds() + Config::Instance().getAutoSpreeThrds() + Config::Instance().getEasyGrocThrds());
 
 }
 

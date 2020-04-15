@@ -355,6 +355,9 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 		iky.shareId = shareIdLst;
 		iky.name = name;
         	recIndx[iky] = offset;
+		std::cout << Util::now() << "added to recIndx IndxKey.shareId="
+		<<iky.shareId << " iky.name=" << iky.name << " offset=" 
+		<< offset << " " << __FILE__ << ":" << __LINE__ << std::endl;		
         	offset +=size;
 		break;
 	}
@@ -562,6 +565,9 @@ CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey
 	iky.shareId = templSize.shrIdLst;
     	iky.name = buf + sizeof(shareInfo);
     
+	std::cout << Util::now() << "Searching recIndx IndxKey.shareId="
+	<<iky.shareId << " iky.name=" << iky.name   << " size=" << recIndx.size()
+	<< " " << __FILE__ << ":" << __LINE__ << std::endl;		
 	auto pItr = recIndx.find(iky);
     
 	if (pItr == recIndx.end())
