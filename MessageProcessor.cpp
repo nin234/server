@@ -90,8 +90,9 @@ void
 MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp)
 {
     if (nMsgTyp >= NO_COMMON_MSGS)
+    {
         return;
-
+    }
 	switch(nMsgTyp)
 	{
 		case GET_SHARE_ID_MSG:
