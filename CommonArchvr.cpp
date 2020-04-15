@@ -562,17 +562,18 @@ CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey
 	iky.shareId = templSize.shrIdLst;
     	iky.name = buf + sizeof(shareInfo);
     
-    std::cout << "Archiving shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	auto pItr = recIndx.find(iky);
     
 	if (pItr == recIndx.end())
 	{
+    		std::cout << "Archiving (appending) shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return appendLst(iky, buf, len, fd, recIndx);
 	}
 	else
 	{
 		if (templSize.del)
 		{
+    			std::cout << "Archiving (updating) shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 			return updateLst(iky, buf, len, fd, pItr->second, recIndx);
 		}
 	}
