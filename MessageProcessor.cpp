@@ -8,6 +8,7 @@
 #include <functional>
 #include <FrndLstMgr.h>
 #include <algorithm>
+#include <Util.h>
 
 using namespace std::placeholders;
 
@@ -287,7 +288,7 @@ MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		return;
 	}
 
-	std::cout << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
 
 	std::map<shrIdLstName, std::string> lstNameMp;
 	dataStore.getShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), lstNameMp);
@@ -507,7 +508,7 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 			if (!pNtwIntf->sendMsg(buf, mlen, pShObj->getFd()))
 				std::cout << "Failed to send message for fd=" << pShObj->getFd() << std::endl;
 		}
-		std::cout << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
+		std::cout << Util::now() << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	}
 	return;
 

@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <Util.h>
 
 thread_local std::unordered_map<int, int> 
 CommonDataMgr::fdFdMp;
@@ -115,7 +116,7 @@ CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, 
 void
 CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
-	std::cout << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << Util::now() << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
     std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   	CommonElem& elem = commonElems[appId][shareId];
   	elem.deviceToken = devTkn;

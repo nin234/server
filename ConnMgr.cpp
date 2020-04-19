@@ -65,7 +65,7 @@ ConnMgr::waitAndGetConnections()
 	for (int i=0; i < NO_OF_APPS; ++i)
 	{
 		FD_SET(apps[i].listenFd(), &readfds);
-		std::cout << "Setting listenFd in readfds of select listenFd=" << apps[i].listenFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		//std::cout << "Setting listenFd in readfds of select listenFd=" << apps[i].listenFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		if (apps[i].listenFd() +1 > maxfd)
 			maxfd = apps[i].listenFd() + 1;		
 	}

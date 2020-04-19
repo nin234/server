@@ -2,6 +2,7 @@
 #include <string.h>
 #include <iostream>
 #include <functional>
+#include <Util.h>
 
 using namespace std::placeholders;
 
@@ -334,7 +335,7 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	long picShareId = 0;
 	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
 	pMsg->setPicShareId(picShareId);
-	std::cout << "Create getItemObj " << *pMsg << " appId=" << getAppId() << __FILE__ << ":" << __LINE__ << std::endl;	
+	std::cout << Util::now() << "Create getItemObj " << *pMsg << " appId=" << getAppId() << __FILE__ << ":" << __LINE__ << std::endl;	
 	
 	pMsgs.push_back(std::move(pMsg));
 	return true;
