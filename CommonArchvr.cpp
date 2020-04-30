@@ -343,8 +343,6 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 
 		int valid;
 		memcpy(&valid, pBufPt, sizeof(int));
-		if (!valid)
-			continue;
 		shareInfo templSize;
 		memcpy(&templSize, pBufPt+sizeof(int), sizeof(shareInfo));
 		shareId = templSize.shrId;
@@ -354,11 +352,16 @@ CommonArchvr::populateshareLstImpl(int& appId, int fd, long& shareId, std::strin
 		IndxKey iky;
 		iky.shareId = shareIdLst;
 		iky.name = name;
-        	recIndx[iky] = offset;
 		std::cout << Util::now() << "added to recIndx IndxKey.shareId="
 		<<iky.shareId << " iky.name=" << iky.name << " offset=" 
-		<< offset << " " << __FILE__ << ":" << __LINE__ << std::endl;		
-        	offset +=size;
+		<< offset << " valid=" << valid << " " 
+		<< __FILE__ << ":" << __LINE__ << std::endl;		
+		if (!valid)
+		{
+        		offset +=size;
+			continue;
+		}
+        	recIndx[iky] = offset;
 		break;
 	}
 	return true;
@@ -572,14 +575,15 @@ CommonArchvr::archiveShareLst(int fd, const char *buf, int len, std::map<IndxKey
     
 	if (pItr == recIndx.end())
 	{
-    		std::cout << "Archiving (appending) shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    		std::cout << Util::now()  << "Archiving (appending) shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return appendLst(iky, buf, len, fd, recIndx);
 	}
 	else
 	{
 		if (templSize.del)
 		{
-    			std::cout << "Archiving (updating) shareLst=" << templSize << " name=" << iky.name << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    			std::cout << Util::now() << "Archiving (updating) shareLst=" << templSize << " name=" << iky.name << " offset=" << pItr->second 
+ 			<< " " <<  __FILE__ << ":" << __LINE__ << std::endl;
 			return updateLst(iky, buf, len, fd, pItr->second, recIndx);
 		}
 	}
