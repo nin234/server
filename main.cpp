@@ -10,6 +10,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <SSLSocket.h>
 
 int
 main()
@@ -47,6 +48,7 @@ main()
 			std::cout << "Failed to create ArchiveMgr message processor thread exiting ... " << __FILE__ << ":" << __LINE__ << std::endl;
 		}
 
+		SSLSocket::initializeSSL();	
 		for(;;)
 		{
 				//get the socket fd and push it into the worker thread select loop
