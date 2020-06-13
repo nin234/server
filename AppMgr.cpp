@@ -45,6 +45,16 @@ AppMgr::~AppMgr()
 
 }
 
+void
+AppMgr::setNewSSLClientConnections(const std::map<AppName, int>& appIdFds)
+{
+
+	for (const auto& x : appIdFds)
+	{
+		wrkMgr[x.first]->setNewSSLClientConnection(x.second);
+	} 
+	return;
+}
 
 void
 AppMgr::setNewClientConnections(const std::map<AppName, int>& appIdFds)

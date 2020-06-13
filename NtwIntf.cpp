@@ -318,6 +318,27 @@ NtwIntf<Decoder>::addFdsQtoLastActiveMp()
 	fdsQ.clear();
 
 }
+
+template<typename Decoder> 
+bool
+NtwIntf<Decoder>::addSSLFd (int fd)
+{
+	std::cout << "Received new connection request " << fd << " appId=" << dcd->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	int ret;
+	struct epoll_event event;
+	event.data.fd = fd;
+	event.events = EPOLLIN ;
+	ret = epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &event);
+	if (ret)
+	{
+		std::cout << "epoll_ctl failed with error=" << errno << std::endl;
+		close(fd);
+		return false;
+	}
+	addFdToFdsQ(fd);
+	return true;
+}
+
 template<typename Decoder> 
 bool
 NtwIntf<Decoder>::addFd (int fd)

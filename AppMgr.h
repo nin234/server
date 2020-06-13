@@ -14,6 +14,7 @@ class AppMgr
 		AppMgr();
 		~AppMgr();
 		void setNewClientConnections(const std::map<AppName, int>& appIdFds);
+		void setNewSSLClientConnections(const std::map<AppName, int>& appIdFds);
 };
 
 #endif

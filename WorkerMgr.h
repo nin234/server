@@ -22,6 +22,7 @@ class WorkerMgr
 		void initialize(int nThrds);
 		virtual void setNoOfThreads(int nThrds);
 		virtual ~WorkerMgr();
+		void setNewSSLClientConnection(int fd);
 		void setNewClientConnection(int fd);
 		virtual Worker* getWorker() =0;
 		virtual std::shared_ptr<ApplePush> getApplePushPtr()=0;

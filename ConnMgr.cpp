@@ -24,6 +24,13 @@ ConnMgr::initializeListeners()
 		apps[i].setPort(port++);
 		apps[i].bindAndListen();
 	}
+	
+	port =16803;
+	for (int i=0; i < NO_OF_APPS; ++i)
+	{
+		ssl[i].setPort(port++);
+		ssl[i].bindAndListen();
+	}
 	return;
 }
 	
@@ -55,10 +62,11 @@ ConnMgr::populateConnMp(std::map<AppName, int>& readyFdsMp, int i, int fd)
 	return;
 }
 
-std::map<AppName, int>
+std::vector<std::map<AppName, int>>
 ConnMgr::waitAndGetConnections()
 {
 	std::map<AppName, int> readyFdsMp;
+	std::map<AppName, int> readySSLFdsMp;
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	int maxfd=1;
@@ -68,6 +76,9 @@ ConnMgr::waitAndGetConnections()
 		//std::cout << "Setting listenFd in readfds of select listenFd=" << apps[i].listenFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		if (apps[i].listenFd() +1 > maxfd)
 			maxfd = apps[i].listenFd() + 1;		
+		FD_SET(ssl[i].listenFd(), &readfds);
+		if (ssl[i].listenFd() +1 > maxfd)
+			maxfd = ssl[i].listenFd() + 1;		
 	}
 	
 
@@ -93,10 +104,25 @@ ConnMgr::waitAndGetConnections()
 				populateConnMp(readyFdsMp, i, fd);
 			
 			}
+			
+			if (FD_ISSET(ssl[i].listenFd(), &readfds))
+			{
+				std::cout << "Accepting connection for app=" << i << " "  << __FILE__ << " " << __LINE__ << std::endl;
+				//push into worker thread queue
+				struct 	sockaddr addr;
+				socklen_t addrlen;
+				int fd = accept(ssl[i].listenFd(), &addr, &addrlen);
+				 int one = 1;
+
+				 setsockopt(fd, SOL_TCP, TCP_NODELAY, &one, sizeof(one));
+				populateConnMp(readySSLFdsMp, i, fd);
+			
+			}
 		}
 	}
-
-	return readyFdsMp;
+	
+	std::vector<std::map<AppName, int>> conns{readyFdsMp, readySSLFdsMp};
+	return conns;
 
 }
 

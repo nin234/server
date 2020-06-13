@@ -55,6 +55,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		virtual ~MessageProcessor();
 		bool process();
 		bool addFd(int fd);
+		bool addSSLFd(int fd);
 		void setMaxFd(int mfd);
 		void setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl);
 		void processRequests();

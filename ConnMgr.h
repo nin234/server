@@ -3,19 +3,22 @@
 
 #include <map>
 #include <ServSocket.h>
+#include <SSLServSocket.h>
 
 #include <Constants.h>
+#include <vector>
 
 class ConnMgr
 {
 	ServSocket apps[NO_OF_APPS];
+	SSLServSocket ssl[NO_OF_APPS];
 	void populateConnMp(std::map<AppName, int>& readyFdsMp, int i, int fd);
 
 	public:
 		ConnMgr();
 		~ConnMgr();
 		void initializeListeners();
-		std::map<AppName, int> waitAndGetConnections();		
+		std::vector<std::map<AppName, int>> waitAndGetConnections();		
 
 };
 

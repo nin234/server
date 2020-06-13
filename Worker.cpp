@@ -56,6 +56,12 @@ Worker::addFd(int fd)
 	return m_pMsgProcessor->addFd(fd);
 }
 
+bool
+Worker::addSSLFd(int fd)
+{
+	return m_pMsgProcessor->addSSLFd(fd);
+}
+
 void 
 Worker::setMaxFd(int mfd)
 {

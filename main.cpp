@@ -51,7 +51,8 @@ main()
 		{
 				//get the socket fd and push it into the worker thread select loop
 			auto appIdConnMp = appConns.waitAndGetConnections();
-			appMgr.setNewClientConnections(appIdConnMp);
+			appMgr.setNewClientConnections(appIdConnMp[0]);
+			appMgr.setNewSSLClientConnections(appIdConnMp[1]);
 			
 		}
 

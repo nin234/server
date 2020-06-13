@@ -57,3 +57,14 @@ WorkerMgr::setNewClientConnection(int fd)
 		last_client_conn = 0;
 	return;
 }
+
+void
+WorkerMgr::setNewSSLClientConnection(int fd)
+{
+
+	workers[last_client_conn]->addSSLFd(fd);
+	++last_client_conn;
+	if (last_client_conn >= no_of_threads)
+		last_client_conn = 0;
+	return;
+}

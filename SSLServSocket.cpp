@@ -1,4 +1,4 @@
-#include <ServSocket.h>
+#include <SSLServSocket.h>
 #include <system_error>
 #include <stdexcept>
 #include <iostream>
@@ -7,18 +7,18 @@
 #include <unistd.h>
 #include <netinet/tcp.h>
 
-ServSocket::ServSocket()
+SSLServSocket::SSLServSocket()
 {
 
 }
 
-ServSocket::~ServSocket()
+SSLServSocket::~SSLServSocket()
 {
 
 }
 
 void 
-ServSocket::bindAndListen()
+SSLServSocket::bindAndListen()
 {
 	memset(&hintaddr, 0, sizeof(struct addrinfo));
 	hintaddr.ai_canonname = NULL;

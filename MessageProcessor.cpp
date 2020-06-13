@@ -36,7 +36,6 @@ MessageProcessor::process()
 	}
 	return false;
 }
-
 bool
 MessageProcessor::addFd(int fd)
 {
@@ -47,6 +46,23 @@ MessageProcessor::addFd(int fd)
 		return false;
 	}
 	if (pNtwIntf->addFd(fd))
+		++nFds;
+	else 
+		return false;
+	return true;
+
+}
+
+bool
+MessageProcessor::addSSLFd(int fd)
+{
+	if (nFds > maxFd)	
+	{
+		std::cout << "Exceeded max capacity in worker fds nFds=" << nFds << " maxFd=" << maxFd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		close(fd);
+		return false;
+	}
+	if (pNtwIntf->addSSLFd(fd))
 		++nFds;
 	else 
 		return false;
