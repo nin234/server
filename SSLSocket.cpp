@@ -66,6 +66,20 @@ SSLSocket::setFd(int fd)
 	return true;
 }
 
+int
+SSLSocket::read(char *buf, int len, bool& readAgain)
+{
+
+	int numRead = SSL_read(m_ssl, buf, len);
+	if (numRead <= 0)
+	{
+		std::cout << Util::now() << "Failed to send SSL message error code=" << SSL_get_error(m_ssl, numRead) << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+		return numRead;
+	}
+	readAgain = SSL_pending(m_ssl);
+	return numRead;
+}
+
 bool
 SSLSocket::write(char *buf, int mlen)
 {

@@ -17,6 +17,7 @@ class SSLSocket
 		static void initializeSSL();
 		bool setFd(int fd);
 		bool write(char *buf, int mlen);
+		int read(char *buf, int len, bool& readAgain);
 };
 
 #endif

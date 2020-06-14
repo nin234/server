@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <MessageDecoder.h>
+#include <Util.h>
 
 template<typename Decoder>
 NtwIntf<Decoder>::NtwIntf()
@@ -59,6 +60,7 @@ NtwIntf<Decoder>::checkAndCleanUpIdleFds()
 			}
 			std::cout << "Closing idle file descriptor "  << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 			m_pObs->onCloseFd(pItr->first);
+			m_fdSSLMp.erase(pItr->first);
 			close(pItr->first);
 			fdLastActiveMp.erase(pItr++);
 
@@ -83,6 +85,7 @@ NtwIntf<Decoder>::closeAndCleanUpFd(int fd)
 	{
 		std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	}
+	m_fdSSLMp.erase(fd);
 	m_pObs->onCloseFd(fd);
 	close(fd);
 	fdLastActiveMp.erase(fd);
@@ -383,7 +386,6 @@ NtwIntf<Decoder>::waitAndGetMsg()
 {
 	checkAndCleanUpIdleFds();
 	struct epoll_event evlist[MAX_EVENTS];
-	char buf[MAX_BUF];
 	//std::cout << "Waiting for epoll events in epoll_wait in thread=" << typeid(*this).name()  << std::endl;	
 	int ready = epoll_wait(epfd, evlist, MAX_EVENTS, 0);
 	if (ready == -1)
@@ -400,38 +402,83 @@ NtwIntf<Decoder>::waitAndGetMsg()
 	//std::cout << "File descriptors ready=" << ready << " in epoll_wait " << __FILE__ << " " << __LINE__ << std::endl;
 	for (auto j=0; j < ready; ++j)
 	{
+		int fd = evlist[j].data.fd;
 		if (evlist[j].events & EPOLLIN)
 		{
-			auto s = read(evlist[j].data.fd, buf , MAX_BUF);
-			if (s == -1)
+			if (auto pItr = m_fdSSLMp.find(fd); pItr != m_fdSSLMp.end())
 			{
-				std::cout << "error reading on socket " << std::endl;
-				closeAndCleanUpFd(evlist[j].data.fd);
-				return false;
-
-			}
-			else if (!s)
-			{
-				std::cout << "remote peer closed socket=" << evlist[j].data.fd;
-				closeAndCleanUpFd(evlist[j].data.fd);
-				return false;
-
+				if (!readSSLMessage(pItr, fd))
+				{
+					return false;
+				}
+				
 			}
 			else
 			{
-				//TO DO process message
-				//std::cout << "Received message= fd=" << evlist[j].data.fd << " length=" << s << " appId=" << dcd->getAppId()<< " " << __FILE__<< ":" << __LINE__ <<  std::endl;
-				processMessage(buf, s, evlist[j].data.fd);
+				if (!readMessage(fd))
+				{
+					return false;
+				}
 			}
 		}
 		else if (evlist[j].events &(EPOLLHUP | EPOLLERR))
 		{
 			std::cout << "Closing file descriptor " << evlist[j].data.fd << std::endl;
-			closeAndCleanUpFd(evlist[j].data.fd);
+			closeAndCleanUpFd(fd);
 			return false;
 		}
 	}
 	
+	return true;
+}
+
+template<typename Decoder>
+bool
+NtwIntf<Decoder>::readMessage(int fd)
+{
+	char buf[MAX_BUF];
+	auto s = read(fd, buf , MAX_BUF);
+	if (s == -1)
+	{
+		std::cout << Util::now() << "error reading on socket " << std::endl;
+		closeAndCleanUpFd(fd);
+		return false;
+
+	}
+	else if (!s)
+	{
+		std::cout << Util::now() << "remote peer closed socket=" << fd;
+		closeAndCleanUpFd(fd);
+		return false;
+
+	}
+	else
+	{
+		//TO DO process message
+		//std::cout << "Received message= fd=" << evlist[j].data.fd << " length=" << s << " appId=" << dcd->getAppId()<< " " << __FILE__<< ":" << __LINE__ <<  std::endl;
+		processMessage(buf, s, fd);
+	}
+	return true;
+}
+
+template<typename Decoder>
+bool
+NtwIntf<Decoder>::readSSLMessage(const std::map<int, std::unique_ptr<SSLSocket>>::iterator& pItr, int fd)
+{
+	char buf[MAX_BUF];
+	bool readAgain=true;
+	while(readAgain)
+	{
+		if (int ret = pItr->second->read(buf, MAX_BUF, readAgain); ret > 0)
+		{
+			processMessage(buf, ret, fd);
+		}
+		else
+		{
+			closeAndCleanUpFd(fd);
+			return false;
+		}
+	}
 	return true;
 }
 

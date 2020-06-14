@@ -40,6 +40,8 @@ class NtwIntf
 	void addFdsQtoLastActiveMp();
 	void updateFdLastActiveMp(int fd);
 	void checkAndCleanUpIdleFds();
+	bool readMessage(int fd);
+	bool readSSLMessage(const std::map<int, std::unique_ptr<SSLSocket>>::iterator& pItr, int fd);
 	NtwIntfObserver *m_pObs;
 
 	public:
