@@ -336,7 +336,13 @@ NtwIntf<Decoder>::addSSLFd (int fd)
 		return false;
 	}
 	addFdToFdsQ(fd);
-	return true;
+	auto pSSLSocket = std::make_unique<SSLSocket>();
+	if (pSSLSocket->setFd(fd))
+	{
+		m_fdSSLMp[fd] = std::move(pSSLSocket);
+		return true;
+	}
+	return false;
 }
 
 template<typename Decoder> 
@@ -442,9 +448,19 @@ template<typename Decoder>
 bool
 NtwIntf<Decoder>::sendMsg(char *buf, int mlen, int fd)
 {
-	if (write(fd, buf, mlen) != mlen)
+	if (auto pItr = m_fdSSLMp.find(fd); pItr != m_fdSSLMp.end())
 	{
-		return false;
+		if (!pItr->second->write(buf, mlen))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (write(fd, buf, mlen) != mlen)
+		{
+			return false;
+		}
 	}
    	updateFdLastActiveMp(fd);
 	return true;

@@ -10,6 +10,8 @@
 #include <vector>
 #include <mutex>
 #include <NtwIntfObserver.h>
+#include <map>
+#include <SSLSocket.h>
 
 struct buf
 {
@@ -23,6 +25,7 @@ class NtwIntf
 	std::list<char *> pFreeList;
 	std::unordered_map<int, buf> pAggrbufs;
 	std::unordered_map<int, time_t> fdLastActiveMp;
+	std::map<int, std::unique_ptr<SSLSocket>> m_fdSSLMp;
 	std::mutex fdsQMtx;
 	std::vector<int> fdsQ;
 	int epfd;
