@@ -326,7 +326,7 @@ template<typename Decoder>
 bool
 NtwIntf<Decoder>::addSSLFd (int fd)
 {
-	std::cout << "Received new connection request " << fd << " appId=" << dcd->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << "Received new SSL connection request " << fd << " appId=" << dcd->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	int ret;
 	struct epoll_event event;
 	event.data.fd = fd;

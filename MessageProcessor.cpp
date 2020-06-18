@@ -25,6 +25,7 @@ MessageProcessor::~MessageProcessor()
 bool
 MessageProcessor::process()
 {
+	std::cout << "Start processing of events " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	for (;;)
 	{
         	pFirebaseNotify->getSendEvents();

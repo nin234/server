@@ -18,6 +18,7 @@ class SSLSocket
 		bool setFd(int fd);
 		bool write(char *buf, int mlen);
 		int read(char *buf, int len, bool& readAgain);
+		static int passwd_cb(char *buf,int size,  int rwflag,void *userdata);
 };
 
 #endif
