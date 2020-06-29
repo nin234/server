@@ -60,7 +60,11 @@ NtwIntf<Decoder>::checkAndCleanUpIdleFds()
 			}
 			std::cout << "Closing idle file descriptor "  << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 			m_pObs->onCloseFd(pItr->first);
-			m_fdSSLMp.erase(pItr->first);
+			if (auto pItrSSLMp = m_fdSSLMp.find(pItr->first); pItrSSLMp != m_fdSSLMp.end())
+			{
+				pItrSSLMp->second->shutdown();
+				m_fdSSLMp.erase(pItr->first);
+			}
 			close(pItr->first);
 			fdLastActiveMp.erase(pItr++);
 
@@ -85,7 +89,11 @@ NtwIntf<Decoder>::closeAndCleanUpFd(int fd)
 	{
 		std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	}
-	m_fdSSLMp.erase(fd);
+	if (auto pItrSSLMp = m_fdSSLMp.find(fd); pItrSSLMp != m_fdSSLMp.end())
+	{
+		pItrSSLMp->second->shutdown();
+		m_fdSSLMp.erase(fd);
+	}
 	m_pObs->onCloseFd(fd);
 	close(fd);
 	fdLastActiveMp.erase(fd);
@@ -327,6 +335,11 @@ bool
 NtwIntf<Decoder>::addSSLFd (int fd)
 {
 	std::cout << "Received new SSL connection request " << fd << " appId=" << dcd->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	auto pSSLSocket = std::make_unique<SSLSocket>();
+	if (!pSSLSocket->setFd(fd))
+	{
+		return false;
+	}
 	int ret;
 	struct epoll_event event;
 	event.data.fd = fd;
@@ -339,13 +352,8 @@ NtwIntf<Decoder>::addSSLFd (int fd)
 		return false;
 	}
 	addFdToFdsQ(fd);
-	auto pSSLSocket = std::make_unique<SSLSocket>();
-	if (pSSLSocket->setFd(fd))
-	{
-		m_fdSSLMp[fd] = std::move(pSSLSocket);
-		return true;
-	}
-	return false;
+	m_fdSSLMp[fd] = std::move(pSSLSocket);
+	return true;
 }
 
 template<typename Decoder> 
@@ -465,18 +473,34 @@ template<typename Decoder>
 bool
 NtwIntf<Decoder>::readSSLMessage(const std::map<int, std::unique_ptr<SSLSocket>>::iterator& pItr, int fd)
 {
-	char buf[MAX_BUF];
-	bool readAgain=true;
-	while(readAgain)
+	if (pItr->second->shouldAccept())
 	{
-		if (int ret = pItr->second->read(buf, MAX_BUF, readAgain); ret > 0)
+		if (pItr->second->accept())
 		{
-			processMessage(buf, ret, fd);
+			return true;
 		}
 		else
 		{
 			closeAndCleanUpFd(fd);
 			return false;
+		}
+	}
+	else
+	{
+		char buf[MAX_BUF];
+		bool readAgain=true;
+
+		while(readAgain)
+		{
+			if (int ret = pItr->second->read(buf, MAX_BUF, readAgain); ret > 0)
+			{
+				processMessage(buf, ret, fd);
+			}
+			else
+			{
+				closeAndCleanUpFd(fd);
+				return false;
+			}
 		}
 	}
 	return true;

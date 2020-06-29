@@ -11,6 +11,7 @@ class SSLSocket
 	static thread_local std::mutex ctx_init;
 	int m_fd;
 	SSL *m_ssl;
+	bool m_bAccepted;
 	public:
 		SSLSocket();
 		~SSLSocket();
@@ -19,6 +20,9 @@ class SSLSocket
 		bool write(char *buf, int mlen);
 		int read(char *buf, int len, bool& readAgain);
 		static int passwd_cb(char *buf,int size,  int rwflag,void *userdata);
+		bool shutdown();
+		bool accept();
+		bool shouldAccept();
 };
 
 #endif
