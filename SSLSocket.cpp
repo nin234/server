@@ -155,9 +155,9 @@ bool
 SSLSocket::shutdown()
 {
 	int ret = SSL_shutdown(m_ssl);
-	if (ret == 1)
+	if (ret == 1 || ret == 0)
 	{
-		std::cout << Util::now() << "SSL shutdown successful"  << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		std::cout << Util::now() << "SSL shutdown successful ret=" << ret  << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		return true;
 	}
 	std::cout << Util::now() << "SSL shutdown failed error code=" << SSL_get_error(m_ssl, ret)<< " ret=" << ret  << " " << __FILE__ << ":" << __LINE__ << std::endl;		
