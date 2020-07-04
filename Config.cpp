@@ -9,6 +9,8 @@ Config::Config()
 	AutoSpreeThrds=3;
 	EasyGrocThrds=3;
 	SmartMsgThrds=3;
+	m_bUseDB = true;
+	m_bUseRocksDB = true;
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile("/home/ninan/config/config.xml") != tinyxml2::XML_SUCCESS)
 	{
@@ -70,6 +72,18 @@ bool
 Config::sandBox()
 {
 	return bSandbox;
+}
+
+bool
+Config::useDB()
+{
+	return m_bUseDB;
+}
+
+bool
+Config::useRocksDB()
+{
+	return m_bUseRocksDB;
 }
 
 Config&

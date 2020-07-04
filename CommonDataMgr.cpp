@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <Util.h>
+#include <Config.h>
 
 thread_local std::unordered_map<int, int> 
 CommonDataMgr::fdFdMp;
@@ -116,11 +117,20 @@ CommonDataMgr::storeTemplItem(int appId, long shareId, const std::string& name, 
 void
 CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn, const std::string& platform)
 {
-	std::cout << Util::now() << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
-    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
-  	CommonElem& elem = commonElems[appId][shareId];
-  	elem.deviceToken = devTkn;
-    elem.os = platform;
+	if (!Config::Instance().useDB())
+	{
+
+		std::cout << Util::now() << "Storing device token message appId=" << appId << " shareId=" << shareId << " devTkn=" << devTkn << " platform=" << platform << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	    std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
+		CommonElem& elem = commonElems[appId][shareId];
+		elem.deviceToken = devTkn;
+		elem.os = platform;
+	}
+
+	if (Config::Instance().useRocksDB())
+	{
+		m_rocksDAO.storeDeviceTkn(appId, shareId, devTkn, platform);
+	}
 	return;
 }
 
@@ -348,18 +358,29 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
         if (elem.os == "ios")
             tokens.push_back(elem.deviceToken);
 	}
+	if (Config::Instance().useRocksDB())
+	{
+		m_rocksDAO.getDeviceTkns(appId, shareIds, tokens);
+	}
 	return;
 }
 
 void
 CommonDataMgr::getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
-    for (const std::string& shareId : shareIds)
+	if (!Config::Instance().useDB())
+	{
+        for (const std::string& shareId : shareIds)
+        {
+            std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
+            CommonElem& elem = commonElems[appId][std::stol(shareId)];
+            if (elem.os == "android")
+                tokens.push_back(elem.deviceToken);
+        }
+    }
+    if (Config::Instance().useRocksDB())
     {
-    	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
-        CommonElem& elem = commonElems[appId][std::stol(shareId)];
-        if (elem.os == "android")
-            tokens.push_back(elem.deviceToken);
+	    m_rocksDAO.getAndroidDeviceTkns(appId, shareIds, tokens);
     }
     return;
 }

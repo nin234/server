@@ -14,6 +14,9 @@ class Config
 	int mq_msgsize;
 	bool bSandbox;
 	std::unordered_map<std::string, std::string> keyvals;
+	bool m_bUseDB;
+	bool m_bUseRocksDB;
+
 	public:
 		Config();
 		virtual ~Config();
@@ -25,5 +28,7 @@ class Config
 		int getMqMaxMsg();
 		int getMqMsgSize();
 		bool sandBox();
+		bool useDB();
+		bool useRocksDB();
 };
 #endif

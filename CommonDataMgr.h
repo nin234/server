@@ -12,20 +12,24 @@
 #include <unordered_map>
 #include <StorageElems.h>
 #include <ArchiveSndr.h>
+#include <DevTknRocksDAO.h>
   
   
     
   class CommonDataMgr
   {               
-                  std::array<CommonElem, HASH_MAP_SIZE> commonElems[NO_OF_APPS];
-                  std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
-		  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
-		  static thread_local std::unordered_map<int, int> fdFdMp;
+	  std::array<CommonElem, HASH_MAP_SIZE> commonElems[NO_OF_APPS];
+	  std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
+	DevTknRocksDAO m_rocksDAO;
 
-         	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
-		  int openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj);
-		  
-		 void storePicMetaData(PicMetaDataObj *pPicMetaObj);
+	
+	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
+	  static thread_local std::unordered_map<int, int> fdFdMp;
+
+	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
+	  int openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj);
+	  
+	 void storePicMetaData(PicMetaDataObj *pPicMetaObj);
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();
