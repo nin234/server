@@ -23,13 +23,42 @@ DevTknRocksDAO::~DevTknRocksDAO()
 void
 DevTknRocksDAO::getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
-
+	for (const std::string& shareId : shareIds)
+	{
+        std::stringstream key;
+        key << appId << "|" << shareId << "|" << "ios";
+        std::string devTkn;
+        rocksdb::Status status;
+        status = m_db->Get(rocksdb::ReadOptions(), key.str(), &devTkn);
+        if (!status.ok())
+        {
+            std::cout << "Failed to retrieve ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            continue;
+        }
+        std::cout << "Retrieved ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        tokens.push_back(devTkn);
+    }
 }
 
 void
 DevTknRocksDAO::getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
 
+	for (const std::string& shareId : shareIds)
+	{
+        std::stringstream key;
+        key << appId << "|" << shareId << "|" << "android";
+        std::string devTkn;
+        rocksdb::Status status;
+        status = m_db->Get(rocksdb::ReadOptions(), key.str(), &devTkn);
+        if (!status.ok())
+        {
+            std::cout << "Failed to retrieve android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            continue;
+        }
+        std::cout << "Retrieved android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        tokens.push_back(devTkn);
+    }
 }
 
 void
@@ -37,11 +66,14 @@ DevTknRocksDAO::storeDeviceTkn(int appId, long shareId, const std::string& devTk
 {
     std::stringstream key;
     key << appId << "|" << shareId << "|" << platform;
-    rocksdb::Status status = m_db->Put(rocksdb::WriteOptions(), key.str(), devTkn);
+    rocksdb::Status status;
+    status  = m_db->Put(rocksdb::WriteOptions(), key.str(), devTkn);
     
     if (!status.ok())
     {
-        std::cout << "Failed to store device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << "Failed to store device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
+        << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
     }
-    std::cout << "Stored device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    std::cout << "Stored device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
+        << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
 }
