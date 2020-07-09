@@ -124,7 +124,16 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 		case ARCHIVE_ITEM_MSG:
 			return processArchvItemMsg(pMsg);
 		case SHARE_ITEM_MSG:
-			return processItemMsg(pMsg);
+        {
+            if (Config::Instance().useDB())
+            {
+			    return processItemMsgDBInsert(pMsg);
+            }
+            else
+            {
+			    return processItemMsg(pMsg);
+            }
+        }    
 		case STORE_DEVICE_TKN_MSG:
 			return processDeviceTknMsg(pMsg);
 		case GET_ITEMS:
@@ -381,6 +390,53 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
     }
     
 }
+
+void
+MessageProcessor::processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+{
+	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
+	if (!pLstObj)
+	{
+		std::cout << "Invalid message received in MessageProcessor::processItemMsg " << std::endl;
+		return;
+	}
+	std::cout << "Received Item message appId="<< pLstObj->getAppId() << " shareId=" << pLstObj->getShrId() << " name=" << pLstObj->getName() << " item=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__  << std::endl;
+	std::string lstToStore;
+	std::string::size_type xpos = pLstObj->getList().find(":::");
+	if (xpos == std::string::npos)
+	{
+		std::cout << "Invalid item received item=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	lstToStore = pLstObj->getList().substr(xpos+3);
+	std::vector<std::string>  shareIds;
+	if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
+	{
+		dataStore.storeItemAndLstShareInfo(pLstObj->getAppId(),pLstObj->getShrId(), pLstObj->getName(), lstToStore, shareIds);
+		std::vector<std::string> tokens;
+		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
+		if (tokens.size())
+			sendApplePush(tokens, pLstObj->getName(), 1);
+        std::vector<std::string> regIds;
+        dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
+	std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+        if (regIds.size())
+        {
+                sendFirebaseMsg(pLstObj->getAppId(), regIds, pLstObj->getName());
+        }
+            
+	}
+	char buf[1024];
+	int mlen=0;
+	if (m_pTrnsl->getReply(buf, &mlen, SHARE_ITEM_RPLY_MSG))
+	{
+		sendMsg(buf, mlen, pLstObj->getFd());
+	}
+
+	
+	return;
+}
+
 
 void
 MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)

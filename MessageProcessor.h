@@ -38,6 +38,9 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		bool sendMsg(char *buf, int mlen, int fd);
 		void processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+
+		void processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+
 		void processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);

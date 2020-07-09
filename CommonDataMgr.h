@@ -13,14 +13,16 @@
 #include <StorageElems.h>
 #include <ArchiveSndr.h>
 #include <DevTknRocksDAO.h>
+#include <ShareItemsDAO.h>
   
   
     
   class CommonDataMgr
   {               
-	  std::array<CommonElem, HASH_MAP_SIZE> commonElems[NO_OF_APPS];
-	  std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
-	DevTknRocksDAO m_rocksDAO;
+	std::array<CommonElem, HASH_MAP_SIZE> commonElems[NO_OF_APPS];
+    std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
+    DevTknRocksDAO m_rocksDAO;
+    ShareItemsDAO  m_shareItemDAO;
 
 	
 	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
@@ -43,6 +45,9 @@
       		void storeTemplLstShareInfo(int appId, long shareId, const std::string& name, long shareIdLst);
       		void storeTemplLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
       		void storeLstShareInfo(int appId, long shareIdLst, const std::vector<std::string>& shareIds, const std::string& name);
+
+      		void storeItemAndLstShareInfo(int appId, long shareIdLst, const std::string& name, const std::string& list, const std::vector<std::string>& shareIds);
+
                   bool storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset);
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);

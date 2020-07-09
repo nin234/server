@@ -1,6 +1,7 @@
 #include <DevTknRocksDAO.h>
 #include <iostream>
 #include <sstream>
+#include <Util.h>
 
 
 DevTknRocksDAO::DevTknRocksDAO()
@@ -32,10 +33,10 @@ DevTknRocksDAO::getDeviceTkns(int appId, const std::vector<std::string>& shareId
         status = m_db->Get(rocksdb::ReadOptions(), key.str(), &devTkn);
         if (!status.ok())
         {
-            std::cout << "Failed to retrieve ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            std::cout << Util::now() << "Failed to retrieve ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
             continue;
         }
-        std::cout << "Retrieved ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << Util::now() << "Retrieved ios device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
         tokens.push_back(devTkn);
     }
 }
@@ -53,10 +54,10 @@ DevTknRocksDAO::getAndroidDeviceTkns(int appId, const std::vector<std::string>& 
         status = m_db->Get(rocksdb::ReadOptions(), key.str(), &devTkn);
         if (!status.ok())
         {
-            std::cout << "Failed to retrieve android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            std::cout << Util::now() << "Failed to retrieve android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
             continue;
         }
-        std::cout << "Retrieved android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << Util::now() << "Retrieved android device token appId=" << appId << " shareId=" << shareId << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
         tokens.push_back(devTkn);
     }
 }
@@ -71,9 +72,9 @@ DevTknRocksDAO::storeDeviceTkn(int appId, long shareId, const std::string& devTk
     
     if (!status.ok())
     {
-        std::cout << "Failed to store device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
+        std::cout  << Util::now()<< "Failed to store device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
         << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
     }
-    std::cout << "Stored device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
+    std::cout << Util::now() << "Stored device token appId=" << appId << " shareId=" << shareId << " platform=" << platform
         << " token=" << devTkn << " " << __FILE__ << ":" << __LINE__ << std::endl;    
 }

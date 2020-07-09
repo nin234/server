@@ -127,7 +127,7 @@ CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn
 		elem.os = platform;
 	}
 
-	if (Config::Instance().useRocksDB())
+	if (Config::Instance().useDB())
 	{
 		m_rocksDAO.storeDeviceTkn(appId, shareId, devTkn, platform);
 	}
@@ -340,6 +340,11 @@ CommonDataMgr::storeLstShareInfo(int appId, long shareIdLst, const std::vector<s
 
 
 
+void 
+CommonDataMgr::storeItemAndLstShareInfo(int appId, long shareIdLst, const std::string& name, const std::string& list, const std::vector<std::string>& shareIds)
+{
+    m_shareItemDAO.storeItem(appId, shareIdLst, name, list, shareIds);
+}
 
 CommonDataMgr&
 CommonDataMgr::Instance()
@@ -358,7 +363,7 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
         if (elem.os == "ios")
             tokens.push_back(elem.deviceToken);
 	}
-	if (Config::Instance().useRocksDB())
+	if (Config::Instance().useDB())
 	{
 		m_rocksDAO.getDeviceTkns(appId, shareIds, tokens);
 	}
@@ -378,7 +383,7 @@ CommonDataMgr::getAndroidDeviceTkns(int appId, const std::vector<std::string>& s
                 tokens.push_back(elem.deviceToken);
         }
     }
-    if (Config::Instance().useRocksDB())
+    if (Config::Instance().useDB())
     {
 	    m_rocksDAO.getAndroidDeviceTkns(appId, shareIds, tokens);
     }
