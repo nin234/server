@@ -43,6 +43,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 
 		void processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);

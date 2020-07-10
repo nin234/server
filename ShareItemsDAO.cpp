@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <Util.h>
+#include <memory>
 
 ShareItemsDAO::ShareItemsDAO()
 {
@@ -41,4 +42,62 @@ ShareItemsDAO::storeItem(int appId, long shareIdLst, const std::string& name, co
     }
 }
 
+void 
+ShareItemsDAO::getShareLists(long appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
+{
+    std::cout << Util::now() << "Getting share list from rocksdb"<< " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    std::stringstream key;
+    key << appId << "|" << shareId;
+    
+    std::string prefix = key.str();
+    for (pItr->Seek(prefix); pItr->Valid();
+       pItr->Next()) 
+    {
+        std::string keyStr = pItr->key().ToString();
+        if (keyStr.rfind(prefix, 0) == 0)
+        {
+           shrIdLstName shlst; 
+           auto keyVec = Util::split(keyStr, '|');
+           if (keyVec.size() != 4)
+           {
+                std::cout << Util::now() << "Invalid size for keyVec=" << keyVec.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+                continue;
+           }
+           shlst.shareId = std::stol(keyVec[2]);
+           shlst.lstName = keyVec[3];
+            lstNameMp[shlst] = pItr->value().ToString(); 
+        } 
+        else
+        {
+            break;
+        }
+    }
+}
 
+
+
+void 
+ShareItemsDAO::delShareLists(long appId, long shareId)
+{
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    std::stringstream key;
+    key << appId << "|" << shareId;
+    
+    std::string prefix = key.str();
+    for (pItr->Seek(prefix); pItr->Valid();
+       pItr->Next()) 
+    {
+        std::string keyStr = pItr->key().ToString();
+        if (keyStr.rfind(prefix, 0) == 0)
+        {
+            std::cout << Util::now() << "Deleted item key=" << keyStr << " list="
+                       << pItr->value().ToString();
+             m_db->Delete(rocksdb::WriteOptions(), pItr->key());
+        } 
+        else
+        {
+            break;
+        }
+    }
+}

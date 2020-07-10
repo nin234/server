@@ -137,7 +137,16 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 		case STORE_DEVICE_TKN_MSG:
 			return processDeviceTknMsg(pMsg);
 		case GET_ITEMS:
-			return processGetItemMsg(pMsg);
+        {
+            if (Config::Instance().useDB())
+            {
+			    return processGetItemMsgFromDB(pMsg);
+            }
+            else
+            {
+			    return processGetItemMsg(pMsg);
+            }
+        }
 		case PIC_METADATA_MSG:
 			return processPicMetaDataMsg(pMsg);
 		case PIC_MSG:
@@ -305,6 +314,44 @@ MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 
 }
 
+void
+MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+{
+	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
+	if (!pGetItemObj)
+	{
+		std::cout << "Invalid message received in MessageProcessor::processGetItemMsg " << std::endl;
+		return;
+	}
+
+	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
+
+	std::map<shrIdLstName, std::string> lstNameMp;
+	dataStore.getShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), lstNameMp);
+	char archbuf[32768];
+	int archlen = 0;
+	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
+	{
+		std::cout << " Send item details " << pItr->first << " " << pItr->second << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first.lstName, pItr->second, SHARE_ITEM_MSG, pItr->first.shareId))
+		{
+			if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
+			{
+				std::cout << "Sent Item=" << pItr->first.lstName << " from shareId=" << pItr->first.shareId <<" to shareId=" << pGetItemObj->getShrId() << " length=" << archlen << " " << __FILE__ << ":" << __LINE__ << std::endl;
+			}
+            else
+            {
+				std::cout << "Failed to sent Item=" << pItr->first.lstName << " from shareId=" << pItr->first.shareId <<" to shareId=" << pGetItemObj->getShrId() << " length=" << archlen << " " << __FILE__ << ":" << __LINE__ << std::endl;
+                return;
+
+            }
+		}
+	}
+	dataStore.delShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId());
+    
+    processGetItemPics(pGetItemObj);
+    return;
+}
 void
 MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {

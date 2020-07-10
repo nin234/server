@@ -29,11 +29,16 @@ CommonDataMgr::CommonDataMgr()
 	{
 		std::cout << "Populating Archive Items " << __FILE__ << ":" << __LINE__ << std::endl;
 		pCommonArch->populateArchvItems([&](int appId, long shareId, const std::string& name, const std::string& templList){storeArchiveItem(appId, shareId, name, templList);});
-		std::cout << "Populating Items " << __FILE__ << ":" << __LINE__ << std::endl;
-		pCommonArch->populateItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeItem(appId, shareId, name, list);});
-//		std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
-		
-//		pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn, devId);}); //devId here is platform ie ios or android
+        
+        if (!Config::Instance().useDB())
+        {
+            std::cout << "Populating Items " << __FILE__ << ":" << __LINE__ << std::endl;
+            pCommonArch->populateItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeItem(appId, shareId, name, list);});
+            
+            std::cout << "Populating device tokens " << __FILE__ << ":" << __LINE__ << std::endl;
+            
+            pCommonArch->populateDeviceTkn([&](int appId, long shareId, const std::string& devId, const std::string& devTkn){storeDeviceTkn(appId, shareId, devTkn, devId);}); //devId here is platform ie ios or android
+        }
 		std::cout << "Populating Templ Items " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplItem([&](int appId, long shareId, const std::string& name, const std::string& list){storeTemplItem(appId, shareId, name, list);});
    		std::cout << "Populating share list " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -460,8 +465,19 @@ CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName
 }
 
 void
+CommonDataMgr::delShareLists(int appId, long shareId)
+{
+    m_shareItemDAO.delShareLists(appId, shareId);
+}
+
+void
 CommonDataMgr::getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp)
 {
+	if (Config::Instance().useDB())
+	{
+        m_shareItemDAO.getShareLists(appId, shareId, lstNameMp);
+        return;
+    }
     	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	std::map<long, std::vector<std::string>> shIdItemNames;

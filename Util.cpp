@@ -2,6 +2,7 @@
 #include <cstring>
 #include <string>
 #include <ctime>
+#include <sstream>
 
 std::ostream&
 operator << (std::ostream& os, const shrIdLstName& shlnm)
@@ -85,3 +86,17 @@ Util::constructPicFile(int shareId, int appId, const std::string& name)
 		std::string tmp;
 		return tmp;
 }
+
+std::vector<std::string> 
+Util::split(const std::string& s, char delimiter)
+{
+   std::vector<std::string> tokens;
+   std::string token;
+   std::istringstream tokenStream(s);
+   while (std::getline(tokenStream, token, delimiter))
+   {
+      tokens.push_back(token);
+   }
+   return tokens;
+}
+
