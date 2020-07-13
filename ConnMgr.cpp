@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/tcp.h>
+#include <Util.h>
 
 
 ConnMgr::ConnMgr()
@@ -82,10 +83,10 @@ ConnMgr::waitAndGetConnections()
 	}
 	
 
-	std::cout << "Waiting in select for new connections maxfd=" << maxfd << " "<< __FILE__ << " " << __LINE__ << std::endl;
+	std::cout << Util::now() << "Waiting in select for new connections maxfd=" << maxfd << " "<< __FILE__ << " " << __LINE__ << std::endl;
 	int nReady =select(maxfd, &readfds, NULL, NULL, NULL);
 
-	std::cout << "select returns " << nReady << " file descriptors ready " << __FILE__ << " " << __LINE__ << std::endl;
+	std::cout  << Util::now()<< "select returns " << nReady << " file descriptors ready " << __FILE__ << " " << __LINE__ << std::endl;
  	
 	if (nReady>0)
 	{
@@ -93,7 +94,7 @@ ConnMgr::waitAndGetConnections()
 		{
 			if (FD_ISSET(apps[i].listenFd(), &readfds))
 			{
-				std::cout << "Accepting connection for app=" << i << " "  << __FILE__ << " " << __LINE__ << std::endl;
+				std::cout  << Util::now()<< "Accepting connection for app=" << i << " "  << __FILE__ << " " << __LINE__ << std::endl;
 				//push into worker thread queue
 				struct 	sockaddr addr;
 				socklen_t addrlen;

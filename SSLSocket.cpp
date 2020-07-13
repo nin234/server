@@ -94,7 +94,6 @@ SSLSocket::setFd(int fd)
 	int flags = fcntl(m_fd, F_GETFL, 0);
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	SSL_set_fd(m_ssl, m_fd);
-	std::cout << Util::now() << "Done setting fd now about to SSL_accept ssl fd=" << m_fd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	return accept();
 }
 
@@ -107,6 +106,7 @@ SSLSocket::shouldAccept()
 bool
 SSLSocket::accept()
 {
+	 std::cout << Util::now() << "Done setting fd now about to SSL_accept ssl fd=" << m_fd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	if (int ret = SSL_accept(m_ssl); ret <=0)
 	{
 		if (SSL_get_error(m_ssl, ret) == SSL_ERROR_WANT_READ)
