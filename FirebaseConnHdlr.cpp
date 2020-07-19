@@ -40,9 +40,9 @@ FirebaseConnHdlr::send(const std::vector<std::string>& tokens, const std::string
 		std::string data = "{\"to\" : \"";
 		data += token;
 		data += "\", ";
-		//data += "\"notification\": {\"title\": \"";
-		//data += msg;
-		//data += "\" }, "
+		data += "\"notification\": {\"title\": \"";
+		data += msg;
+		data += "\" }, ";
 		data += "\"data\": {\"title\": \"";
 		data += msg;
 		data += "\"} }";

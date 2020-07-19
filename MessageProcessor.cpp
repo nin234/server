@@ -673,12 +673,6 @@ MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	if (!pFrndObj)
 		return;
 	std::cout << "Received friend list message shareId=" << pFrndObj->getShrId() << " friend list=" << pFrndObj->getFrndLst() <<  " " << __FILE__ << ":" << __LINE__  << std::endl;
-	FrndLstMgr::Instance().storeFrndLst(pFrndObj);
-	std::unique_ptr<char> pArchMsg;
-	char archbuf[8192];
-	int archlen =0;
-	pArchMsg =  ArchiveMsgCreator::createFrndLstMsg(archbuf, archlen, pFrndObj->getShrId(), pFrndObj->getFrndLst(), 8192);
-	pArch->sendMsg(pArchMsg == nullptr ? archbuf : pArchMsg.get(), archlen, 10);
 	char buf[512];
 	int mlen =0;
 	if (m_pTrnsl->getReply(buf, &mlen, STORE_FRIEND_LIST_RPLY_MSG))
