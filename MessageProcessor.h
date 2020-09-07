@@ -73,6 +73,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
         bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg);
 		bool notify (char *buf, int mlen, int fd, bool *tryAgain);
+
 		bool picDone(int fd);
 		void onCloseFd(int fd);
 		void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName); 
