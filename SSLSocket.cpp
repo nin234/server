@@ -132,11 +132,55 @@ SSLSocket::read(char *buf, int len, bool& readAgain)
 	int numRead = SSL_read(m_ssl, buf, len);
 	if (numRead <= 0)
 	{
-		std::cout << Util::now() << "Failed to read SSL message error code=" << SSL_get_error(m_ssl, numRead) << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+        char lbuf[4096];
+        int err = SSL_get_error(m_ssl, numRead);
+		std::cout << Util::now() << "Failed to read SSL message error code=" << err
+       << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+        lbuf[0] = '\0';
+        strerror_r(errno, lbuf, 4096); 
+        std::cout << Util::now() << " error message=" << lbuf  << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        if (err == SSL_ERROR_WANT_READ)
+        {
+            sleep(1);
+            readAgain = true;
+        }
+        else
+        {
+            readAgain = false;
+        }
 		return numRead;
 	}
-	readAgain = SSL_pending(m_ssl);
+    if (SSL_pending(m_ssl))
+    {
+	    readAgain = true;
+    }
+    else
+    {
+	    readAgain = false;
+    }
 	return numRead;
+}
+bool
+SSLSocket::write(char *buf, int mlen, bool *tryAgain)
+{
+	int ret = SSL_write(m_ssl, buf, mlen);
+	if (ret <= 0)
+	{
+        int sslErr = SSL_get_error(m_ssl, ret);
+		std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+        switch(sslErr)
+        {
+            case SSL_ERROR_WANT_WRITE:
+                *tryAgain =true;
+            break;
+            
+            default:
+                *tryAgain = false;
+            break;
+        }
+		return false;
+	}
+	return true;
 }
 
 bool

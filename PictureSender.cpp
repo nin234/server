@@ -68,7 +68,8 @@ PictureSender::sendPicMetaDat()
 		
 		if (m_pTrnsl->getPicMetaMsg(archbuf, &archlen, 32768, picNameShId))
 		{
-			if (m_pObs && m_pObs->notify(archbuf, archlen, picNameShId.fd))
+            bool tryAgain;
+			if (m_pObs && m_pObs->notify(archbuf, archlen, picNameShId.fd, &tryAgain))
 			{
 				std::cout << "Sent picMetadataMsg for file=" << file << " " << __FILE__ << ":" << __LINE__ << std::endl;
 				PicFileDetails pfd;
@@ -82,6 +83,7 @@ PictureSender::sendPicMetaDat()
 				pfd.picRealName = Util::getPicRealName(picNameShId.lstName);	
 				pfd.picSoFar = picNameShId.picSoFar;
                 pfd.waiting = true;
+                pfd.tryAgain = false;
                 struct timeval tv;
                 gettimeofday(&tv, NULL);
                 pfd.tv_sec = tv.tv_sec;
@@ -228,10 +230,27 @@ PictureSender::sendPicData()
 			++pItr;
 			continue;
 		}
+
+        if (pItr->second.tryAgain)
+        {
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			if (now.tv_sec > pItr->second.tryAgainTime + 2)
+			{
+                pItr->second.tryAgain = false;
+            }
+            else
+            {
+			    ++pItr;
+			    continue;
+            }
+
+        }
 		char buf[MAX_BUF];
 		int fd = pItr->first;
 		constexpr int msgId = PIC_MSG;
 		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+        
 		int numread = read(pItr->second.picFd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
 		if (!numread ||  numread == -1)
 		{
@@ -241,10 +260,11 @@ PictureSender::sendPicData()
 		}
 		int msglen = numread + 2*sizeof(int);
 		memcpy(buf, &msglen, sizeof(int));
-		if (m_pObs && m_pObs->notify(buf, msglen, pItr->first))
+        bool tryAgain;
+		if (m_pObs && m_pObs->notify(buf, msglen, pItr->first, &tryAgain))
 		{
 			pItr->second.totWritten += numread;
-			//std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+			std::cout << "Sent file contents " << pItr->second << " numread=" << numread  << " "  << __FILE__ << ":" << __LINE__ << std::endl;
 			if (pItr->second.totWritten >= 	pItr->second.picLen)
 			{
 				std::cout << "Finished reading file " << pItr->second <<  __FILE__ << ":" << __LINE__ << std::endl;
@@ -254,9 +274,22 @@ PictureSender::sendPicData()
 		}
 		else
 		{
-			std::cout << "Failed to send file " << pItr->second << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
-			closeAndNotify(pItr->second.picFd, fd, pItr);
-			continue;
+            if (tryAgain)
+            {
+                off_t position = lseek(pItr->second.picFd, 0, SEEK_CUR);
+                position -= numread;
+                lseek(pItr->second.picFd, position, SEEK_SET); 
+                pItr->second.tryAgain = true;
+			    struct timeval now;
+			    gettimeofday(&now, NULL);
+                pItr->second.tryAgainTime = now.tv_sec;
+            }
+            else
+            {
+			    std::cout << "Failed to send file " << pItr->second << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+			    closeAndNotify(pItr->second.picFd, fd, pItr);
+			    continue;
+            }
 		}
 		++pItr;	
 	}

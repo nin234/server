@@ -252,7 +252,7 @@ CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
 	int lenWrittenSoFar = pItr1->second->getWrittenLen();
 	int lenWrittenNow = pPicObj->getBufLen() ;
 	int totLenWritten = lenWrittenSoFar + lenWrittenNow;
-	//std::cout << "lenWrittenSoFar=" << lenWrittenSoFar << " lenWrittenNow=" << lenWrittenNow << " totLenWritten=" << totLenWritten << " pic len=" << pItr1->second->getPicLen() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << "Storing picture lenWrittenSoFar=" << lenWrittenSoFar << " lenWrittenNow=" << lenWrittenNow << " totLenWritten=" << totLenWritten << " pic len=" << pItr1->second->getPicLen() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (totLenWritten >= pItr1->second->getPicLen())
 	{
 		std::cout << "Picture " << pItr1->second->getName() << " stored picLen=" << pItr1->second->getPicLen() << " totalWritten=" << totLenWritten << std::endl;

@@ -31,7 +31,7 @@ enum class AppName
 #define MAX_FD 100
 #define CHECK_INTERVAL 120
 
-#define MAX_BUF 16384
+#define MAX_BUF 32768
 #define TMP_BUF 32768
 #define MAX_EVENTS 5
 #define MSG_AGGR_BUF_LEN 16384

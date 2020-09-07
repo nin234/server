@@ -23,6 +23,7 @@ class SSLSocket
 		bool shutdown();
 		bool accept();
 		bool shouldAccept();
+		bool write(char *buf, int mlen, bool* tryAgain);
 };
 
 #endif

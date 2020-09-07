@@ -692,9 +692,9 @@ MessageProcessor::sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_
 }
 
 bool
-MessageProcessor::notify(char *buf, int mlen, int fd)
+MessageProcessor::notify(char *buf, int mlen, int fd, bool *tryAgain)
 {
-	return sendMsg(buf, mlen , fd);
+	return sendMsg(buf, mlen , fd, tryAgain);
 }
 
 void
@@ -731,6 +731,18 @@ MessageProcessor::sendMsg(char *buf, int mlen, int fd)
 {
 
 	if (!pNtwIntf->sendMsg(buf, mlen, fd))
+	{
+		std::cout << "Failed to send message for fd=" << fd << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool
+MessageProcessor::sendMsg(char *buf, int mlen, int fd, bool *tryAgain)
+{
+
+	if (!pNtwIntf->sendMsg(buf, mlen, fd, tryAgain))
 	{
 		std::cout << "Failed to send message for fd=" << fd << std::endl;
 		return false;

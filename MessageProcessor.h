@@ -36,6 +36,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		bool sendMsg(char *buf, int mlen, int fd);
+		bool sendMsg(char *buf, int mlen, int fd, bool *tryAgain);
 		void processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 		void processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 
@@ -71,7 +72,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
         void setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
         bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg);
-		bool notify (char *buf, int mlen, int fd);
+		bool notify (char *buf, int mlen, int fd, bool *tryAgain);
 		bool picDone(int fd);
 		void onCloseFd(int fd);
 		void updatePicShareInfo(int appId, long shareId, long frndShareId, const std::string& picName); 

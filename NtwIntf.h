@@ -53,6 +53,7 @@ class NtwIntf
 		bool addSSLFd (int fd);
 		void setDecoder(std::shared_ptr<Decoder> pDcd);
 		bool sendMsg(char *buf, int mlen, int fd);
+		bool sendMsg(char *buf, int mlen, int fd, bool *tryAgain);
 		void attach(NtwIntfObserver *pObs);
         void closeAndCleanUpFd(int fd);
 };

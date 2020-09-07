@@ -22,7 +22,8 @@ struct PicFileDetails
     long tv_sec;
 	std::string picName;
 	std::string picRealName;
-	
+    bool tryAgain;
+    long tryAgainTime;	
 };
 
 std::ostream& operator << (std::ostream& os, const PicFileDetails& pfd);

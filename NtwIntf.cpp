@@ -109,7 +109,9 @@ NtwIntf<Decoder>::processMessage(char *buffer, ssize_t mlen, int fd)
     bool start = false;
     if (pItr == pAggrbufs.end())
 	start = true;
-	
+
+    std::cout << Util::now() << "Processing message of length=" << mlen
+              << " " << __FILE__ << ":" << __LINE__ << std::endl;   	
     if(start)
     {
         bMore = processFreshMessage(buffer, mlen, fd);
@@ -498,6 +500,8 @@ NtwIntf<Decoder>::readSSLMessage(const std::map<int, std::unique_ptr<SSLSocket>>
 			}
 			else
 			{
+                if (readAgain)
+                    continue;
 				closeAndCleanUpFd(fd);
 				return false;
 			}
@@ -511,6 +515,28 @@ void
 NtwIntf<Decoder>::setDecoder(std::shared_ptr<Decoder> pDcd)
 {
 	dcd = pDcd;
+}
+
+template<typename Decoder>
+bool
+NtwIntf<Decoder>::sendMsg(char *buf, int mlen, int fd, bool *tryAgain)
+{
+	if (auto pItr = m_fdSSLMp.find(fd); pItr != m_fdSSLMp.end())
+	{
+		if (!pItr->second->write(buf, mlen, tryAgain))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		if (write(fd, buf, mlen) != mlen)
+		{
+			return false;
+		}
+	}
+   	updateFdLastActiveMp(fd);
+	return true;
 }
 
 
