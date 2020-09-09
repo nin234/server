@@ -3,6 +3,7 @@
 
 #include <rocksdb/db.h>
 
+//RocksDB interface for storing picture metadata information
 class PicMetaRocksDAO
 {
     rocksdb::DB *m_db;
