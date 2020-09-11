@@ -44,10 +44,12 @@ CommonDataMgr::CommonDataMgr()
    		std::cout << "Populating share list " << __FILE__ << ":" << __LINE__ << std::endl;
         
         pCommonArch->populateShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeLstShareInfo(appId, shareId, name, shareIdLst);});
-   		std::cout << "Populating pic meta list " << __FILE__ << ":" << __LINE__ << std::endl;
         
-        pCommonArch->populatePicMetaLst([&](int appId, long shareId, const std::string& name, long& shareIdLst, int pic_len){storePicMetaInfo(appId, shareId, name, shareIdLst, pic_len);});
-
+	    if (!Config::Instance().useDB())
+        {
+   		    std::cout << "Populating pic meta list " << __FILE__ << ":" << __LINE__ << std::endl;
+            pCommonArch->populatePicMetaLst([&](int appId, long shareId, const std::string& name, long& shareIdLst, int pic_len){storePicMetaInfo(appId, shareId, name, shareIdLst, pic_len);});
+        }
    		std::cout << "Populating template share list " << __FILE__ << ":" << __LINE__ << std::endl;
         pCommonArch->populateTemplShareLst([&](int appId, long shareId, const std::string& name, long& shareIdLst){storeTemplLstShareInfo(appId, shareId, name, shareIdLst);});
 	}
@@ -284,15 +286,22 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	std::string name = pPicMetaObj->getName();
 	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
 	std::cout << "Storing picMetaData appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " picLen=" << pPicMetaObj->getPicLen();
-	for (const std::string& shareId : shareIds)
+    long val = pPicMetaObj->getPicLen();
+	if (!Config::Instance().useDB())
 	{
-		std::cout << " shareId=" << shareId;
-    		std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
-  		CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-		long val = pPicMetaObj->getPicLen();
-		elem.picShareInsert(shareIdLst, name, val);
-		
-	}
+        for (const std::string& shareId : shareIds)
+        {
+            std::cout << " shareId=" << shareId;
+                std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
+            CommonElem& elem = commonElems[appId][std::stol(shareId)];	
+            elem.picShareInsert(shareIdLst, name, val);
+            
+        }
+    }
+    else
+    {
+        m_picMetaDAO.store(appId, shareIdLst, name, val, shareIds);
+    }
 
 }
 
@@ -421,6 +430,11 @@ CommonDataMgr::updatePicShareInfo(int appId, long shareId, long frndShareId, con
 {
 		
 	std::cout << "Erasing picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    if (Config::Instance().useDB())
+    {
+        m_picMetaDAO.del(appId, frndShareId, picName, shareId);
+        return;
+    }
     	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
 	elem.picShareDel(frndShareId, picName);
@@ -440,6 +454,11 @@ void
 CommonDataMgr::getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNamesShIds)
 {
 	
+	if (Config::Instance().useDB())
+	{
+        m_picMetaDAO.get(appId, shareId, picNamesShIds);
+        return;
+    }
     	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
   	CommonElem& elem = commonElems[appId][shareId];
 	std::map<long, std::map<std::string, long>> shIdItemNames;

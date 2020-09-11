@@ -272,14 +272,17 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 	int picOffset = 0;
 	bool bShoulUpload = dataStore.storePicMetaData(pPicMetaObj, &picOffset);
 	const std::vector<std::string>&  shareIds = pPicMetaObj->getFrndLst();
-	for (const std::string& shareId : shareIds)
-	{
-		char archbuf[32768];
-		int archlen = 0;
-		std::cout << "Archiving shareId=" << shareId << " in processPicMetaDataMsg " << __FILE__ << ":" << __LINE__ << std::endl;
-		if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicMetaObj->getAppId(), false, std::stol(shareId), pPicMetaObj->getShrId(), pPicMetaObj->getName(),  32768, pPicMetaObj->getPicLen()))
-			sendArchiveMsg(archbuf, archlen, 10);	
-	}
+    if (!Config::Instance().useDB())
+    {
+        for (const std::string& shareId : shareIds)
+        {
+            char archbuf[32768];
+            int archlen = 0;
+            std::cout << "Archiving shareId=" << shareId << " in processPicMetaDataMsg " << __FILE__ << ":" << __LINE__ << std::endl;
+            if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicMetaObj->getAppId(), false, std::stol(shareId), pPicMetaObj->getShrId(), pPicMetaObj->getName(),  32768, pPicMetaObj->getPicLen()))
+                sendArchiveMsg(archbuf, archlen, 10);	
+        }
+    }
 	char buf[32768];
 	int mlen=0;
 	if (m_pTrnsl->getShouldUploadMsg(buf, &mlen, pPicMetaObj, bShoulUpload, picOffset))

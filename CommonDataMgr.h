@@ -14,6 +14,7 @@
 #include <ArchiveSndr.h>
 #include <DevTknRocksDAO.h>
 #include <ShareItemsDAO.h>
+#include <PicMetaRocksDAO.h>
   
   
     
@@ -23,7 +24,7 @@
     std::array<std::mutex, HASH_MAP_SIZE> commonElemsMtx[NO_OF_APPS];
     DevTknRocksDAO m_rocksDAO;
     ShareItemsDAO  m_shareItemDAO;
-
+    PicMetaRocksDAO m_picMetaDAO;
 	
 	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
