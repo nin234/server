@@ -104,6 +104,10 @@ PicMetaRocksDAO::del(int appId,
     {
         std::cout << "Failed to Deleted pic meta for key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
     }
+    else
+    {
+        std::cout << "Deleted pic meta for key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    }
 }
 
 void
