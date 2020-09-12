@@ -28,6 +28,11 @@ class PicMetaRocksDAO
                  long shareIdSender, 
                  const std::string& picName,
                  long shareIdRecv);
+
+        void updateStatus(int appId, 
+                 long shareIdSender, 
+                 const std::string& picName,
+                 long shareIdRecv);
 };
 
 #endif

@@ -419,6 +419,11 @@ void
 CommonDataMgr::updatePicShareStatus(int appId, long shareId, long frndShareId, const std::string& picName)
 {
 	std::cout << "Updating ready to download picName=" << picName << " shareId=" << shareId << " frndShareId=" << frndShareId << " appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl;
+    if (Config::Instance().useDB())
+    {
+        m_picMetaDAO.updateStatus(appId, frndShareId, picName, shareId);
+        return;
+    }
     	std::lock_guard<std::mutex> lock(commonElemsMtx[appId][shareId]); 
 	CommonElem& elem = commonElems[appId][shareId];
     elem.picShareSetDwldFalse(frndShareId, picName);

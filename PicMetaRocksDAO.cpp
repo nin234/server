@@ -3,6 +3,7 @@
 #include <sstream>
 #include <Util.h>
 #include <memory>
+#include <map>
 
 PicMetaRocksDAO::PicMetaRocksDAO()
 {
@@ -53,6 +54,39 @@ PicMetaRocksDAO::store(int appId,
     }
 }
 
+void
+PicMetaRocksDAO::updateStatus(int appId, 
+                 long shareIdSender, 
+                 const std::string& picName,
+                 long shareIdRecv)
+{
+    std::stringstream key;
+    key << appId << "|" << shareIdRecv << "|" << shareIdSender << "|"
+        << picName;
+    std::string value;
+    rocksdb::Status status;
+    status = m_db->Get(rocksdb::ReadOptions(), key.str(), &value);
+    if (!status.ok())
+    {
+        std::cout << Util::now() << "Failed to update PicMeta status key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+    }
+    else
+    {
+        auto valVec = Util::split(value, '|');
+        std::stringstream valstr;
+        valstr << valVec[0] << "|" << false;
+        status = m_db->Put(rocksdb::WriteOptions(), key.str(), valstr.str());
+        if (status.ok())
+        {
+            std::cout << Util::now() << "Updated PicMeta status key=" << key.str() << " value=" << valstr.str() << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+
+        }
+        else
+        {
+            std::cout << Util::now() << "Failed to Update status key=" << key.str() << " value=" << valstr.str() << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        }
+    }
+}
 
 void
 PicMetaRocksDAO::del(int appId, 
@@ -64,7 +98,12 @@ PicMetaRocksDAO::del(int appId,
     std::stringstream key;
     key << appId << "|" << shareIdRecv << "|" << shareIdSender << "|"
         << picName;
-    m_db->Delete(rocksdb::WriteOptions(), key.str());
+    rocksdb::Status status;
+    status = m_db->Delete(rocksdb::WriteOptions(), key.str());
+    if (!status.ok())
+    {
+        std::cout << "Failed to Deleted pic meta for key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    }
 }
 
 void
@@ -75,6 +114,7 @@ PicMetaRocksDAO::get(int appId, long shareId, std::vector<shrIdLstName>& picName
     std::stringstream key;
     key << appId << "|" << shareId;
 
+    std::map<std::string, std::string> updatedItems;
     std::string prefix = key.str();
     for (pItr->Seek(prefix); pItr->Valid();
        pItr->Next()) 
@@ -89,12 +129,33 @@ PicMetaRocksDAO::get(int appId, long shareId, std::vector<shrIdLstName>& picName
             shlst.lstName = keyVec[3];
             shlst.shareIdElem = shareId;
             auto valVec = Util::split(pItr->value().ToString(), '|');
-            shlst.picLen =  std::stol(valVec[0]); 
-            picNamesShId.push_back(shlst);
+            if (valVec[1] == "false")
+            {
+                shlst.picLen =  std::stol(valVec[0]); 
+                std::cout << Util::now() << "Getting PicMetaData from rocksdb" <<shlst << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+                picNamesShId.push_back(shlst);
+                std::stringstream value;
+                value << shlst.picLen << "|" << true;
+                updatedItems[keyStr] = value.str();
+            }
         } 
         else
         {
             break;
+        }
+    }
+    for (const auto& [updatedKey, updatedVal] : updatedItems)
+    {
+        rocksdb::Status status;
+        status = m_db->Put(rocksdb::WriteOptions(), updatedKey, updatedVal);
+        if (status.ok())
+        {
+            std::cout << Util::now() << "Updating picture metadata key=" <<updatedKey << " value=" << updatedVal << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        }
+        else
+        {
+            std::cout << Util::now() << "Failed to Update picture metadata key=" <<updatedKey << " value=" << updatedVal << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+
         }
     }
 }
