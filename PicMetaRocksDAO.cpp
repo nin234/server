@@ -113,13 +113,13 @@ PicMetaRocksDAO::del(int appId,
 void
 PicMetaRocksDAO::get(int appId, long shareId, std::vector<shrIdLstName>& picNamesShId)
 {
-    std::cout << Util::now() << "Getting PicMetaData from rocksdb" << " " << __FILE__ << ":" << __LINE__ << std::endl;  
     std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
     std::stringstream key;
     key << appId << "|" << shareId;
 
     std::map<std::string, std::string> updatedItems;
     std::string prefix = key.str();
+    std::cout << Util::now() << "Getting PicMetaData from rocksdb key_prefix=" << prefix<< " " << __FILE__ << ":" << __LINE__ << std::endl;  
     for (pItr->Seek(prefix); pItr->Valid();
        pItr->Next()) 
     {
@@ -133,7 +133,7 @@ PicMetaRocksDAO::get(int appId, long shareId, std::vector<shrIdLstName>& picName
             shlst.lstName = keyVec[3];
             shlst.shareIdElem = shareId;
             auto valVec = Util::split(pItr->value().ToString(), '|');
-            if (valVec[1] == "false")
+            if (valVec[1] == "0")
             {
                 shlst.picLen =  std::stol(valVec[0]); 
                 std::cout << Util::now() << "Getting PicMetaData from rocksdb" <<shlst << " " << __FILE__ << ":" << __LINE__ << std::endl;  
