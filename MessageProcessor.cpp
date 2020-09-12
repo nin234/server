@@ -308,11 +308,14 @@ MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	}
 	std::cout << "Received PicDone Msg=" << *pPicDoneObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	updatePicShareInfo(pPicDoneObj->getAppId(), pPicDoneObj->getShrId(), pPicDoneObj->getPicShareId(), pPicDoneObj->getPicName());
-	char archbuf[32768];
-	int archlen = 0;
-	std::cout << "Updating Archive with picDoneMsg in processPicDoneMsg " << __FILE__ << ":" << __LINE__ << std::endl;
-	if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicDoneObj->getAppId(), true, pPicDoneObj->getShrId(), pPicDoneObj->getPicShareId(), pPicDoneObj->getPicName(),  32768, 100))
-		sendArchiveMsg(archbuf, archlen, 10);	
+    if (!Config::Instance().useDB())
+    {
+        char archbuf[32768];
+        int archlen = 0;
+        std::cout << "Updating Archive with picDoneMsg in processPicDoneMsg " << __FILE__ << ":" << __LINE__ << std::endl;
+        if (ArchiveMsgCreator::createPicMetaDataMsg(archbuf, archlen, pPicDoneObj->getAppId(), true, pPicDoneObj->getShrId(), pPicDoneObj->getPicShareId(), pPicDoneObj->getPicName(),  32768, 100))
+            sendArchiveMsg(archbuf, archlen, 10);	
+    }
 
 
 }

@@ -98,15 +98,28 @@ PicMetaRocksDAO::del(int appId,
     std::stringstream key;
     key << appId << "|" << shareIdRecv << "|" << shareIdSender << "|"
         << picName;
-    rocksdb::Status status;
-    status = m_db->Delete(rocksdb::WriteOptions(), key.str());
-    if (!status.ok())
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    std::string prefix = key.str();
+    std::vector<std::string> keys; 
+    for (pItr->Seek(prefix); pItr->Valid();
+       pItr->Next()) 
     {
-        std::cout << "Failed to Deleted pic meta for key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::string keyStr = pItr->key().ToString();
+        keys.push_back(keyStr);
     }
-    else
+    
+    for (const auto& k : keys)
     {
-        std::cout << "Deleted pic meta for key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        rocksdb::Status status;
+        status = m_db->Delete(rocksdb::WriteOptions(), k);
+        if (!status.ok())
+        {
+            std::cout << "Failed to Deleted pic meta for key=" << k << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        }
+        else
+        {
+            std::cout << "Deleted pic meta for key=" << k << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        }
     }
 }
 
