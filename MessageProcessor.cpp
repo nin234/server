@@ -619,7 +619,7 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	long shareId = 0;
 	bool archive;
 	if (pShObj)
-		shareId = ShareIdMgr::Instance().getShareId(pShObj->getTrnId(), archive);
+		shareId = ShareIdMgr::Instance().getShareId(pShObj->getTrnId(), archive, pShObj->getDeviceId());
 	if (shareId)
 	{
 		if (archive)
@@ -637,8 +637,9 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		{
 			if (!pNtwIntf->sendMsg(buf, mlen, pShObj->getFd()))
 				std::cout << "Failed to send message for fd=" << pShObj->getFd() << std::endl;
+            else
+		        std::cout << Util::now() << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 		}
-		std::cout << Util::now() << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	}
 	return;
 

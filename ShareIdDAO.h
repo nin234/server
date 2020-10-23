@@ -12,5 +12,10 @@ class ShareIdDAO
     ShareIdDAO();
     
     virtual ~ShareIdDAO();
+
+    long get(const std::string& deviceId);
+    
+    bool set(const std::string& deviceId, long shareId);
+
 };
 #endif

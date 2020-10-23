@@ -79,6 +79,7 @@ class ShareIdObj : public MsgObj
 {
 	long trnId;
 	long shrId;
+    std::string deviceId;
 	public:
 		virtual ~ShareIdObj(){}
 		ShareIdObj():shrId(0){}
@@ -86,6 +87,8 @@ class ShareIdObj : public MsgObj
 		void setTrnId(long tid) {trnId = tid;}
 		long  getShrId() {return shrId;}
 		void setShrId(long sid) {shrId = sid;}
+		const std::string& getDeviceId() const {return deviceId;}
+		void setDeviceId(const char *pDevId) {deviceId = pDevId;}
 };
 
 struct shrIdTrnId

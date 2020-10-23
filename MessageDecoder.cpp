@@ -150,13 +150,22 @@ MessageDecoder::createShareIdObj(char *buffer,  ssize_t mlen, int fd)
 {
 	std::unique_ptr<ShareIdObj, MsgObjDeltr> pMsg{new ShareIdObj(), MsgObjDeltr()};
       pMsg->setMsgTyp(GET_SHARE_ID_MSG);
+    int msgLen;
+    memcpy(&msgLen, buffer, sizeof(int));
 	constexpr int offset = 2*sizeof(int);
+
+    constexpr int lenWithOutId = 2*sizeof(int) + sizeof(long);
 	long tid;
 	memcpy(&tid, buffer+offset, sizeof(long));
 	pMsg->setTrnId(tid);
 	pMsg->setFd(fd);
 	pMsg->setAppId(getAppId());
-	std::cout << "Creating shareId Obj fd=" << fd << " tid=" << tid << " appId=" << getAppId() << " " << __FILE__ << " " << __LINE__ << std::endl;
+    if (msgLen > lenWithOutId)
+    {
+        pMsg->setDeviceId(buffer+lenWithOutId);
+    }
+	std::cout << "Creating shareId Obj fd=" << fd << " tid=" << tid << " appId=" << getAppId() << " deviceId=" << pMsg->getDeviceId()
+     << " " << __FILE__ << " " << __LINE__ << std::endl;
 	pMsgs.push_back(std::move(pMsg));
     return true;
 }

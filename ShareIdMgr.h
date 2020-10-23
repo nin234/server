@@ -6,6 +6,7 @@
 #include <HashMap.h>
 #include <mutex>
 #include <LckFreeLst.h>
+#include <ShareIdDAO.h>
 
 class ShareIdMgr
 {
@@ -18,10 +19,11 @@ class ShareIdMgr
 		long shareId;
 		long shareId_Init;
 		std::mutex shid_init_mutex;
+        ShareIdDAO m_shareIdDAO;
 
 	public:
 		static ShareIdMgr&  Instance();
-		long getShareId(long trnId, bool& archive);
+		long getShareId(long trnId, bool& archive, const std::string& deviceId);
 		void setShareId(long sid);		
 		void setShareIdStep(int step);
 		void initThreadShareId();
