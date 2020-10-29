@@ -24,16 +24,15 @@ long
 ShareIdDAO::get(const std::string& deviceId)
 {
 
-        rocksdb::Status status;
-        std::string shareIdStr;
-        status = m_db->Get(rocksdb::ReadOptions(), deviceId, &shareIdStr);
-        if (!status.ok())
-        {
-            std::cout << Util::now() << "Failed to retrieve shareId for deviceId=" << deviceId << " " << __FILE__ << ":" << __LINE__ << std::endl;  
-            return 0;
-        }
-        std::cout << Util::now() << "deviceId=" << deviceId << " shareId=" << shareIdStr << " " << __FILE__ << ":" << __LINE__ << std::endl;    
-        return std::stol(shareIdStr);
+    rocksdb::Status status; std::string shareIdStr;
+    status = m_db->Get(rocksdb::ReadOptions(), deviceId, &shareIdStr);
+    if (!status.ok())
+    {
+        std::cout << Util::now() << "Failed to retrieve shareId for deviceId=" << deviceId << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+        return 0;
+    }
+    std::cout << Util::now() << "deviceId=" << deviceId << " shareId=" << shareIdStr << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    return std::stol(shareIdStr);
 }
 
 bool

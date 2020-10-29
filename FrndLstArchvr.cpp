@@ -113,42 +113,7 @@ void
 FrndLstArchvr::populateFrndLstShIdMp(FrndLstMgr& frndMgr)
 {
 
-	if (lseek(frndFd, 0, SEEK_SET) == -1)
-	{
-		std::cout << "lseek failed in frndLst archive " << strerror(errno) << std::endl;
-		return;
-	}
-
-	while (true)
-	{
-		int size;
-		int numRead = read(frndFd, &size, sizeof(int));
-		if (!numRead)
-			break;
-		int toread = size - sizeof(int);
-		char *pBufPt;
-		std::unique_ptr<char> pBuf;
-
-		if (toread <= BUF_SIZE_4K)
-		{
-			numRead = read(frndFd, wrbuf, toread);
-			pBufPt = wrbuf;
-		}
-		else
-		{
-			pBuf = std::unique_ptr<char>{new char[size]};			
-			pBufPt = pBuf.get();
-		}
-		int valid;
-		memcpy(&valid, pBufPt, sizeof(int));
-		if (!valid)
-			continue;
-
-		shrdIdSize shIdSize;
-		memcpy(&shIdSize, pBufPt+sizeof(int), sizeof(shrdIdSize));
-		std::string frndLst = pBufPt+sizeof(shrdIdSize)+sizeof(int);
-		frndMgr.storeFrndLst(shIdSize.shrId, frndLst);
-	}
+	
 
 	return;
 }
