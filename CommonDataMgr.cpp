@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <Util.h>
 #include <Config.h>
+#include <FrndLstMgr.h>
 
 thread_local std::unordered_map<int, int> 
 CommonDataMgr::fdFdMp;
@@ -555,3 +556,13 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
     }
     
 }
+
+void
+CommonDataMgr::storeFrndLst(const FrndLstObj *pFrndObj)
+{
+    FrndLst frndLst;
+    FrndLstMgr frndMgr;
+    frndMgr.populateDAO(pFrndObj, frndLst); 
+    m_frndLstDAO.update(pFrndObj->getShrId(), frndLst);
+}
+

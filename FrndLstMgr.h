@@ -5,6 +5,7 @@
 #include <HashMap.h>
 #include <MessageObjs.h>
 #include <array>
+#include <FrndLstDAO.h>
 
 class FrndLstMgr
 {
@@ -14,6 +15,8 @@ class FrndLstMgr
 	~FrndLstMgr();
 	void storeFrndLst(const FrndLstObj *pFrndObj);
 	void storeFrndLst(long shareId, const std::string& frndLst);
+
+    void populateDAO(const FrndLstObj *pFrndObj, FrndLst& frndLst);
 	
 };
 #endif

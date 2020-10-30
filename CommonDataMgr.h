@@ -15,6 +15,7 @@
 #include <DevTknRocksDAO.h>
 #include <ShareItemsDAO.h>
 #include <PicMetaRocksDAO.h>
+#include <FrndLstDAO.h>
   
   
     
@@ -25,6 +26,7 @@
     DevTknRocksDAO m_rocksDAO;
     ShareItemsDAO  m_shareItemDAO;
     PicMetaRocksDAO m_picMetaDAO;
+    FrndLstDAO      m_frndLstDAO;
 	
 	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
@@ -66,6 +68,8 @@
 		  void updatePicShareStatus(int appId, long shareId, long frndShareId, const std::string& picName);
             void updateTemplLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
             void storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list);
+
+            void storeFrndLst(const FrndLstObj *pFrndObj);
   };
   #endif
 
