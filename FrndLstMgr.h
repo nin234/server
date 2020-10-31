@@ -9,6 +9,8 @@
 
 class FrndLstMgr
 {
+    FrndLstDAO m_frndLstDAO;
+    void populateDAO(const FrndLstObj *pFrndObj, FrndLst& frndLst);
 	
   public:
 	FrndLstMgr();
@@ -16,7 +18,8 @@ class FrndLstMgr
 	void storeFrndLst(const FrndLstObj *pFrndObj);
 	void storeFrndLst(long shareId, const std::string& frndLst);
 
-    void populateDAO(const FrndLstObj *pFrndObj, FrndLst& frndLst);
+
+    std::string getFrndList(int appId, long shareId);
 	
 };
 #endif

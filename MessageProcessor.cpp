@@ -330,6 +330,8 @@ MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDe
 		return;
 	}
 
+    processGetItemFrndLst(pGetItemObj);
+
 	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
 
 	std::map<shrIdLstName, std::string> lstNameMp;
@@ -358,6 +360,15 @@ MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDe
     processGetItemPics(pGetItemObj);
     return;
 }
+
+void
+MessageProcessor::processGetItemFrndLst(GetItemObj *pGetItemObj)
+{
+    std::string frndLst = dataStore.getFrndList(pGetItemObj->getAppId(), pGetItemObj->getShrId());
+    if (!frndLst.size())
+        return;
+}
+
 void
 MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {

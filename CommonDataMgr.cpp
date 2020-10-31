@@ -560,9 +560,11 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
 void
 CommonDataMgr::storeFrndLst(const FrndLstObj *pFrndObj)
 {
-    FrndLst frndLst;
-    FrndLstMgr frndMgr;
-    frndMgr.populateDAO(pFrndObj, frndLst); 
-    m_frndLstDAO.update(pFrndObj->getShrId(), frndLst);
+    m_frndLstMgr.storeFrndLst(pFrndObj);
 }
 
+std::string
+CommonDataMgr::getFrndList(int appId, long shareId)
+{
+    return m_frndLstMgr.getFrndList(appId, shareId);
+}

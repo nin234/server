@@ -15,7 +15,7 @@
 #include <DevTknRocksDAO.h>
 #include <ShareItemsDAO.h>
 #include <PicMetaRocksDAO.h>
-#include <FrndLstDAO.h>
+#include <FrndLstMgr.h>
   
   
     
@@ -26,7 +26,7 @@
     DevTknRocksDAO m_rocksDAO;
     ShareItemsDAO  m_shareItemDAO;
     PicMetaRocksDAO m_picMetaDAO;
-    FrndLstDAO      m_frndLstDAO;
+    FrndLstMgr      m_frndLstMgr;
 	
 	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
@@ -60,6 +60,7 @@
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
       void getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
 		  void getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
+		  std::string getFrndList(int appId, long shareId);
 		  void delShareLists(int appId, long shareId);
       void getShareTemplLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
 		  void getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNames);

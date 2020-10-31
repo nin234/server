@@ -13,11 +13,51 @@ FrndLstMgr::~FrndLstMgr()
 
 }
 
+std::string
+FrndLstMgr::getFrndList(int appId, long shareId)
+{
+    std::string frndLstStr;
+    FrndLst frndLst;
+    m_frndLstDAO.get(shareId, frndLst);
+    switch (appId)
+    {
+        case OPENHOUSES_ID:
+            if (frndLst.m_bUpdOpenHouses)
+                return frndLstStr;
+            else
+                frndLst.m_bUpdOpenHouses = true;
+        break;
+        
+        case AUTOSPREE_ID:
+            if (frndLst.m_bUpdAutoSpree)
+                return frndLstStr;
+            else
+                frndLst.m_bUpdAutoSpree = true;
+        break;
+
+        case EASYGROCLIST_ID:
+            if (frndLst.m_bUpdEasyList)
+                return frndLstStr;
+            else
+                frndLst.m_bUpdEasyList = true;
+        break;
+
+        default:
+        break;
+    }
+
+
+    return frndLstStr;
+}
+
 void
 FrndLstMgr::storeFrndLst(const FrndLstObj *pFrndObj)
 	
 {
 	std::cout << "Storing friendlist shareId=" << pFrndObj->getShrId() << " friendList=" << pFrndObj->getFrndLst() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+    FrndLst frndLst;
+    populateDAO(pFrndObj, frndLst);
+    m_frndLstDAO.update(pFrndObj->getShrId(), frndLst);
 	return;
 }
 

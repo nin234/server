@@ -31,6 +31,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
     std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     
     void processGetItemPics(GetItemObj *pGetItemObj);
+    void processGetItemFrndLst(GetItemObj *pGetItemObj);
 
 	void sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName);
 	protected:
