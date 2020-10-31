@@ -2,6 +2,7 @@
 #include <ArchiveMgr.h>
 #include <iostream>
 #include <Util.h>
+#include <sstream>
 
 
 FrndLstMgr::FrndLstMgr()
@@ -16,28 +17,29 @@ FrndLstMgr::~FrndLstMgr()
 std::string
 FrndLstMgr::getFrndList(int appId, long shareId)
 {
-    std::string frndLstStr;
+    std::string frndLstEmpty;
     FrndLst frndLst;
-    m_frndLstDAO.get(shareId, frndLst);
+    if (!m_frndLstDAO.get(shareId, frndLst))
+        return frndLstEmpty;
     switch (appId)
     {
         case OPENHOUSES_ID:
             if (frndLst.m_bUpdOpenHouses)
-                return frndLstStr;
+                return frndLstEmpty;
             else
                 frndLst.m_bUpdOpenHouses = true;
         break;
         
         case AUTOSPREE_ID:
             if (frndLst.m_bUpdAutoSpree)
-                return frndLstStr;
+                return frndLstEmpty;
             else
                 frndLst.m_bUpdAutoSpree = true;
         break;
 
         case EASYGROCLIST_ID:
             if (frndLst.m_bUpdEasyList)
-                return frndLstStr;
+                return frndLstEmpty;
             else
                 frndLst.m_bUpdEasyList = true;
         break;
@@ -46,8 +48,12 @@ FrndLstMgr::getFrndList(int appId, long shareId)
         break;
     }
 
-
-    return frndLstStr;
+    std::stringstream frndLstStr;
+    for (const auto& frnd : frndLst.m_bFrndLst )
+    {
+        frndLstStr << frnd.shareId << ":" << frnd.name << ";";
+    }
+    return frndLstStr.str();
 }
 
 void

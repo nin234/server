@@ -367,6 +367,20 @@ MessageProcessor::processGetItemFrndLst(GetItemObj *pGetItemObj)
     std::string frndLst = dataStore.getFrndList(pGetItemObj->getAppId(), pGetItemObj->getShrId());
     if (!frndLst.size())
         return;
+    char archbuf[32768];
+    int archlen = 0;
+    if (m_pTrnsl->getFrndLstMsg(archbuf, &archlen, 32768, frndLst))
+    {
+        if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
+        {
+            std::cout << "Send friend list=" << frndLst << " to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        }
+        else
+        {
+            std::cout << "Failed to send friend list=" << frndLst << " to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+
+        }
+    }
 }
 
 void

@@ -95,6 +95,25 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 }
 
 bool
+MessageTranslator::getFrndLstMsg(char *pMsg, int *mlen, int buflen, const std::string& frndLst)
+{
+	int msglen = 3*sizeof(int) + frndLst.size() +1;
+	if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getFrndLstMsg " << std::endl;
+		return false;
+	}
+	constexpr int msgId = FRIEND_LIST_MSG;
+	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    int frndLstLen = frndLst.size() + 1;
+    memcpy(pMsg+2*sizeof(int), &frndLstLen, sizeof(int));
+    memcpy(pMsg + 3*sizeof(int), frndLst.c_str(), frndLstLen); 
+    *mlen = msglen;
+    return true;
+}
+
+bool
 MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst, int msgId, long shareId)
 {
 	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2 + sizeof(long);

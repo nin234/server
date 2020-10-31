@@ -98,7 +98,7 @@ enum class AppName
 
 #define NO_EASYGROC_MSGS 2
 
-
+#define FRIEND_LIST_MSG 25
 
 #define GET_OPENHOUSES_ITEMS 60
 

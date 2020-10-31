@@ -18,5 +18,7 @@ class MessageTranslator
 		bool getPicMetaMsg(char *buf, int *mlen, int buflen, const shrIdLstName& shidlst);
 		bool getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataObj *pPicMetaObj, bool shoudUpload, int picOffset);
 		virtual bool translateMsg(char *buf, int *mlen, int msgTyp, MsgObj *pMsgObj)=0;		
+        
+        bool getFrndLstMsg(char *buf, int *mlen, int buflen, const std::string& frndLst);
 };
 #endif
