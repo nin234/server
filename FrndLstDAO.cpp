@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <Util.h>
+#include <Constants.h>
 
 FrndLst::FrndLst():m_bUpdAutoSpree(false), m_bUpdOpenHouses(false), m_bUpdEasyList(false)
 {

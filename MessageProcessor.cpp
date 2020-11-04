@@ -330,7 +330,7 @@ MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDe
 		return;
 	}
 
-    processGetItemFrndLst(pGetItemObj);
+    sendFrndLst(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getFd(), false);
 
 	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
 
@@ -362,22 +362,23 @@ MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDe
 }
 
 void
-MessageProcessor::processGetItemFrndLst(GetItemObj *pGetItemObj)
+MessageProcessor::sendFrndLst(int appId, long shareId, int fd, bool bDontCheckUpdFlag)
 {
-    std::string frndLst = dataStore.getFrndList(pGetItemObj->getAppId(), pGetItemObj->getShrId());
+    std::string frndLst = dataStore.getFrndList(appId, shareId, bDontCheckUpdFlag);
     if (!frndLst.size())
         return;
     char archbuf[32768];
     int archlen = 0;
     if (m_pTrnsl->getFrndLstMsg(archbuf, &archlen, 32768, frndLst))
     {
-        if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
+        if (sendMsg(archbuf, archlen, fd))
         {
-            std::cout << "Send friend list=" << frndLst << " to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            std::cout << "Send friend list=" << frndLst << " to shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            dataStore.updateFrndLstStatus(shareId, appId);
         }
         else
         {
-            std::cout << "Failed to send friend list=" << frndLst << " to shareId=" << pGetItemObj->getShrId() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            std::cout << "Failed to send friend list=" << frndLst << " to shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;    
 
         }
     }
@@ -665,6 +666,8 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
             else
 		        std::cout << Util::now() << "Replying with shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 		}
+
+        sendFrndLst(pShObj->getAppId(), shareId, pShObj->getFd(), true);
 	}
 	return;
 

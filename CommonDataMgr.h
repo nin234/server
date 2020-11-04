@@ -60,7 +60,7 @@
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
       void getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
 		  void getShareLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
-		  std::string getFrndList(int appId, long shareId);
+		  std::string getFrndList(int appId, long shareId, bool bDontCheckUpdFlag);
 		  void delShareLists(int appId, long shareId);
       void getShareTemplLists(int appId, long shareId, std::map<shrIdLstName, std::string>& lstNameMp);
 		  void getPictureNames(int appId, long shareId, std::vector<shrIdLstName>& picNames);
@@ -71,6 +71,7 @@
             void storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list);
 
             void storeFrndLst(const FrndLstObj *pFrndObj);
+            void updateFrndLstStatus(long shareId, int appId);
   };
   #endif
 

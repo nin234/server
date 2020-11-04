@@ -564,7 +564,13 @@ CommonDataMgr::storeFrndLst(const FrndLstObj *pFrndObj)
 }
 
 std::string
-CommonDataMgr::getFrndList(int appId, long shareId)
+CommonDataMgr::getFrndList(int appId, long shareId, bool bDontCheckUpdFlag)
 {
-    return m_frndLstMgr.getFrndList(appId, shareId);
+    return m_frndLstMgr.getFrndList(appId, shareId, bDontCheckUpdFlag);
+}
+
+void
+CommonDataMgr::updateFrndLstStatus(long shareId, int appId)
+{
+    m_frndLstMgr.updateStatus(shareId, appId);
 }

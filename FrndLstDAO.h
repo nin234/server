@@ -40,6 +40,7 @@ class FrndLstDAO
 
     bool update(long shareId, const FrndLst& frndLst);
 
+
 };
 
 #endif

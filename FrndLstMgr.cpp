@@ -14,39 +14,45 @@ FrndLstMgr::~FrndLstMgr()
 
 }
 
+bool
+FrndLstMgr::returnEmptyFrndLst(const FrndLst& frndLst, int appId)
+{
+    switch (appId)
+    {
+        case OPENHOUSES_ID:
+            if (frndLst.m_bUpdOpenHouses)
+                return true;
+        break;
+        
+        case AUTOSPREE_ID:
+            if (frndLst.m_bUpdAutoSpree)
+                return true;
+        break;
+
+        case EASYGROCLIST_ID:
+            if (frndLst.m_bUpdEasyList)
+                return true;
+        break;
+
+        default:
+            return true;
+        break;
+    }
+    return false;
+}
+
 std::string
-FrndLstMgr::getFrndList(int appId, long shareId)
+FrndLstMgr::getFrndList(int appId, long shareId, bool bDontCheckUpdFlag)
 {
     std::string frndLstEmpty;
     FrndLst frndLst;
     if (!m_frndLstDAO.get(shareId, frndLst))
         return frndLstEmpty;
-    switch (appId)
+    if (!bDontCheckUpdFlag)
     {
-        case OPENHOUSES_ID:
-            if (frndLst.m_bUpdOpenHouses)
-                return frndLstEmpty;
-            else
-                frndLst.m_bUpdOpenHouses = true;
-        break;
-        
-        case AUTOSPREE_ID:
-            if (frndLst.m_bUpdAutoSpree)
-                return frndLstEmpty;
-            else
-                frndLst.m_bUpdAutoSpree = true;
-        break;
-
-        case EASYGROCLIST_ID:
-            if (frndLst.m_bUpdEasyList)
-                return frndLstEmpty;
-            else
-                frndLst.m_bUpdEasyList = true;
-        break;
-
-        default:
-        break;
-    }
+        if (returnEmptyFrndLst(frndLst, appId))
+            return frndLstEmpty;
+    } 
 
     std::stringstream frndLstStr;
     for (const auto& frnd : frndLst.m_bFrndLst )
@@ -55,6 +61,42 @@ FrndLstMgr::getFrndList(int appId, long shareId)
     }
     return frndLstStr.str();
 }
+
+bool
+FrndLstMgr::updateStatus(long shareId, int appId)
+{
+    FrndLst frndLst;
+    if (m_frndLstDAO.get(shareId, frndLst))
+    {
+       switch(appId)
+       {
+            case OPENHOUSES_ID:
+            {
+                frndLst.m_bUpdOpenHouses = true;
+            }
+            break;
+
+            case AUTOSPREE_ID:
+            {
+                frndLst.m_bUpdAutoSpree = true;
+            }
+            break;
+            
+            case EASYGROCLIST_ID:
+            {
+                frndLst.m_bUpdEasyList = true;
+            }
+            break;
+
+            default:
+                return false;   
+            break;
+       } 
+       return m_frndLstDAO.update(shareId, frndLst);
+    }
+    return false;
+}
+
 
 void
 FrndLstMgr::storeFrndLst(const FrndLstObj *pFrndObj)
