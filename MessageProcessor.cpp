@@ -321,6 +321,43 @@ MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 }
 
 void
+MessageProcessor::sendUpdatedMaxShareIdIfRequd(GetItemObj *pGetItemObj)
+{
+    long maxAppShareId = pGetItemObj->getMaxShareId();
+    long maxShareId = ShareIdMgr::Instance().readShareId();
+    if (!maxAppShareId)
+    {
+        return;
+    }
+
+    if (maxAppShareId - maxShareId < 500)
+    {
+        long newMaxAppShareId = 0;
+        if (maxAppShareId >= maxShareId)
+        {
+            newMaxAppShareId = maxAppShareId + 3000;    
+        }
+        else
+        {
+            newMaxAppShareId = maxShareId + 3000;
+        }
+		char buf[512];
+		int mlen=0;
+		if (m_pTrnsl->getUpdateShareIdMsg(buf, &mlen, newMaxAppShareId))
+		{
+			if (!pNtwIntf->sendMsg(buf, mlen, pGetItemObj->getFd()))
+				std::cout << "Failed to send message for fd=" << pGetItemObj->getFd() << std::endl;
+            else
+		        std::cout << Util::now() << "Updating max shareId=" << newMaxAppShareId << " " << __FILE__ << " " << __LINE__ << std::endl;
+		}
+
+
+
+    }
+    return;
+}
+
+void
 MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
@@ -330,6 +367,7 @@ MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDe
 		return;
 	}
 
+    sendUpdatedMaxShareIdIfRequd(pGetItemObj);
     sendFrndLst(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pGetItemObj->getFd(), false);
 
 	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;

@@ -344,6 +344,14 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	long picShareId = 0;
 	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
 	pMsg->setPicShareId(picShareId);
+    long maxShareId = 0;
+    int maxShIdOffset = picshidoffset + sizeof(long);
+    ssize_t len = maxShIdOffset + sizeof(long);
+    if (mlen >= len)
+    {
+        memcpy(&maxShareId, buffer+maxShIdOffset, sizeof(long));
+        pMsg->setMaxShareId(maxShareId);
+    }
 	std::cout << Util::now() << "Create getItemObj " << *pMsg << " appId=" << getAppId() << __FILE__ << ":" << __LINE__ << std::endl;	
 	
 	pMsgs.push_back(std::move(pMsg));

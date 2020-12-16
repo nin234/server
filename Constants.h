@@ -106,6 +106,7 @@ enum class AppName
 #define GET_AUTOSPREE_ITEMS 80
 
 #define TOTAL_PIC_LEN_MSG 1500
+#define UPDATE_MAX_SHARE_ID_MSG 1501
 
 #define MAX_MSG_ID 23
 

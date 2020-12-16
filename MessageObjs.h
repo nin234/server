@@ -243,13 +243,17 @@ class GetItemObj : public PicDoneObj
 {
 	std::string devId;
 	int picRemaining;
+    long maxShareId;
 	public:
 		virtual ~GetItemObj(){}
-		GetItemObj(){}
+		GetItemObj():maxShareId(0){}
 		const std::string& getDeviceId() const {return devId;}
 		void setDeviceId(const std::string& dvId) {devId = dvId;}	
 		int getPicRemaining() const {return picRemaining;}
 		void setPicRemaining(int picrmng) {picRemaining = picrmng;}		
+        long getMaxShareId() const {return maxShareId;}
+        void setMaxShareId(long maxId) {maxShareId = maxId;}
+
 };
 
 class ShouldDownLoad : public MsgObj

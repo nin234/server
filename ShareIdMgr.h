@@ -28,6 +28,7 @@ class ShareIdMgr
 		void setShareIdStep(int step);
 		void initThreadShareId();
 		void storeTrndId(long trnId, long shrId, bool& archive);
+        long readShareId() {return shareId;}
 
 };
 #endif

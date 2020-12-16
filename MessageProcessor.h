@@ -31,6 +31,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
     std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     
     void processGetItemPics(GetItemObj *pGetItemObj);
+    void sendUpdatedMaxShareIdIfRequd(GetItemObj *pGetItemObj);
     void sendFrndLst(int appId, long shareId, int fd, bool bDontCheckUpdFlag);
 
 	void sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName);
