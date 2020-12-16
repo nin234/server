@@ -444,6 +444,8 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
 {
     std::vector<shrIdLstName> picNamesShIds;
     dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
+    long nTotalDownLoadSize = 0;
+
     if (pGetItemObj->getPicRemaining())
     {
         auto pItr = find_if(picNamesShIds.begin(), picNamesShIds.end(), [pGetItemObj](const shrIdLstName& shItem) {return shItem.lstName.find(pGetItemObj->getPicName()) != std::string::npos && shItem.shareId == pGetItemObj->getPicShareId();});
@@ -454,6 +456,7 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
             (*pItr).fd = pGetItemObj->getFd();
             if ((*pItr).picSoFar < 0)
                 (*pItr).picSoFar = 0;
+            nTotalDownLoadSize += (*pItr).picLen - (*pItr).picSoFar;
             m_pPicSndr->insertPicNameShid(*pItr);
         }
     }
@@ -465,8 +468,24 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
             continue;
         }
         picNameShId.fd = pGetItemObj->getFd();
+        nTotalDownLoadSize += picNameShId.picLen;
         m_pPicSndr->insertPicNameShid(picNameShId);
     }
+    if (!nTotalDownLoadSize)
+    {
+        return;
+    }
+	char buf[512];
+	int mlen=0;
+    if (m_pTrnsl->getTotalPicLenMsg(buf, &mlen, nTotalDownLoadSize))
+    {
+        if (!pNtwIntf->sendMsg(buf, mlen, pGetItemObj->getFd()))
+            std::cout << Util::now() << "Failed to send TOTAL_PIC_LEN_MSG message for fd=" << pGetItemObj->getFd() << std::endl;
+        else
+            std::cout << Util::now() << "Sending TOTAL_PIC_LEN_MSG  download size=" << nTotalDownLoadSize << " " << __FILE__ << " " << __LINE__ << std::endl;
+    }
+
+
     
 }
 

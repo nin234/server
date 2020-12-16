@@ -20,5 +20,6 @@ class MessageTranslator
 		virtual bool translateMsg(char *buf, int *mlen, int msgTyp, MsgObj *pMsgObj)=0;		
         
         bool getFrndLstMsg(char *buf, int *mlen, int buflen, const std::string& frndLst);
+        bool getTotalPicLenMsg(char *buf, int *mlen, long picLen);
 };
 #endif

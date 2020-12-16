@@ -105,6 +105,8 @@ enum class AppName
 
 #define GET_AUTOSPREE_ITEMS 80
 
+#define TOTAL_PIC_LEN_MSG 1500
+
 #define MAX_MSG_ID 23
 
 #define LCKFREE_LST_TDIFF 10.0

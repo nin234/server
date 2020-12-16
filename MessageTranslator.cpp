@@ -28,6 +28,20 @@ MessageTranslator::getShareIdReply(char *buf, int* mlen, long shareId)
 }
 
 bool
+MessageTranslator::getTotalPicLenMsg(char *buf, int* mlen, long picLen)
+{
+	constexpr int len = 2*sizeof(int) + sizeof(long);
+	constexpr int shoffset = 2*sizeof(int);
+	*mlen = len;
+	memcpy(buf, &len, sizeof(int));
+	constexpr int msgId = TOTAL_PIC_LEN_MSG;
+	memcpy(buf+sizeof(int), &msgId, sizeof(int));
+	memcpy(buf+shoffset, &picLen, sizeof(long));
+	return true;
+}
+
+
+bool
 MessageTranslator::getStoreIdReply(char *buf, int* mlen)
 {
 	constexpr int len = 2*sizeof(int);

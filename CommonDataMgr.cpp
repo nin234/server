@@ -371,6 +371,11 @@ CommonDataMgr::Instance()
 void
 CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens)
 {
+    if (Config::Instance().useDB())
+	{
+		m_rocksDAO.getDeviceTkns(appId, shareIds, tokens);
+        return;
+	}
 	for (const std::string& shareId : shareIds)
 	{
     		std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
@@ -378,10 +383,7 @@ CommonDataMgr::getDeviceTkns(int appId, const std::vector<std::string>& shareIds
         if (elem.os == "ios")
             tokens.push_back(elem.deviceToken);
 	}
-	if (Config::Instance().useDB())
-	{
-		m_rocksDAO.getDeviceTkns(appId, shareIds, tokens);
-	}
+	
 	return;
 }
 
