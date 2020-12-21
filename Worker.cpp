@@ -29,7 +29,6 @@ void*
 Worker::main()
 {
 	
-	ShareIdMgr::Instance().initThreadShareId();
 	
 	try		
 	{

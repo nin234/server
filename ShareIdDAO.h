@@ -17,5 +17,9 @@ class ShareIdDAO
     
     bool set(const std::string& deviceId, long shareId);
 
+    long getMaxShareId();
+
+    bool setMaxShareId(long maxShareId);
+
 };
 #endif

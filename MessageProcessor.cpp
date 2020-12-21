@@ -700,19 +700,11 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
 
 	long shareId = 0;
-	bool archive;
 	if (pShObj)
-		shareId = ShareIdMgr::Instance().getShareId(pShObj->getTrnId(), archive, pShObj->getDeviceId());
+		shareId = ShareIdMgr::Instance().getShareId(pShObj->getDeviceId());
 	if (shareId)
 	{
-		if (archive)
-		{
-			//send message to archiver
-			char archbuf[256];
-			int archlen=0;
-			if (ArchiveMsgCreator::createShareIdMsg(archbuf, archlen, shareId))
-				pArch->sendMsg(archbuf, archlen, 10);
-		}
+		
 		//send reply
 		char buf[512];
 		int mlen=0;
@@ -733,29 +725,7 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 void
 MessageProcessor::processStoreIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
-	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
-	if (!pShObj)
 		return;
-	bool archive;
-	ShareIdMgr::Instance().storeTrndId(pShObj->getTrnId(), pShObj->getShrId(), archive);
-	shrIdTrnId shtrId{pShObj->getShrId(), pShObj->getTrnId()};
-
-	if (archive)
-	{
-		char archbuf[256];
-		int archlen=0;
-		if (ArchiveMsgCreator::createTrnIdShrIdMsg(archbuf, archlen, shtrId))
-			pArch->sendMsg(archbuf, archlen, 10);
-	}
-	char buf[512];
-	int mlen =0;
-	if (m_pTrnsl->getStoreIdReply(buf, &mlen))
-	{
-		if (!pNtwIntf->sendMsg(buf, mlen, pShObj->getFd()))
-			std::cout << "Failed to send message for fd=" << pShObj->getFd() << std::endl;
-	}
-
-	return;
 }
 
 void

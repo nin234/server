@@ -13,11 +13,27 @@ ShareIdDAO::ShareIdDAO()
 		std::cout << "Failed to open shareIdRocks database, exiting" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		exit(0);
 	}
+	
+
 }
 
 ShareIdDAO::~ShareIdDAO()
 {
     delete m_db;
+}
+
+long
+ShareIdDAO::getMaxShareId()
+{
+    std::string shareIdStr;
+    rocksdb::Status status = m_db->Get(rocksdb::ReadOptions(), "MaxShareId", &shareIdStr);
+    if (!status.ok())
+    {
+        std::cout << Util::now() << "Failed retrieve MaxShareId" << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        return 0; 
+    }
+        std::cout << Util::now() << "maxShareId=" << shareIdStr << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+    return std::stol(shareIdStr);
 }
 
 long
@@ -50,4 +66,21 @@ ShareIdDAO::set(const std::string& deviceId, long shareId)
     }
     std::cout << Util::now() << "Stored deviceId=" << deviceId << " shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;    
     return true;
+}
+
+bool
+ShareIdDAO::setMaxShareId(long maxShareId)
+{
+    std::stringstream value;
+    value << maxShareId;
+    rocksdb::Status status;
+    status = m_db->Put(rocksdb::WriteOptions(), "MaxShareId", value.str());
+    if (!status.ok())
+    {
+        std::cout << Util::now() << "Failed to store  maxShareId=" << maxShareId << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return false;
+    }
+    std::cout << Util::now() << "Stored maxShareId=" << maxShareId << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    return true;
+
 }

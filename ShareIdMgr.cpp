@@ -6,29 +6,11 @@
 
 ShareIdMgr::ShareIdMgr()
 {
-	std::shared_ptr<ShareIdArchvr> pShArch = ArchiveMgr::Instance().getShareIdArchvr(ARCHIVE_SHARE_ID_MSG);
-	if (pShArch)
-	{
-		shareId_Init = pShArch->getShareId();
-	}
-	else
-		shareId_Init =1000;
-	//pShArch->populateTrnIdShrIdMp(trnIdShrIdMp);
-	++shareId_Init;
 }
 
 ShareIdMgr::~ShareIdMgr()
 {
 
-}
-
-void
-ShareIdMgr::initThreadShareId()
-{
-	std::lock_guard<std::mutex> lock(shid_init_mutex);
-	shareId = shareId_Init;
-	std::cout << "Setting shareId to " << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
-	return;
 }
 
 ShareIdMgr&
@@ -40,52 +22,29 @@ ShareIdMgr::Instance()
 }
 
 long
-ShareIdMgr::getShareId(long trnId, bool& archive, const std::string& deviceId)
+ShareIdMgr::getShareId(const std::string& deviceId)
 {
 	std::lock_guard<std::mutex> lock(shid_init_mutex);
-	archive = true;
+    long shareId = m_shareIdDAO.getMaxShareId();
+    if (!shareId)
+        return shareId;
     if (deviceId.size())
     {
         long shid = m_shareIdDAO.get(deviceId);
         if (shid)
             return shid;
-
         ++shareId;
         m_shareIdDAO.set(deviceId, shareId);
+        m_shareIdDAO.setMaxShareId(shareId);
         return shareId;
     }
 	++shareId;
+    m_shareIdDAO.setMaxShareId(shareId);
 	std::cout << "Returning new shareId=" << shareId << " " << __FILE__ << " " << __LINE__ << std::endl;
 	return shareId;
 }
 
-void
-ShareIdMgr::storeTrndId(long trnId, long shrId, bool& archive)
-{
-/*	
-	if (trnIdShrIdMp.getValue(trnId, shrId))		
-	{
-		archive = false;
-		return;
-	}
-	archive = true;
-	trnIdShrIdMp[trnId] = shrId;
-*/
-	return;
-}
 
 
-void
-ShareIdMgr::setShareId(long sid)
-{
-	shareId = sid + shareId_Init;
-	return;
-}
 
-void
-ShareIdMgr::setShareIdStep(int step)
-{
-	shareIdStep = step;
-	std::cout << "Setting shareIdStep to " << shareIdStep << " " << __FILE__ << " " << __LINE__ << std::endl;
-	return;
-}
+
