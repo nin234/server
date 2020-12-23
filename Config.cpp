@@ -61,11 +61,26 @@ Config::Config()
 		int sb = std::stoi(pItr->second);
 		bSandbox = sb?true:false;
 	}	
+    
+    pItr = keyvals.find("ssl_startport");
+	if (pItr != keyvals.end())
+	{
+		m_nStartSSLPort = std::stoi(pItr->second);
+	}	
+	std::cout << "Config values ssl_startport=" << m_nStartSSLPort << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+
+
 }
 
 Config::~Config()
 {
 
+}
+
+int
+Config::getStartSSLPort()
+{
+    return m_nStartSSLPort;
 }
 
 bool

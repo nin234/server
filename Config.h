@@ -16,6 +16,7 @@ class Config
 	std::unordered_map<std::string, std::string> keyvals;
 	bool m_bUseDB;
 	bool m_bUseRocksDB;
+    int m_nStartSSLPort;
 
 	public:
 		Config();
@@ -30,5 +31,6 @@ class Config
 		bool sandBox();
 		bool useDB();
 		bool useRocksDB();
+        int getStartSSLPort();
 };
 #endif

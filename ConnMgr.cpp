@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <netinet/tcp.h>
 #include <Util.h>
-
+#include <Config.h>
 
 ConnMgr::ConnMgr()
 {
@@ -26,7 +26,7 @@ ConnMgr::initializeListeners()
 		apps[i].bindAndListen();
 	}
 	
-	port =16803;
+	port = Config::Instance().getStartSSLPort();
 	for (int i=0; i < NO_OF_APPS; ++i)
 	{
 		ssl[i].setPort(port++);
