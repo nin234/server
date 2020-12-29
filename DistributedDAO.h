@@ -15,8 +15,10 @@ class DistributedDAO
 
     virtual ~DistributedDAO();
 
-    bool setNode(int startShareId, int endShareId, const std::map<std::string, int>& hostPortMp);
+    bool setNode(int startShareId, int endShareId, const std::map<int, std::pair<std::string, int>>& hostPortMp);
 
+    bool getNode(int shareId, int appId, std::pair<std::string, int>& hostPort);
+    bool getLastNode(int appId, std::pair<std::string, int>& hostPort);
     
 };
 
