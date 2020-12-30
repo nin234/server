@@ -11,9 +11,12 @@
 #include <FirebaseConnHdlr.h>
 #include <Config.h>
 #include <FrndLstMgr.h>
+#include <DistribMgr.h>
 
 AppMgr::AppMgr()
 {
+    DistribMgr::Instance().storeNodeInfo();
+
 	FirebaseConnHdlr::initialize();
 	std::cout << "Initialized FirebaseConnHdlr " << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	OpenHousesMgr *pOhMgr = new OpenHousesMgr();

@@ -179,4 +179,8 @@ Config::getEndShareId()
     return m_nShareIdEnd;
 }
 
-
+std::map<std::string, std::pair<std::string, int>>
+Config::getAppConns()
+{
+    return appConns;
+}

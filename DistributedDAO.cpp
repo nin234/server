@@ -23,13 +23,6 @@ DistributedDAO::~DistributedDAO()
 }
 
 bool
-DistributedDAO::isNode(int shareId)
-{
-
-    return false;
-}
-
-bool
 DistributedDAO::setNode(int startShareId, int endShareId, const std::map<int, std::pair<std::string, int>>& hostPortMap)
 {
     std::stringstream key;
@@ -83,6 +76,23 @@ DistributedDAO::getLastNode(int appId, std::pair<std::string, int>& hostPort)
     }
     return false;
 }
+bool
+DistributedDAO::isNode(int shareId)
+{
+    std::stringstream key;
+    key << shareId;
+    rocksdb::Status status;
+    std::string node;
+    status = m_db->Get(rocksdb::ReadOptions(), key.str(), &node);
+    if (!status.ok())
+    {
+        std::cout << Util::now() << "Failed to find shareId=" << shareId << " in distributed DB" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return false;
+    }
+    std::cout << Util::now() << "Found shareId=" << shareId << " in distributed DB" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+    return true;
+}
+
 
 bool
 DistributedDAO::getNode(int shareId, int appId, std::pair<std::string, int>& hostPort)

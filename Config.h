@@ -39,5 +39,7 @@ class Config
         int getStartSSLPort();
         int getStartShareId();
         int getEndShareId();
+        std::map<std::string, std::pair<std::string, int>> getAppConns();
+        
 };
 #endif
