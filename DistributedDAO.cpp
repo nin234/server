@@ -23,6 +23,13 @@ DistributedDAO::~DistributedDAO()
 }
 
 bool
+DistributedDAO::isNode(int shareId)
+{
+
+    return false;
+}
+
+bool
 DistributedDAO::setNode(int startShareId, int endShareId, const std::map<int, std::pair<std::string, int>>& hostPortMap)
 {
     std::stringstream key;

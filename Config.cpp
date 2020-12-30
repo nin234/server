@@ -61,15 +61,38 @@ Config::Config()
 		int sb = std::stoi(pItr->second);
 		bSandbox = sb?true:false;
 	}	
-    
-    pItr = keyvals.find("ssl_startport");
-	if (pItr != keyvals.end())
+    loadAppConns();    
+}
+
+void
+Config::loadAppConns()
+{
+
+	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile("/home/ninan/config/node.xml") != tinyxml2::XML_SUCCESS)
 	{
-		m_nStartSSLPort = std::stoi(pItr->second);
-	}	
-	std::cout << "Config values ssl_startport=" << m_nStartSSLPort << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+		std::cout << "Failed to parse xml file node.xml " << std::endl;
+		throw std::runtime_error("Failed to parse xml file /home/ninan/config/node.xml");
+	}
+    
+    auto apps = doc.FirstChildElement()->FirstChildElement("Apps");
 
+    for (auto app = apps->FirstChildElement(); app != NULL; app = app->NextSiblingElement())
+    {
+        auto name = app->FirstChildElement("name");
+        auto host = app->FirstChildElement("host");
+        auto port = app->FirstChildElement("port");
+        std::string nameStr = name->GetText();
+        std::string hostStr = host->GetText();
+        int portVal = std::stoi(port->GetText());
+        std::cout << "Adding host details name=" << nameStr << " port=" << portVal << " host=" << hostStr << " " << __FILE__ << ":" << __LINE__ << std::endl;          appConns[nameStr] = std::make_pair(hostStr, portVal); 
+    }
+    auto shareIds = doc.FirstChildElement()->FirstChildElement("ShareIds");
 
+    auto start = shareIds->FirstChildElement("start");
+    m_nShareIdStart = std::stoi(start->GetText());
+    auto end = shareIds->FirstChildElement("end");
+    m_nShareIdEnd = std::stoi(end->GetText());
 }
 
 Config::~Config()
@@ -144,5 +167,16 @@ Config::getSmartMsgThrds()
 	return SmartMsgThrds;
 }
 
+int 
+Config::getStartShareId()
+{
+    return m_nShareIdStart;
+}
+
+int 
+Config::getEndShareId()
+{
+    return m_nShareIdEnd;
+}
 
 

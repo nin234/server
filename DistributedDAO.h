@@ -19,7 +19,8 @@ class DistributedDAO
 
     bool getNode(int shareId, int appId, std::pair<std::string, int>& hostPort);
     bool getLastNode(int appId, std::pair<std::string, int>& hostPort);
-    
+
+    bool isNode(int shareId);    
 };
 
 #endif

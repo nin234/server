@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include <map>
 
 class Config
 {
@@ -17,6 +18,10 @@ class Config
 	bool m_bUseDB;
 	bool m_bUseRocksDB;
     int m_nStartSSLPort;
+    int m_nShareIdStart;
+    int m_nShareIdEnd;
+    std::map<std::string, std::pair<std::string, int>> appConns;    
+    void loadAppConns();
 
 	public:
 		Config();
@@ -32,5 +37,7 @@ class Config
 		bool useDB();
 		bool useRocksDB();
         int getStartSSLPort();
+        int getStartShareId();
+        int getEndShareId();
 };
 #endif
