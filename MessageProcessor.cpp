@@ -724,19 +724,15 @@ MessageProcessor::processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>
 void
 MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
-    auto [host, port] = DistribMgr::Instance().getNewShareIdHost(); 
-    if (host == "LOCAL")
-    {
-        processShareIdLocal(pMsg);
-        return;
-    }
-
-
 	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
-
 	if (pShObj)
 	{
-		
+        auto [host, port] = DistribMgr::Instance().getNewShareIdHost(pShObj->getAppId()); 
+        if (host == "LOCAL")
+        {
+            processShareIdLocal(pMsg);
+            return;
+        }
 		//send reply
 		char buf[32768];
 		int mlen=0;

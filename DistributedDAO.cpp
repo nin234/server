@@ -50,7 +50,7 @@ DistributedDAO::setNode(int startShareId, int endShareId, const std::map<int, st
 }
 
 bool
-DistributedDAO::getLastNode(int appId, std::pair<std::string, int>& hostPort)
+DistributedDAO::getLastNode(int appId, long& startShareId, std::pair<std::string, int>& hostPort)
 {
     std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
     pItr->SeekToLast();
@@ -58,9 +58,10 @@ DistributedDAO::getLastNode(int appId, std::pair<std::string, int>& hostPort)
     {
         std::string value = pItr->value().ToString();
         auto valVec = Util::split(value, '|');
+        startShareId = std::stol(pItr->key().ToString());
         for (unsigned long i=1; i < valVec.size(); i+=3)
         {
-            if (appId == std::stoi(valVec[1]))
+            if (appId == std::stoi(valVec[i]))
             {
                 hostPort.first = valVec[i+1];
                 hostPort.second = std::stoi(valVec[i+2]); 
@@ -108,7 +109,7 @@ DistributedDAO::getNode(int shareId, int appId, std::pair<std::string, int>& hos
         auto valVec = Util::split(value, '|');
         for (unsigned long i=1; i < valVec.size(); i+=3)
         {
-            if (appId == std::stoi(valVec[1]))
+            if (appId == std::stoi(valVec[i]))
             {
                 hostPort.first = valVec[i+1];
                 hostPort.second = std::stoi(valVec[i+2]); 

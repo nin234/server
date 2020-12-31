@@ -3,10 +3,11 @@
 
 #include <string>
 #include <map>
+#include <DistributedDAO.h>
 
 class DistribMgr
 {
-
+        DistributedDAO m_distribDAO;
         int getAppId(const std::string& name);
         std::map<std::string, int> m_appIdMp;
     public:
@@ -15,7 +16,7 @@ class DistribMgr
         virtual ~DistribMgr();
         static DistribMgr& Instance();
         bool storeNodeInfo();
-        std::pair<std::string, int> getNewShareIdHost();
+        std::pair<std::string, int> getNewShareIdHost(int appId);
 };
 
 #endif

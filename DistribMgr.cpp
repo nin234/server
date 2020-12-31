@@ -34,17 +34,25 @@ DistribMgr::Instance()
 }
 
 std::pair<std::string, int>
-DistribMgr::getNewShareIdHost()
+DistribMgr::getNewShareIdHost(int appId)
 {
-
+    std::pair<std::string, int> hostPort;
+    long startShareId;
+    if (m_distribDAO.getLastNode(appId, startShareId, hostPort))
+    {
+        if (Config::Instance().getStartShareId() == startShareId)
+        {
+            return {"LOCAL", 0};
+        }
+        return hostPort;
+    }
     return {"LOCAL", 0};
 }
 bool
 DistribMgr::storeNodeInfo()
 {
-    DistributedDAO distribDAO;
     int startShareId = Config::Instance().getStartShareId();
-    if (distribDAO.isNode(startShareId))
+    if (m_distribDAO.isNode(startShareId))
     {
         std::cout << "startShareId=" << startShareId << " already in distributed DB " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
         return true;
@@ -62,6 +70,6 @@ DistribMgr::storeNodeInfo()
         }
         appHostPortMp[appId] = hostPort;
     }
-    distribDAO.setNode(startShareId, endShareId, appHostPortMp);
+    m_distribDAO.setNode(startShareId, endShareId, appHostPortMp);
     return true;
 }
