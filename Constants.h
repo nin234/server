@@ -107,6 +107,7 @@ enum class AppName
 
 #define TOTAL_PIC_LEN_MSG 1500
 #define UPDATE_MAX_SHARE_ID_MSG 1501
+#define SHARE_ID_REMOTE_HOST_MSG 1502
 
 #define MAX_MSG_ID 23
 

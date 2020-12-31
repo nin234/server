@@ -33,6 +33,12 @@ DistribMgr::Instance()
     return instance;
 }
 
+std::pair<std::string, int>
+DistribMgr::getNewShareIdHost()
+{
+
+    return {"LOCAL", 0};
+}
 bool
 DistribMgr::storeNodeInfo()
 {

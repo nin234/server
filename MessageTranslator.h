@@ -11,6 +11,7 @@ class MessageTranslator
 		MessageTranslator();
 		virtual ~MessageTranslator();
 		bool getShareIdReply(char *buf, int* mlen, long shareId);
+		bool getShareIdRemoteHostMsg(char *buf, int* mlen, std::string host, int port);
 		bool getUpdateShareIdMsg(char *buf, int* mlen, long shareId);
 		bool getStoreIdReply (char *buf, int* mlen);
 		bool getReply (char *buf, int* mlen, int msgTyp);

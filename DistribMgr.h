@@ -15,6 +15,7 @@ class DistribMgr
         virtual ~DistribMgr();
         static DistribMgr& Instance();
         bool storeNodeInfo();
+        std::pair<std::string, int> getNewShareIdHost();
 };
 
 #endif

@@ -35,6 +35,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
     void sendFrndLst(int appId, long shareId, int fd, bool bDontCheckUpdFlag);
 
 	void sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName);
+	void processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		bool sendMsg(char *buf, int mlen, int fd);

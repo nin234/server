@@ -141,6 +141,23 @@ MessageTranslator::getFrndLstMsg(char *pMsg, int *mlen, int buflen, const std::s
 }
 
 bool
+MessageTranslator::getShareIdRemoteHostMsg(char *buf, int *mlen, std::string host , int port)
+{
+
+	int msglen = 4*sizeof(int) + host.size() +1;
+	memcpy(buf, &msglen, sizeof(int));
+	constexpr int msgId = SHARE_ID_REMOTE_HOST_MSG;
+	memcpy(buf+sizeof(int), &msgId, sizeof(int));
+    int hostlen = host.size() + 1;
+	memcpy(buf+2*sizeof(int), &hostlen, sizeof(int));
+	memcpy(buf + 3*sizeof(int), host.c_str(), hostlen);
+    int portOffset = 3*sizeof(int) + hostlen;
+    memcpy(buf + portOffset, &port, sizeof(int));
+    *mlen = msglen;
+    return true;
+}
+
+bool
 MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::string& name, const std::string& lst, int msgId, long shareId)
 {
 	int msglen = 4*sizeof(int) + name.size() + lst.size() + 2 + sizeof(long);

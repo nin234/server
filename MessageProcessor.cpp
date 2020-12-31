@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <Util.h>
 #include <Config.h>
+#include <DistribMgr.h>
 
 using namespace std::placeholders;
 
@@ -692,10 +693,8 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 	return;
 }
 
-
-
 void
-MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
 {
 	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
 
@@ -717,6 +716,39 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 		}
 
         sendFrndLst(pShObj->getAppId(), shareId, pShObj->getFd(), true);
+	}
+	return;
+
+}
+
+void
+MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+{
+    auto [host, port] = DistribMgr::Instance().getNewShareIdHost(); 
+    if (host == "LOCAL")
+    {
+        processShareIdLocal(pMsg);
+        return;
+    }
+
+
+	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
+
+	if (pShObj)
+	{
+		
+		//send reply
+		char buf[32768];
+		int mlen=0;
+		if (m_pTrnsl->getShareIdRemoteHostMsg(buf, &mlen, host, port))
+		{
+			if (!pNtwIntf->sendMsg(buf, mlen, pShObj->getFd()))
+				std::cout << "Failed to send message for fd=" << pShObj->getFd() << std::endl;
+            else
+		        std::cout << Util::now() << "Replying with host=" << host 
+                << " port=" << port << " " << __FILE__ << " " << __LINE__ << std::endl;
+		}
+
 	}
 	return;
 
