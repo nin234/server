@@ -20,7 +20,7 @@ class ShareIdMgr
 	public:
 		static ShareIdMgr&  Instance();
 		long getShareId(const std::string& deviceId);
-        long readShareId() {return m_shareIdDAO.getMaxShareId();}
+        long readShareId();
 
 };
 #endif

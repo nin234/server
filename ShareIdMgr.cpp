@@ -3,6 +3,7 @@
 #include <Constants.h>
 #include <iostream>
 #include <ShareIdDAO.h>
+#include <DistribMgr.h>
 
 ShareIdMgr::ShareIdMgr()
 {
@@ -44,7 +45,11 @@ ShareIdMgr::getShareId(const std::string& deviceId)
 	return shareId;
 }
 
-
+long
+ShareIdMgr::readShareId()
+{
+    return DistribMgr::Instance().getEndShareId();
+}
 
 
 

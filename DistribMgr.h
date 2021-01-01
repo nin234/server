@@ -17,6 +17,7 @@ class DistribMgr
         static DistribMgr& Instance();
         bool storeNodeInfo();
         std::pair<std::string, int> getNewShareIdHost(int appId);
+        long getEndShareId();
 };
 
 #endif

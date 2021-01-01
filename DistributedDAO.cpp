@@ -49,6 +49,21 @@ DistributedDAO::setNode(int startShareId, int endShareId, const std::map<int, st
     return true;
 }
 
+long
+DistributedDAO::getEndShareId()
+{
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    pItr->SeekToLast();
+    if (pItr->Valid())
+    {
+        std::string value = pItr->value().ToString();
+        auto valVec = Util::split(value, '|');
+        if (valVec.size())
+            return std::stol(valVec[0]);
+    }
+    return 0;
+}
+
 bool
 DistributedDAO::getLastNode(int appId, long& startShareId, std::pair<std::string, int>& hostPort)
 {

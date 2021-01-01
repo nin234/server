@@ -73,3 +73,10 @@ DistribMgr::storeNodeInfo()
     m_distribDAO.setNode(startShareId, endShareId, appHostPortMp);
     return true;
 }
+
+long
+DistribMgr::getEndShareId()
+{
+
+    return m_distribDAO.getEndShareId();
+}
