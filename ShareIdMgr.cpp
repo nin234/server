@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ShareIdDAO.h>
 #include <DistribMgr.h>
+#include <Config.h>
 
 ShareIdMgr::ShareIdMgr()
 {
@@ -28,7 +29,14 @@ ShareIdMgr::getShareId(const std::string& deviceId)
 	std::lock_guard<std::mutex> lock(shid_init_mutex);
     long shareId = m_shareIdDAO.getMaxShareId();
     if (!shareId)
-        return shareId;
+    {
+       shareId = Config::Instance().getStartShareId();
+       if (!shareId)
+       {
+            return 0;
+       }
+    }
+
     if (deviceId.size())
     {
         long shid = m_shareIdDAO.get(deviceId);
