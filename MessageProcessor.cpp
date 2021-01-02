@@ -89,6 +89,7 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 	m_pPicSndr->setTrnsl(pTrnsl);
 	m_pPicSndr->attach(this);
 	pNtwIntf->attach(this);
+    m_distributor.setTrnsl(pTrnsl);
 	return;
 }
 
@@ -546,8 +547,8 @@ MessageProcessor::processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDel
 		return;
 	}
 	lstToStore = pLstObj->getList().substr(xpos+3);
-	std::vector<std::string>  shareIds;
-	if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
+	std::vector<std::string>  shareIds = m_distributor.distribute(pLstObj);
+	if (shareIds.size())
 	{
 		dataStore.storeItemAndLstShareInfo(pLstObj->getAppId(),pLstObj->getShrId(), pLstObj->getName(), lstToStore, shareIds);
 		std::vector<std::string> tokens;
