@@ -77,6 +77,8 @@ MessageTranslator::getReply(char *buf, int* mlen, int msgTyp)
 	return true;
 }
 
+
+
 bool 
 MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>& shareIds)
 {
@@ -154,6 +156,52 @@ MessageTranslator::getShareIdRemoteHostMsg(char *buf, int *mlen, std::string hos
     int portOffset = 3*sizeof(int) + hostlen;
     memcpy(buf + portOffset, &port, sizeof(int));
     *mlen = msglen;
+    return true;
+}
+
+bool 
+MessageTranslator::createShareItemMsg(char *pMsg, int *mlen, int buflen, LstObj *pLstObj, const std::vector<std::string>& shareIds)
+{
+
+	std::string::size_type xpos = pLstObj->getList().find(":::");
+	if (xpos == std::string::npos)
+    {
+        std::cout << "Invalid list format for list=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+		return false;
+    }
+    std::string lst = pLstObj->getList();
+    lst.erase(0, xpos);
+    std::stringstream ss;
+    for (const auto& shareId : shareIds)
+    {
+        ss << shareId << ";"; 
+    }
+    std::string pre = ss.str();
+    std::string prefix = pre.substr(0, pre.size()-1);
+    std::string lstShare = prefix + lst;
+    int listLen = lstShare.size()+1;
+     int nameLen =  pLstObj->getName().size() + 1;
+    int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
+    if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:createShareItemMsg" << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+		return false;
+	}
+	memcpy(pMsg, &msglen, sizeof(int));
+    int msgId = SHARE_ITEM_MSG;
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    long shareId = pLstObj->getShrId();
+    memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long)); 
+    constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+    memcpy(pMsg + namelenoffset, &nameLen, sizeof(int));
+     constexpr int lstlenoffset = 3*sizeof(int) + sizeof(long);
+    memcpy(pMsg + lstlenoffset, &listLen, sizeof(int));
+    constexpr int nameoffset = 4*sizeof(int) + sizeof(long);
+    memcpy(pMsg + nameoffset, pLstObj->getName().c_str(), nameLen);    
+    int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
+	memcpy(pMsg+lstoffset, lstShare.c_str(), listLen);
+	*mlen = msglen;
+    
     return true;
 }
 

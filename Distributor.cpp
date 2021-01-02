@@ -37,7 +37,20 @@ Distributor::distribute(LstObj *pLstObj)
     }
     std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
     populateShareIdHostMap(pLstObj->getAppId(), hostPortShareIds, remoteShareIds);
+    createAndSendMsgs(hostPortShareIds, pLstObj);
     return lclShareIds;
+}
+
+void 
+Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
+                std::vector<std::string>>& hostPortShareIds, LstObj *pLstObj)
+{
+    for (auto [hostPort, shareIds] : hostPortShareIds)
+    {
+        char buf[65536];
+        int mlen = 0;
+        m_pTrnsl->createShareItemMsg(buf, &mlen, 65536, pLstObj, shareIds);
+    }
 }
 
 void

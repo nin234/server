@@ -4,6 +4,7 @@
 #include <MessageObjs.h>
 #include <memory>
 #include <StorageElems.h>
+#include <vector>
 
 class MessageTranslator
 {
@@ -23,5 +24,8 @@ class MessageTranslator
         
         bool getFrndLstMsg(char *buf, int *mlen, int buflen, const std::string& frndLst);
         bool getTotalPicLenMsg(char *buf, int *mlen, long picLen);
+        
+        bool createShareItemMsg(char *buf, int *mlen, int buflen, LstObj *pLstObj, const std::vector<std::string>& shareIds);
+        
 };
 #endif
