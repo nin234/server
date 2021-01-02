@@ -50,6 +50,8 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
         char buf[65536];
         int mlen = 0;
         m_pTrnsl->createShareItemMsg(buf, &mlen, 65536, pLstObj, shareIds);
+        auto [host, port] = hostPort;
+        m_ntwIntf.sendMsg(buf, mlen, host, port);
     }
 }
 
@@ -75,3 +77,5 @@ Distributor::populateShareIdHostMap(int appId, std::map<std::pair<std::string, i
         
     }
 }
+
+

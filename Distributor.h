@@ -7,15 +7,17 @@
 #include <MessageTranslator.h>
 #include <map>
 #include <DistributedDAO.h>
+#include <NtwClientIntf.h>
 
 class Distributor
 {
 
         std::shared_ptr<MessageTranslator> m_pTrnsl;
-        void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
-
-        void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, LstObj *pLsObj);
         DistributedDAO m_distribDAO;
+        NtwClientIntf m_ntwIntf;
+        
+        void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
+        void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, LstObj *pLsObj);
 
     public:
         Distributor();
