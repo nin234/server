@@ -13,14 +13,17 @@ class SSLClntSocket
 	static thread_local std::mutex ctx_init;
 	int m_fd;
 	SSL *m_ssl;
-    std::string host;
-    int port;
+    std::string m_host;
+    int m_port;
 
     public:
         
         SSLClntSocket();
 
         virtual ~SSLClntSocket();
+    
+        bool connect(std::string host, int port);
+        
 };
 
 #endif
