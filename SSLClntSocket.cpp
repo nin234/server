@@ -46,7 +46,7 @@ SSLClntSocket::connect(std::string host, int port)
 {
     m_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-    std::cout << "Connecting to server host=" << host << " port=" 
+    std::cout << Util::now() << "Connecting to server host=" << host << " port=" 
                 << port << " " << __FILE__ << ":" << __LINE__ << std::endl; 
     struct addrinfo hints;
     struct addrinfo *result, *rp;
@@ -64,7 +64,7 @@ SSLClntSocket::connect(std::string host, int port)
     int ret = getaddrinfo(host.c_str(), ss.str().c_str(), &hints, &result);
     if ( ret)
     {
-        std::cout << "getaddrinfo failed for host=" << host << " port="
+        std::cout << Util::now() << "getaddrinfo failed for host=" << host << " port="
                   << port << " error=" << gai_strerror(ret)
                   << " " << __FILE__ << ":" << __LINE__ << std::endl; 
         return false;
@@ -76,7 +76,7 @@ SSLClntSocket::connect(std::string host, int port)
             continue;
         if (::connect(m_fd, rp->ai_addr, rp->ai_addrlen) != -1) {
 
-            std::cout << "Connected to host=" << host << " sin_port=" 
+            std::cout << Util::now()  << "Connected to host=" << host << " sin_port=" 
             << ((struct sockaddr_in*)rp->ai_addr)->sin_port << " port=" 
             << port << " " << __FILE__ << ":" << __LINE__ << std::endl;  
             break;
@@ -86,8 +86,25 @@ SSLClntSocket::connect(std::string host, int port)
 
     if (rp == NULL)
     {
-        std::cout << "Could not connect socket to any address" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << Util::now() << "Could not connect socket to any address" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
         return false;
     }
+    m_ssl = SSL_new(pCtx);
+    if (!m_ssl)
+    {
+        std::cout << Util::now() << "Error creating ssl object" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return false;
+    }
+
+    SSL_set_fd(m_ssl, m_fd);
+
+    ret = SSL_connect(m_ssl);
+    if (ret  <= 0)
+    {
+        std::cout << Util::now() << "Failed to connect SSL" << SSL_get_error(m_ssl, ret) << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return false;
+    }
+    std::cout << Util::now() << "SSL connection established to host="
+               << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;  
     return true;
 }
