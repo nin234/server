@@ -15,7 +15,7 @@ class SSLClntSocket
 	SSL *m_ssl;
     std::string m_host;
     int m_port;
-
+    int m_bConnected;
     public:
         
         SSLClntSocket();
@@ -24,7 +24,7 @@ class SSLClntSocket
     
         bool connect(std::string host, int port);
 
-        bool sendMsg(char *buf, int mlen);
+        bool sendMsg(char *buf, int mlen, const std::string& host, int port);
         
 };
 

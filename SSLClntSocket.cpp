@@ -14,7 +14,7 @@ thread_local SSL_CTX* SSLClntSocket::pCtx = NULL;
 
 thread_local std::mutex SSLClntSocket::ctx_init;
 
-SSLClntSocket::SSLClntSocket()
+SSLClntSocket::SSLClntSocket() : m_bConnected(false)
 {
 
 	if (!pCtx)
@@ -110,8 +110,12 @@ SSLClntSocket::connect(std::string host, int port)
 }
 
 bool
-SSLClntSocket::sendMsg(char *buf, int mlen)
+SSLClntSocket::sendMsg(char *buf, int mlen, const std::string& host, int port)
 {
-
+    if (!m_bConnected)
+    {
+        if (!connect(host, port))
+            return false;
+    }    
     return true;
 }
