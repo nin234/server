@@ -2,10 +2,13 @@
 #define _NTWCLIENTINTF_H_
 
 #include <string>
+#include <SSLClntSocket.h>
+#include <map>
+#include <memory>
 
 class NtwClientIntf
 {
-
+        std::map<std::string, std::unique_ptr<SSLClntSocket>> m_clntConns;        
     public:
     
         NtwClientIntf();

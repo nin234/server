@@ -38,7 +38,7 @@ SSLClntSocket::SSLClntSocket()
 
 SSLClntSocket::~SSLClntSocket()
 {
-
+    close(m_fd);
 }
 
 bool
@@ -106,5 +106,12 @@ SSLClntSocket::connect(std::string host, int port)
     }
     std::cout << Util::now() << "SSL connection established to host="
                << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+    return true;
+}
+
+bool
+SSLClntSocket::sendMsg(char *buf, int mlen)
+{
+
     return true;
 }

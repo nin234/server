@@ -23,6 +23,8 @@ class SSLClntSocket
         virtual ~SSLClntSocket();
     
         bool connect(std::string host, int port);
+
+        bool sendMsg(char *buf, int mlen);
         
 };
 
