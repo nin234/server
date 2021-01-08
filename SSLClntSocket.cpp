@@ -12,14 +12,12 @@
 
 thread_local SSL_CTX* SSLClntSocket::pCtx = NULL;
 
-thread_local std::mutex SSLClntSocket::ctx_init;
 
 SSLClntSocket::SSLClntSocket() : m_bConnected(false)
 {
 
 	if (!pCtx)
 	{
-		std::lock_guard<std::mutex> ctxLock(ctx_init);
 		if (pCtx)
 			return;
 		std::cout << Util::now() << "Initialising SSL client context " << __FILE__ << " " << __LINE__ << std::endl;
@@ -110,12 +108,36 @@ SSLClntSocket::connect(std::string host, int port)
 }
 
 bool
-SSLClntSocket::sendMsg(char *buf, int mlen, const std::string& host, int port)
+SSLClntSocket::sendMsg(const char *buf, int mlen, const std::string& host, int port, bool *tryAgain)
 {
     if (!m_bConnected)
     {
         if (!connect(host, port))
+        {
+            std::cout << Util::now() << "Failed to send message not connected to host=" << host << " port=" << port
+            << " " << __FILE__ << ":" << __LINE__ << std::endl; 
             return false;
-    }    
+        }
+        m_bConnected = true;
+    }   
+    
+     int ret = SSL_write(m_ssl, buf, mlen);
+     if (ret <= 0)
+     {
+         int sslErr = SSL_get_error(m_ssl, ret);
+		std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+        switch(sslErr)
+        {
+            case SSL_ERROR_WANT_WRITE:
+                *tryAgain =true;
+            break;
+            
+            default:
+                *tryAgain = false;
+            break;
+        }
+		return false;
+
+     } 
     return true;
 }

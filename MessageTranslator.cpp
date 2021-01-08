@@ -160,7 +160,7 @@ MessageTranslator::getShareIdRemoteHostMsg(char *buf, int *mlen, std::string hos
 }
 
 bool 
-MessageTranslator::createShareItemMsg(char *pMsg, int *mlen, int buflen, LstObj *pLstObj, const std::vector<std::string>& shareIds)
+MessageTranslator::createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, const std::vector<std::string>& shareIds)
 {
 
 	std::string::size_type xpos = pLstObj->getList().find(":::");
@@ -182,11 +182,10 @@ MessageTranslator::createShareItemMsg(char *pMsg, int *mlen, int buflen, LstObj 
     int listLen = lstShare.size()+1;
      int nameLen =  pLstObj->getName().size() + 1;
     int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
-    if (buflen < msglen)
-	{
-		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:createShareItemMsg" << " " << __FILE__ << ":" << __LINE__ << std::endl; 
-		return false;
-	}
+    
+    msg.reserve(msglen);    
+    char* pMsg = msg.data();
+
 	memcpy(pMsg, &msglen, sizeof(int));
     int msgId = SHARE_ITEM_MSG;
 	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
@@ -200,8 +199,7 @@ MessageTranslator::createShareItemMsg(char *pMsg, int *mlen, int buflen, LstObj 
     memcpy(pMsg + nameoffset, pLstObj->getName().c_str(), nameLen);    
     int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
 	memcpy(pMsg+lstoffset, lstShare.c_str(), listLen);
-	*mlen = msglen;
-    
+     
     return true;
 }
 

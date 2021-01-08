@@ -11,7 +11,6 @@
 
 thread_local SSL_CTX* SSLSocket::pCtx = NULL;
 
-thread_local std::mutex SSLSocket::ctx_init;
 
 void
 SSLSocket::initializeSSL()
@@ -51,7 +50,6 @@ SSLSocket::SSLSocket() : m_bAccepted(false)
 {
 	if (!pCtx)
 	{
-		std::lock_guard<std::mutex> ctxLock(ctx_init);
 		if (pCtx)
 			return;
 		std::cout << Util::now() << "Initialising SSL context " << __FILE__ << " " << __LINE__ << std::endl;

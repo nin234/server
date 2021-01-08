@@ -25,7 +25,7 @@ class MessageTranslator
         bool getFrndLstMsg(char *buf, int *mlen, int buflen, const std::string& frndLst);
         bool getTotalPicLenMsg(char *buf, int *mlen, long picLen);
         
-        bool createShareItemMsg(char *buf, int *mlen, int buflen, LstObj *pLstObj, const std::vector<std::string>& shareIds);
+        bool createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, const std::vector<std::string>& shareIds);
         
 };
 #endif

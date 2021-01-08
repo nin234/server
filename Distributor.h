@@ -8,6 +8,17 @@
 #include <map>
 #include <DistributedDAO.h>
 #include <NtwClientIntf.h>
+#include <pthread.h>
+#include <list>
+#include <mutex>
+#include <condition_variable>
+
+struct DistribItem
+{
+    std::string host;
+    int port;
+    std::vector<char> msg;
+};
 
 class Distributor
 {
@@ -18,6 +29,9 @@ class Distributor
         
         void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, LstObj *pLsObj);
+        std::list <DistribItem> m_shareItems;
+        std::mutex  m_shareItemsMutex;
+        std::condition_variable m_shareItemsCV;        
 
     public:
         Distributor();
@@ -26,6 +40,10 @@ class Distributor
         std::vector<std::string> distribute(LstObj *pLstObj);
 
         void setTrnsl(MessageTranslator *pTrnsl);
+
+        static void *entry(void *context);
+
+        void *main();
 };
 
 #endif

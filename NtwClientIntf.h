@@ -14,7 +14,7 @@ class NtwClientIntf
         NtwClientIntf();
         virtual ~NtwClientIntf();
         
-        bool sendMsg(char *buf, int mlen, const std::string& host, int port);
+        bool sendMsg(const char *buf, int mlen, const std::string& host, int port);
 };
 
 #endif

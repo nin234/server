@@ -8,7 +8,6 @@
 class SSLSocket
 {
 	thread_local static SSL_CTX *pCtx;
-	static thread_local std::mutex ctx_init;
 	int m_fd;
 	SSL *m_ssl;
 	bool m_bAccepted;

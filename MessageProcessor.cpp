@@ -14,9 +14,17 @@
 
 using namespace std::placeholders;
 
-MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), pMsgEnq(new MessageEnqueuer()), dataStore{CommonDataMgr::Instance()}
+MessageProcessor::MessageProcessor():m_pDcd(NULL), m_pTrnsl(NULL), m_pPicSndr(NULL),  pNtwIntf(new NtwIntf<MessageDecoder>()), pArch(new ArchiveSndr()), 
+      pMsgEnq(new MessageEnqueuer()), m_distributor(new Distributor()),
+      dataStore{CommonDataMgr::Instance()}
 {
 	nFds = 0;
+    pthread_t tid;
+    if (pthread_create(&tid, NULL, &Distributor::entry, m_distributor.get()) != 0)
+    {
+        std::cout << "Failed to create Worker thread " << __FILE__ << ":" << __LINE__ << std::endl;
+        throw std::system_error(errno, std::system_category());			
+    }
 }
 
 MessageProcessor::~MessageProcessor()
@@ -89,7 +97,7 @@ MessageProcessor::setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl)
 	m_pPicSndr->setTrnsl(pTrnsl);
 	m_pPicSndr->attach(this);
 	pNtwIntf->attach(this);
-    m_distributor.setTrnsl(pTrnsl);
+    m_distributor->setTrnsl(pTrnsl);
 	return;
 }
 
@@ -547,7 +555,7 @@ MessageProcessor::processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDel
 		return;
 	}
 	lstToStore = pLstObj->getList().substr(xpos+3);
-	std::vector<std::string>  shareIds = m_distributor.distribute(pLstObj);
+	std::vector<std::string>  shareIds = m_distributor->distribute(pLstObj);
 	if (shareIds.size())
 	{
 		dataStore.storeItemAndLstShareInfo(pLstObj->getAppId(),pLstObj->getShrId(), pLstObj->getName(), lstToStore, shareIds);

@@ -10,7 +10,6 @@ class SSLClntSocket
 {
 
 	thread_local static SSL_CTX *pCtx;
-	static thread_local std::mutex ctx_init;
 	int m_fd;
 	SSL *m_ssl;
     std::string m_host;
@@ -24,7 +23,7 @@ class SSLClntSocket
     
         bool connect(std::string host, int port);
 
-        bool sendMsg(char *buf, int mlen, const std::string& host, int port);
+        bool sendMsg(const char *buf, int mlen, const std::string& host, int port,  bool *tryAgain);
         
 };
 

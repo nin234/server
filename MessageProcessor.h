@@ -26,7 +26,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 	std::unique_ptr<NtwIntf<MessageDecoder>>  pNtwIntf;
 	std::unique_ptr<ArchiveSndr> pArch;
 	std::unique_ptr<MessageEnqueuer> pMsgEnq;
-    Distributor m_distributor;
+    std::unique_ptr<Distributor> m_distributor;
 	int maxFd;
 	int nFds;
 	std::shared_ptr<ApplePush> pAppleNotfy;
