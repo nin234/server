@@ -167,7 +167,12 @@ MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, const PicMetaD
 	constexpr int msgId = PIC_METADATA_MSG;
     std::string name = pPicMetaObj->getName();
     int nameLen = name.size() + 1;
-    std::string metaStr = pPicMetaObj->getFrnLstStr();
+    std::stringstream ss;
+    for (auto& shareId : shareIds)
+    {
+        ss << shareId << ";";
+    }
+    std::string metaStr = ss.str();
     int metaStrLen = metaStr.size() + 1;
     int msglen = 5*sizeof(int) + nameLen  + sizeof(long) + metaStrLen;
     msg.reserve(msglen);    
