@@ -39,6 +39,8 @@ class Distributor
         
         std::vector<std::string> distribute(LstObj *pLstObj);
 
+        std::unique_ptr<PicMetaDataObj> distribute(PicMetaDataObj *pPicMetaObj);        
+
         void setTrnsl(MessageTranslator *pTrnsl);
 
         static void *entry(void *context);

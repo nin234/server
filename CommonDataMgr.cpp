@@ -288,21 +288,7 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
 	std::cout << "Storing picMetaData appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " picLen=" << pPicMetaObj->getPicLen();
     long val = pPicMetaObj->getPicLen();
-	if (!Config::Instance().useDB())
-	{
-        for (const std::string& shareId : shareIds)
-        {
-            std::cout << " shareId=" << shareId;
-                std::lock_guard<std::mutex> lock(commonElemsMtx[appId][std::stol(shareId)]); 
-            CommonElem& elem = commonElems[appId][std::stol(shareId)];	
-            elem.picShareInsert(shareIdLst, name, val);
-            
-        }
-    }
-    else
-    {
-        m_picMetaDAO.store(appId, shareIdLst, name, val, shareIds);
-    }
+    m_picMetaDAO.store(appId, shareIdLst, name, val, shareIds);
 
 }
 

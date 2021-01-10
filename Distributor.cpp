@@ -14,6 +14,33 @@ Distributor::~Distributor()
 
 }
 
+std::unique_ptr<PicMetaDataObj> 
+Distributor::distribute(PicMetaDataObj *pPicMetaObj)
+{
+
+    std::vector<std::string> lclShareIds;
+    std::vector<std::string> remoteShareIds;
+
+    auto& shareIds = pPicMetaObj->getFrndLst(); 
+    for (auto shareIdStr : shareIds)
+    {
+        long nShareid = std::stol(shareIdStr);
+        if (nShareid >= Config::Instance().getStartShareId() && nShareid <= Config::Instance().getEndShareId())
+        {
+            lclShareIds.push_back(shareIdStr);
+        }
+        else
+        {
+            remoteShareIds.push_back(shareIdStr);
+        }
+    }
+    
+    std::unique_ptr<PicMetaDataObj> lclPicMeta(new PicMetaDataObj(*pPicMetaObj));
+    lclPicMeta->setFrndLst(lclShareIds);
+    return lclPicMeta;
+
+}
+
 std::vector<std::string>
 Distributor::distribute(LstObj *pLstObj)
 {

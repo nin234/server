@@ -89,6 +89,18 @@ PicMetaDataObj::PicMetaDataObj()
 }
 
 void
+PicMetaDataObj::setFrndLst(const std::vector<std::string>& fl)
+{
+    frndLst = fl;
+    std::stringstream ss;
+    for (auto& frnd : fl)
+    {
+        ss << frnd << ";";
+    }
+    frndLstStr = ss.str(); 
+}
+
+void
 PicMetaDataObj::setFrndLstStr(const char *pFlist, int len)
 {
 	frndLstStr.resize(len);

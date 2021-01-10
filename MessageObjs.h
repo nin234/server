@@ -66,7 +66,7 @@ class PicMetaDataObj : public MsgObj
 		std::string getName() const {return name;}
 		void setName(const char *pName, int len);
 		const std::vector<std::string>& getFrndLst(){return frndLst;}
-		void setFrndLst(const std::vector<std::string>& fl){frndLst = fl;}
+		void setFrndLst(const std::vector<std::string>& fl);
 		int getPicLen() {return picLen;}
 		void setPicLen(int len){picLen = len;}
 		int getWrittenLen() {return writtenLen;}
