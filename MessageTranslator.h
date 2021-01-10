@@ -26,6 +26,7 @@ class MessageTranslator
         bool getTotalPicLenMsg(char *buf, int *mlen, long picLen);
         
         bool createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, const std::vector<std::string>& shareIds);
+        bool createServerPicMetaMsg(std::vector<char>& msg, const PicMetaDataObj *pPicMetaObj, const std::vector<std::string>& shareIds);
         
 };
 #endif

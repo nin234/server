@@ -35,6 +35,10 @@ Distributor::distribute(PicMetaDataObj *pPicMetaObj)
         }
     }
     
+    std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
+    populateShareIdHostMap(pPicMetaObj->getAppId(), hostPortShareIds, remoteShareIds);
+    createAndSendMsgs(hostPortShareIds, pPicMetaObj);
+
     std::unique_ptr<PicMetaDataObj> lclPicMeta(new PicMetaDataObj(*pPicMetaObj));
     lclPicMeta->setFrndLst(lclShareIds);
     return lclPicMeta;
@@ -73,6 +77,27 @@ Distributor::distribute(LstObj *pLstObj)
 
 void 
 Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
+                std::vector<std::string>>& hostPortShareIds, PicMetaDataObj *pPicMetaObj)
+{
+    for (auto [hostPort, shareIds] : hostPortShareIds)
+    {
+        auto [host, port] = hostPort;
+        DistribItem shareItem;
+        shareItem.host = host;
+        shareItem.port = port;
+    
+        if (m_pTrnsl->createServerPicMetaMsg(shareItem.msg, pPicMetaObj, shareIds))
+        {
+            std::lock_guard<std::mutex> lock(m_shareItemsMutex);
+            m_shareItems.push_back(shareItem);
+            m_shareItemsCV.notify_all();
+        }
+    }
+}
+
+
+void 
+Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
                 std::vector<std::string>>& hostPortShareIds, LstObj *pLstObj)
 {
     for (auto [hostPort, shareIds] : hostPortShareIds)
@@ -88,7 +113,6 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
             m_shareItems.push_back(shareItem);
             m_shareItemsCV.notify_all();
         }
-        //m_ntwIntf.sendMsg(buf, mlen, host, port);
     }
 }
 

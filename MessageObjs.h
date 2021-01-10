@@ -67,11 +67,11 @@ class PicMetaDataObj : public MsgObj
 		void setName(const char *pName, int len);
 		const std::vector<std::string>& getFrndLst(){return frndLst;}
 		void setFrndLst(const std::vector<std::string>& fl);
-		int getPicLen() {return picLen;}
+		int getPicLen() const {return picLen;}
 		void setPicLen(int len){picLen = len;}
 		int getWrittenLen() {return writtenLen;}
 		void setWrittenLen(int len) {writtenLen = len;}
-		std::string getFrnLstStr() {return frndLstStr;}
+		std::string getFrnLstStr() const {return frndLstStr;}
 		void setFrndLstStr(const char *pFlist, int len); 
 };
 

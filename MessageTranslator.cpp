@@ -97,31 +97,7 @@ MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>&
 	return true;
 }
 
-bool
-MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdLstName& shidlst)
-{
-	int msglen = 2*sizeof(long) + 4*sizeof(int) + shidlst.lstName.size() +1;
-	if (buflen < msglen)
-	{
-		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl;
-		return false;
-	}
-	constexpr int msgId = PIC_METADATA_MSG;
-	memcpy(pMsg, &msglen, sizeof(int));
-	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
-	memcpy(pMsg+2*sizeof(int), &shidlst.shareId, sizeof(long));
-	int picNameLen = shidlst.lstName.size() + 1;
-	int picNameLenOffset = 2*sizeof(int) + sizeof(long);
-	memcpy(pMsg+picNameLenOffset, &picNameLen, sizeof(int));
-	int picNameOffset = picNameLenOffset+sizeof(int);	
-	memcpy(pMsg+picNameOffset, shidlst.lstName.c_str(), picNameLen);
-	int picLenOffset = picNameOffset+picNameLen;
-	memcpy(pMsg+picLenOffset, &shidlst.picLen, sizeof(long));
-	int picOffset = picLenOffset + sizeof(long);
-	memcpy(pMsg + picOffset, &shidlst.picSoFar, sizeof(int));
-	*mlen = msglen;
-	return true;
-}
+
 
 bool
 MessageTranslator::getFrndLstMsg(char *pMsg, int *mlen, int buflen, const std::string& frndLst)
@@ -159,6 +135,62 @@ MessageTranslator::getShareIdRemoteHostMsg(char *buf, int *mlen, std::string hos
     return true;
 }
 
+bool
+MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdLstName& shidlst)
+{
+	int msglen = 2*sizeof(long) + 4*sizeof(int) + shidlst.lstName.size() +1;
+	if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPicMetaMsg " << std::endl;
+		return false;
+	}
+	constexpr int msgId = PIC_METADATA_MSG;
+	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+	memcpy(pMsg+2*sizeof(int), &shidlst.shareId, sizeof(long));
+	int picNameLen = shidlst.lstName.size() + 1;
+	int picNameLenOffset = 2*sizeof(int) + sizeof(long);
+	memcpy(pMsg+picNameLenOffset, &picNameLen, sizeof(int));
+	int picNameOffset = picNameLenOffset+sizeof(int);	
+	memcpy(pMsg+picNameOffset, shidlst.lstName.c_str(), picNameLen);
+	int picLenOffset = picNameOffset+picNameLen;
+	memcpy(pMsg+picLenOffset, &shidlst.picLen, sizeof(long));
+	int picOffset = picLenOffset + sizeof(long);
+	memcpy(pMsg + picOffset, &shidlst.picSoFar, sizeof(int));
+	*mlen = msglen;
+	return true;
+}
+bool 
+MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, const PicMetaDataObj *pPicMetaObj, const std::vector<std::string>& shareIds)
+{
+
+	constexpr int msgId = PIC_METADATA_MSG;
+    std::string name = pPicMetaObj->getName();
+    int nameLen = name.size() + 1;
+    std::string metaStr = pPicMetaObj->getFrnLstStr();
+    int metaStrLen = metaStr.size() + 1;
+    int msglen = 5*sizeof(int) + nameLen  + sizeof(long) + metaStrLen;
+    msg.reserve(msglen);    
+    char* pMsg = msg.data();
+	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    long shareId = pPicMetaObj->getShrId();
+    memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long));
+    constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+    memcpy(pMsg + namelenoffset, &nameLen, sizeof(int));
+    int nameoffset = namelenoffset + sizeof(int);
+    memcpy(pMsg + nameoffset, name.c_str(), nameLen);
+    int piclenoffset = nameoffset + nameLen;
+    int picLen = pPicMetaObj->getPicLen();
+    memcpy(pMsg + piclenoffset, &picLen, sizeof(int)); 
+    int metastrlenoffset = piclenoffset + sizeof(int);
+    memcpy(pMsg + metastrlenoffset, &metaStrLen, sizeof(int));
+    int metastroffset = metastrlenoffset + sizeof(int);
+    memcpy(pMsg + metastroffset, metaStr.c_str(), metaStrLen);
+    return true;
+}
+
+
 bool 
 MessageTranslator::createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, const std::vector<std::string>& shareIds)
 {
@@ -181,7 +213,7 @@ MessageTranslator::createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, c
     std::string lstShare = prefix + lst;
     int listLen = lstShare.size()+1;
      int nameLen =  pLstObj->getName().size() + 1;
-    int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long long);
+    int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long);
     
     msg.reserve(msglen);    
     char* pMsg = msg.data();

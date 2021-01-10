@@ -29,6 +29,7 @@ class Distributor
         
         void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, LstObj *pLsObj);
+        void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, PicMetaDataObj *pPicMetaObj);
         std::list <DistribItem> m_shareItems;
         std::mutex  m_shareItemsMutex;
         std::condition_variable m_shareItemsCV;        
