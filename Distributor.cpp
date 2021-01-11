@@ -14,6 +14,7 @@ Distributor::~Distributor()
 
 }
 
+
 std::unique_ptr<PicMetaDataObj> 
 Distributor::distribute(PicMetaDataObj *pPicMetaObj)
 {
@@ -73,6 +74,12 @@ Distributor::distribute(LstObj *pLstObj)
     populateShareIdHostMap(pLstObj->getAppId(), hostPortShareIds, remoteShareIds);
     createAndSendMsgs(hostPortShareIds, pLstObj);
     return lclShareIds;
+}
+
+void
+Distributor::distribute(PicObj *pPicObj)
+{
+
 }
 
 void 

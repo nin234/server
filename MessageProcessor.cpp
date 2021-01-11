@@ -238,6 +238,7 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 			dataStore.eraseFdMp(pPicObj->getFd());
 			sendPicNotifications(shareIds, pPicObj->getAppId(), picName);
 		}
+	    m_distributor->distribute(pPicObj);
 	
 	}
     else
