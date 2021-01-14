@@ -1,5 +1,7 @@
 #include <PicDistribDAO.h>
-
+#include <iostream>
+#include <sstream>
+#include <Util.h>
 
 PicDistribDAO::PicDistribDAO()
 {
