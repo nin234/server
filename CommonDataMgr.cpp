@@ -247,7 +247,7 @@ CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
 	if (write(fd, pPicObj->getBuf(), pPicObj->getBufLen()) == -1)
 	{
 		fdFdMp.erase(pPicObj->getFd());
-		fdPicMetaMp.erase(fd);
+		fdPicMetaMp.erase(pPicObj->getFd());
 		std::cout << "Failed to store picture " << pItr1->second->getName() << std::endl;
         cleanUpNtwFd = true;
 		return false;
@@ -261,8 +261,6 @@ CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
 		std::cout << "Picture " << pItr1->second->getName() << " stored picLen=" << pItr1->second->getPicLen() << " totalWritten=" << totLenWritten << std::endl;
 		storePicMetaData(pItr1->second.get());
 		close(fd);
-		fdFdMp.erase(fd);
-		fdPicMetaMp.erase(fd);
 		//signifies that the picture is completly stored , time to send push notification
 		return true;
 	}

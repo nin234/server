@@ -16,7 +16,7 @@ FrndLstDAO::FrndLstDAO()
 	rocksdb::Status  status = rocksdb::DB::Open(options, "/home/ninan/data/frndLstRocks", &m_db);
 	if (!status.ok())
 	{
-		std::cout << "Failed to open shareIdRocks database, exiting" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+		std::cout << "Failed to open frndLstRocks database, exiting" << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		exit(0);
 	}
 }
