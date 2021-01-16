@@ -235,10 +235,10 @@ MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg
 			
 			std::string picName = dataStore.getPicName(pPicObj->getFd());
 			std::cout << "Sending push notification to receive picture name=" << picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
-			dataStore.eraseFdMp(pPicObj->getFd());
 			sendPicNotifications(shareIds, pPicObj->getAppId(), picName);
 		}
-	    m_distributor->distribute(pPicObj);
+	    m_distributor->distributePicture(dataStore.getPicMetaObj(pPicObj->getFd()));
+		dataStore.eraseFdMp(pPicObj->getFd());
 	
 	}
     else

@@ -28,7 +28,7 @@
     PicMetaRocksDAO m_picMetaDAO;
     FrndLstMgr      m_frndLstMgr;
 	
-	  static thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> fdPicMetaMp;
+	  static thread_local std::unordered_map<int, std::shared_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
 
 	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
@@ -72,6 +72,7 @@
 
             void storeFrndLst(const FrndLstObj *pFrndObj);
             void updateFrndLstStatus(long shareId, int appId);
+            std::shared_ptr<PicMetaDataObj> getPicMetaObj(int fd);
   };
   #endif
 

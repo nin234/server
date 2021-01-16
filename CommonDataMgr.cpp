@@ -19,7 +19,7 @@
 thread_local std::unordered_map<int, int> 
 CommonDataMgr::fdFdMp;
 
-thread_local std::unordered_map<int, std::unique_ptr<PicMetaDataObj>> CommonDataMgr::fdPicMetaMp;
+thread_local std::unordered_map<int, std::shared_ptr<PicMetaDataObj>> CommonDataMgr::fdPicMetaMp;
 
 CommonDataMgr::CommonDataMgr()
 {
@@ -140,6 +140,18 @@ CommonDataMgr::storeDeviceTkn(int appId, long shareId, const std::string& devTkn
 		m_rocksDAO.storeDeviceTkn(appId, shareId, devTkn, platform);
 	}
 	return;
+}
+
+std::shared_ptr<PicMetaDataObj>
+CommonDataMgr::getPicMetaObj(int fd)
+{
+
+	auto pItr = fdPicMetaMp.find(fd);
+	if (pItr != fdPicMetaMp.end())
+	{
+		return pItr->second;
+	}
+    return std::shared_ptr<PicMetaDataObj>();    
 }
 
 std::string 

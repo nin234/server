@@ -1,6 +1,7 @@
 #include <Distributor.h>
 #include <Config.h>
 #include <chrono>
+#include <Util.h>
 
 using namespace std::chrono_literals;
 
@@ -39,6 +40,7 @@ Distributor::distribute(PicMetaDataObj *pPicMetaObj)
     std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
     populateShareIdHostMap(pPicMetaObj->getAppId(), hostPortShareIds, remoteShareIds);
     createAndSendMsgs(hostPortShareIds, pPicMetaObj);
+    storePicDistribInfo(hostPortShareIds, pPicMetaObj);
 
     std::unique_ptr<PicMetaDataObj> lclPicMeta(new PicMetaDataObj(*pPicMetaObj));
     lclPicMeta->setFrndLst(lclShareIds);
@@ -77,9 +79,30 @@ Distributor::distribute(LstObj *pLstObj)
 }
 
 void
-Distributor::distribute(PicObj *pPicObj)
+Distributor::distributePicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+        std::lock_guard<std::mutex> lock(m_shareItemsMutex);
+        m_pictures.push_back(pPicMetaObj);
+        m_shareItemsCV.notify_all();
+}
+
+void 
+Distributor::storePicDistribInfo(std::map<std::pair<std::string, int>, 
+                std::vector<std::string>>& hostPortShareIds, PicMetaDataObj *pPicMetaObj)
 {
 
+    for (auto [hostPort, shareIds] : hostPortShareIds)
+    {
+        auto [host, port] = hostPort;
+        std::string picUrl = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
+        bool bSend;
+        if (!m_picDistribDAO.get(picUrl, host, port, bSend))
+        {
+            bSend = false;
+            m_picDistribDAO.store(picUrl, host, port, bSend);
+        }
+        
+    }
 }
 
 void 
