@@ -2,6 +2,9 @@
 #include <Config.h>
 #include <chrono>
 #include <Util.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 using namespace std::chrono_literals;
 
@@ -191,8 +194,38 @@ Distributor::main()
             }
             m_shareItems.clear();
         }
+
+        if (m_pictures.size())
+        {
+            for (auto picture : m_pictures)
+            {
+                sendPicture(picture);
+            }
+        }
     }       
     return this;
 }
 
+void
+Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+    std::vector<PicNode> picNodes;
+     
+	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
+    if (!file.size())
+	{
+		std::cout << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	int fd  = -1;
+	fd = open(file.c_str(), O_RDONLY);
+	
+	if (fd == -1)
+	{
+		std::cout << "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	std::cout << "Opened file=" << file << " to distribute picture " << __FILE__ << ":" << __LINE__ << std::endl;
+
+}
 
