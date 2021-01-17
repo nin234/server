@@ -13,7 +13,7 @@
 thread_local SSL_CTX* SSLClntSocket::pCtx = NULL;
 
 
-SSLClntSocket::SSLClntSocket() : m_bConnected(false)
+SSLClntSocket::SSLClntSocket() : m_ssl(NULL), m_bConnected(false)
 {
 
 	if (!pCtx)
@@ -37,6 +37,10 @@ SSLClntSocket::SSLClntSocket() : m_bConnected(false)
 SSLClntSocket::~SSLClntSocket()
 {
     close(m_fd);
+    if (m_ssl)
+    {
+        SSL_free(m_ssl);
+    }
 }
 
 bool
@@ -116,6 +120,7 @@ SSLClntSocket::sendMsg(const char *buf, int mlen, const std::string& host, int p
         {
             std::cout << Util::now() << "Failed to send message not connected to host=" << host << " port=" << port
             << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+            *tryAgain = false;
             return false;
         }
         m_bConnected = true;
@@ -125,14 +130,20 @@ SSLClntSocket::sendMsg(const char *buf, int mlen, const std::string& host, int p
      if (ret <= 0)
      {
          int sslErr = SSL_get_error(m_ssl, ret);
-		std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
         switch(sslErr)
         {
             case SSL_ERROR_WANT_WRITE:
+            {
+                struct timespec ts;
+                ts.tv_sec = 0;
+                ts.tv_nsec = 100000;
+                nanosleep(&ts, &ts);
                 *tryAgain =true;
+            }
             break;
             
             default:
+		        std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
                 *tryAgain = false;
             break;
         }

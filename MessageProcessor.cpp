@@ -837,7 +837,7 @@ MessageProcessor::sendMsg(char *buf, int mlen, int fd, bool *tryAgain)
 
 	if (!pNtwIntf->sendMsg(buf, mlen, fd, tryAgain))
 	{
-		std::cout << "Failed to send message for fd=" << fd << std::endl;
+		//std::cout << "Failed to send message for fd=" << fd << std::endl;
 		return false;
 	}
 	return true;

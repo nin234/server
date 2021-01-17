@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <Constants.h>
 
 using namespace std::chrono_literals;
 
@@ -209,7 +210,6 @@ Distributor::main()
 void
 Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
-    std::vector<PicNode> picNodes;
      
 	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
     if (!file.size())
@@ -217,6 +217,9 @@ Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 		std::cout << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return;
 	}
+
+    std::vector<PicNode> picNodes;
+    m_picDistribDAO.getAll(file, picNodes);
 	int fd  = -1;
 	fd = open(file.c_str(), O_RDONLY);
 	
@@ -227,5 +230,29 @@ Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 	}
 	std::cout << "Opened file=" << file << " to distribute picture " << __FILE__ << ":" << __LINE__ << std::endl;
 
+    for (;;)
+    {
+        char buf[MAX_BUF];
+		constexpr int msgId = PIC_MSG;
+		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+        
+		int numread = read(fd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
+		if (!numread ||  numread == -1)
+		{
+			std::cout << "Finished reading file " << file << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+		    close(fd);
+			break;
+		}
+		int msglen = numread + 2*sizeof(int);
+		memcpy(buf, &msglen, sizeof(int));
+        
+        for (const auto& picNode : picNodes)
+        {
+            if (!picNode.send)
+            {
+                m_ntwIntf.sendMsg(buf, msglen, picNode.host, picNode.port);
+            }
+        }
+    }
 }
 

@@ -279,7 +279,8 @@ PictureSender::sendPicData()
                 off_t position = lseek(pItr->second.picFd, 0, SEEK_CUR);
                 position -= numread;
                 lseek(pItr->second.picFd, position, SEEK_SET); 
-                pItr->second.tryAgain = true;
+                //Disabling tryAgain for now and introducing 1 ms sleep
+                pItr->second.tryAgain = false;
 			    struct timeval now;
 			    gettimeofday(&now, NULL);
                 pItr->second.tryAgainTime = now.tv_sec;

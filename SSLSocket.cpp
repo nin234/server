@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <time.h>
 
 
 thread_local SSL_CTX* SSLSocket::pCtx = NULL;
@@ -23,6 +24,10 @@ SSLSocket::initializeSSL()
 SSLSocket::~SSLSocket()
 {
 
+    if (m_ssl)
+    {
+        SSL_free(m_ssl);
+    }
 }
 
 int 
@@ -46,7 +51,7 @@ SSLSocket::passwd_cb(char *buf,int size,
   
 }
 
-SSLSocket::SSLSocket() : m_bAccepted(false)
+SSLSocket::SSLSocket() : m_ssl(NULL), m_bAccepted(false)
 {
 	if (!pCtx)
 	{
@@ -132,18 +137,21 @@ SSLSocket::read(char *buf, int len, bool& readAgain)
 	{
         char lbuf[4096];
         int err = SSL_get_error(m_ssl, numRead);
-		std::cout << Util::now() << "Failed to read SSL message error code=" << err
-       << " " << __FILE__ << ":" << __LINE__ << std::endl;		
-        lbuf[0] = '\0';
-        strerror_r(errno, lbuf, 4096); 
-        std::cout << Util::now() << " error message=" << lbuf  << " " << __FILE__ << ":" << __LINE__ << std::endl; 
-        if (err == SSL_ERROR_WANT_READ)
+		if (err == SSL_ERROR_WANT_READ)
         {
-            sleep(1);
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 100000;
+            nanosleep(&ts, &ts);
             readAgain = true;
         }
         else
         {
+            std::cout << Util::now() << "Failed to read SSL message error code=" << err
+           << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+            lbuf[0] = '\0';
+            strerror_r(errno, lbuf, 4096); 
+            std::cout << Util::now() << " error message=" << lbuf  << " " << __FILE__ << ":" << __LINE__ << std::endl; 
             readAgain = false;
         }
 		return numRead;
@@ -165,14 +173,20 @@ SSLSocket::write(char *buf, int mlen, bool *tryAgain)
 	if (ret <= 0)
 	{
         int sslErr = SSL_get_error(m_ssl, ret);
-		std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
         switch(sslErr)
         {
             case SSL_ERROR_WANT_WRITE:
+            {
+                struct timespec ts;
+                ts.tv_sec = 0;
+                ts.tv_nsec = 100000;
+                nanosleep(&ts, &ts);
                 *tryAgain =true;
+            }
             break;
             
             default:
+		    std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
                 *tryAgain = false;
             break;
         }
