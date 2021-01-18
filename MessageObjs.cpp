@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <sys/time.h>
+#include <Config.h>
 
 void
 MsgObjDeltr::operator () (MsgObj *pMsg)
@@ -86,6 +87,24 @@ PicMetaDataObj::PicMetaDataObj()
 	picLen =0;
 	writtenLen =0;
 	std::cout << "created PicMetaDataObj " << __FILE__ << ":" << __LINE__ << std::endl;
+}
+
+std::vector<std::string>
+PicMetaDataObj::getLocalFrndLst() const
+{
+    std::vector<std::string> lclShareIds;
+
+    for (auto shareIdStr : frndLst)
+    {
+        long nShareid = std::stol(shareIdStr);
+        if (nShareid >= Config::Instance().getStartShareId() && nShareid <= Config::Instance().getEndShareId())
+        {
+            lclShareIds.push_back(shareIdStr);
+        }
+    }
+   
+    return lclShareIds; 
+
 }
 
 void

@@ -295,7 +295,7 @@ CommonDataMgr::storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 	int appId = pPicMetaObj->getAppId();
 	long shareIdLst = pPicMetaObj->getShrId();
 	std::string name = pPicMetaObj->getName();
-	const std::vector<std::string>& shareIds = pPicMetaObj->getFrndLst();
+	std::vector<std::string> shareIds = pPicMetaObj->getLocalFrndLst();
 	std::cout << "Storing picMetaData appId=" << appId << " shareIdLst=" << shareIdLst << " name=" << name << " picLen=" << pPicMetaObj->getPicLen();
     long val = pPicMetaObj->getPicLen();
     m_picMetaDAO.store(appId, shareIdLst, name, val, shareIds);
