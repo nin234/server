@@ -12,13 +12,13 @@ MessageEnqueuer::~MessageEnqueuer()
 }
 
 void
-MessageEnqueuer::enqMsg(std::unique_ptr<MsgObj, MsgObjDeltr> pMsg)
+MessageEnqueuer::enqMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	pMsgsFdMp[pMsg->getFd()].push_back(std::move(pMsg));
+	pMsgsFdMp[pMsg->getFd()].push_back(pMsg);
 	return;
 }
 
-std::unique_ptr<MsgObj, MsgObjDeltr>
+std::shared_ptr<MsgObj>
 MessageEnqueuer::getNextMsg(int fd)
 {
 	auto pItr = pMsgsFdMp.find(fd);
@@ -26,7 +26,7 @@ MessageEnqueuer::getNextMsg(int fd)
 	{
 		if (!pItr->second.empty())
 		{
-			std::unique_ptr<MsgObj, MsgObjDeltr> pMsg = std::move(pItr->second.front());
+			auto pMsg = pItr->second.front();
 			pItr->second.pop_front();
 			if (pItr->second.empty())
 			{
@@ -34,9 +34,6 @@ MessageEnqueuer::getNextMsg(int fd)
 			}
 			return pMsg;
 		}
-		std::unique_ptr<MsgObj, MsgObjDeltr> pNll{};
-		return pNll;
 	}
-	std::unique_ptr<MsgObj, MsgObjDeltr> pNll{};
-	return pNll;
+	return std::shared_ptr<MsgObj>() ;
 }

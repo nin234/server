@@ -99,7 +99,7 @@ FrndLstMgr::updateStatus(long shareId, int appId)
 
 
 void
-FrndLstMgr::storeFrndLst(const FrndLstObj *pFrndObj)
+FrndLstMgr::storeFrndLst(std::shared_ptr<FrndLstObj> pFrndObj)
 	
 {
 	std::cout << "Storing friendlist shareId=" << pFrndObj->getShrId() << " friendList=" << pFrndObj->getFrndLst() << " " << __FILE__ << ":" << __LINE__ << std::endl;	
@@ -118,7 +118,7 @@ FrndLstMgr::storeFrndLst(long shareId, const std::string& frndLst)
 }
 
 void
-FrndLstMgr::populateDAO(const FrndLstObj *pFrndObj, FrndLst& frndLst)
+FrndLstMgr::populateDAO(std::shared_ptr<FrndLstObj> pFrndObj, FrndLst& frndLst)
 {
     switch (pFrndObj->getAppId())
     {

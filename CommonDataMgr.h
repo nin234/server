@@ -31,10 +31,10 @@
 	  static thread_local std::unordered_map<int, std::shared_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
 
-	 bool shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset); 
-	  int openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj);
+	 bool shouldUpload(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset); 
+	  int openPicFile(long shareId, int appId, const std::string& picName, std::shared_ptr<PicObj> pPicObj);
 	  
-	 void storePicMetaData(PicMetaDataObj *pPicMetaObj);
+	 void storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
           public: 
                   CommonDataMgr();
                   virtual ~CommonDataMgr();
@@ -51,11 +51,11 @@
 
       		void storeItemAndLstShareInfo(int appId, long shareIdLst, const std::string& name, const std::string& list, const std::vector<std::string>& shareIds);
 
-                  bool storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset);
+                  bool storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset);
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);
 		  void eraseFdMp(int fd);
-		  bool storePic(PicObj *pObj, bool& cleanUpFd);
+		  bool storePic(std::shared_ptr<PicObj> pObj, bool& cleanUpFd);
 		  static CommonDataMgr& Instance();
 		  void getDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
       void getAndroidDeviceTkns(int appId, const std::vector<std::string>& shareIds, std::vector<std::string>& tokens);
@@ -70,7 +70,7 @@
             void updateTemplLstShareInfo(int appId, long shareId, long frndShareId, const std::string& itemName);
             void storeTemplItem(int appId, long shareId, const std::string& name, const std::string& list);
 
-            void storeFrndLst(const FrndLstObj *pFrndObj);
+            void storeFrndLst(std::shared_ptr<FrndLstObj> pFrndObj);
             void updateFrndLstStatus(long shareId, int appId);
             std::shared_ptr<PicMetaDataObj> getPicMetaObj(int fd);
   };

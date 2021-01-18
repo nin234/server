@@ -15,7 +15,7 @@ SmartMsgMsgProcessor::~SmartMsgMsgProcessor()
 }
 
 void
-SmartMsgMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+SmartMsgMsgProcessor::processMsg(std::shared_ptr<MsgObj> pMsg)
 {
 
 	return;

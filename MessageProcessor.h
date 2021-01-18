@@ -32,29 +32,28 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 	std::shared_ptr<ApplePush> pAppleNotfy;
     std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     
-    void processGetItemPics(GetItemObj *pGetItemObj);
-    void sendUpdatedMaxShareIdIfRequd(GetItemObj *pGetItemObj);
+    void processGetItemPics(std::shared_ptr<GetItemObj> pGetItemObj);
+    void sendUpdatedMaxShareIdIfRequd(std::shared_ptr<GetItemObj> pGetItemObj);
     void sendFrndLst(int appId, long shareId, int fd, bool bDontCheckUpdFlag);
 
 	void sendPicNotifications(const std::vector<std::string>& shareIds, int appId, const std::string& picName);
-	void processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+	void processShareIdLocal(std::shared_ptr<MsgObj> pMsg);
 	protected:
 		void sendArchiveMsg(const char *pMsg, size_t len, unsigned int msg_prio);
 		bool sendMsg(char *buf, int mlen, int fd);
 		bool sendMsg(char *buf, int mlen, int fd, bool *tryAgain);
-		void processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processArchvItemMsg(std::shared_ptr<MsgObj> pMsg);
+		void processItemMsg(std::shared_ptr<MsgObj> pMsg);
 
-		void processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
+		void processItemMsgDBInsert(std::shared_ptr<MsgObj> pMsg);
 
-		void processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-        void processShouldDownLoadMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp);
+		void processDeviceTknMsg(std::shared_ptr<MsgObj> pMsg);
+		void processGetItemMsgFromDB(std::shared_ptr<MsgObj> pMsg);
+		void processPicMetaDataMsg(std::shared_ptr<MsgObj> pMsg);
+		void processPicMsg(std::shared_ptr<MsgObj> pMsg);
+		void processPicDoneMsg(std::shared_ptr<MsgObj> pMsg);
+        void processShouldDownLoadMsg(std::shared_ptr<MsgObj> pMsg);
+		void processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp);
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getReply(char *buf, int *mlen, int msgTyp);
 		CommonDataMgr& dataStore;
@@ -69,10 +68,10 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		void setMaxFd(int mfd);
 		void setDcdTransl(MessageDecoder *pDcd, MessageTranslator *pTrnsl);
 		void processRequests();
-		void processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processStoreIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		void processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg);
-		virtual void processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)=0;
+		void processShareIdMsg(std::shared_ptr<MsgObj> pMsg);
+		void processStoreIdMsg(std::shared_ptr<MsgObj> pMsg);
+		void processFrndLstMsg(std::shared_ptr<MsgObj> pMsg);
+		virtual void processMsg(std::shared_ptr<MsgObj> pMsg)=0;
 		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
         void setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
 		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);

@@ -12,10 +12,11 @@
 
 class MessageDecoder
 {
+	std::list<std::shared_ptr<MsgObj>> pMsgs;
+
 	bool createShareIdObj(char *buffer,  ssize_t mlen, int fd);
 	bool createStoreIdObj(char *buffer,  ssize_t mlen, int fd);
 	bool createFrndLstObj(char *buffer, ssize_t mlen, int fd);
-	std::list<std::unique_ptr<MsgObj, MsgObjDeltr>> pMsgs;
 	bool createTemplLstObj(char *buffer,  ssize_t mlen, int fd);
 	bool createLstObj(char *buffer,  ssize_t mlen, int fd);
 	bool createDeviceTknObj(char *buffer, ssize_t mlen, int fd);
@@ -25,15 +26,14 @@ class MessageDecoder
 	bool createPicObj(char *buffer, ssize_t mlen, int fd);
     bool createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd);
 
-	std::map<int, PicObj*> picObjs;
 	protected:
-		void addMsgObj(std::unique_ptr<MsgObj, MsgObjDeltr> pMsg);
+		void addMsgObj(std::shared_ptr<MsgObj> pMsg);
 
 	public:
 		MessageDecoder();
 		virtual ~MessageDecoder();
 		bool operator ()(char* buffer, ssize_t mlen, int fd);
-		std::unique_ptr<MsgObj, MsgObjDeltr> getNextMsg();
+		std::shared_ptr<MsgObj> getNextMsg();
 		virtual bool decodeMsg(char *buffer, ssize_t mlen, int fd)=0;
 		virtual int getAppId() =0;
 };

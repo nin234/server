@@ -116,7 +116,7 @@ MessageProcessor::onCloseFd(int fd)
 
 
 void
-MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, int nMsgTyp)
+MessageProcessor::processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp)
 {
     if (nMsgTyp >= NO_COMMON_MSGS)
     {
@@ -148,14 +148,7 @@ MessageProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg, i
 			return processDeviceTknMsg(pMsg);
 		case GET_ITEMS:
         {
-            if (Config::Instance().useDB())
-            {
 			    return processGetItemMsgFromDB(pMsg);
-            }
-            else
-            {
-			    return processGetItemMsg(pMsg);
-            }
         }
 		case PIC_METADATA_MSG:
 			return processPicMetaDataMsg(pMsg);
@@ -179,7 +172,7 @@ MessageProcessor::processRequests()
 {
 		for (;;)
 	{
-		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{m_pDcd->getNextMsg()};
+		std::shared_ptr<MsgObj> pMsg{m_pDcd->getNextMsg()};
 		if (!pMsg)
 			break;
 		int nMsgTyp = pMsg->getMsgTyp();
@@ -192,7 +185,7 @@ MessageProcessor::processRequests()
 		}	
 		if (nMsgTyp != SHOULD_DOWNLOAD_MSG && m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
-			pMsgEnq->enqMsg(std::move(pMsg));	
+			pMsgEnq->enqMsg(pMsg);	
 			continue;
 		}
 		processMsg(pMsg, nMsgTyp);						
@@ -202,9 +195,9 @@ MessageProcessor::processRequests()
 
     
     void
-    MessageProcessor::processShouldDownLoadMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+    MessageProcessor::processShouldDownLoadMsg(std::shared_ptr<MsgObj> pMsg)
     {
-        ShouldDownLoad  *pShouldDownLoad  = dynamic_cast<ShouldDownLoad*>(pMsg.get());
+        auto pShouldDownLoad  = std::dynamic_pointer_cast<ShouldDownLoad>(pMsg);
         if (!pShouldDownLoad )
         {
             std::cout << "Invalid message received in MessageProcessor::processShouldDownLoadMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
@@ -215,9 +208,9 @@ MessageProcessor::processRequests()
     }
 
 void
-MessageProcessor::processPicMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processPicMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	PicObj *pPicObj = dynamic_cast<PicObj*>(pMsg.get());
+	auto pPicObj = std::dynamic_pointer_cast<PicObj>(pMsg);
 	if (!pPicObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processPicMsg " << std::endl;
@@ -270,18 +263,17 @@ MessageProcessor::sendPicNotifications(const std::vector<std::string>& shareIds,
 }
 
 void
-MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processPicMetaDataMsg(const std::shared_ptr<MsgObj> pMsg)
 {
 
-	PicMetaDataObj *pPicMetaObjAll = dynamic_cast<PicMetaDataObj*>(pMsg.get());
-	if (!pPicMetaObjAll)
+	auto pPicMetaObj = std::dynamic_pointer_cast<PicMetaDataObj>(pMsg);
+	if (!pPicMetaObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processPicMetaDataMsg " << std::endl;
 		return;
 	}
-	std::cout << "Received " << *pPicMetaObjAll << " " << __FILE__ << ":" << __LINE__ << std::endl;	
-	auto pPicMetaObjUnqPtr  = m_distributor->distribute(pPicMetaObjAll);
-    auto pPicMetaObj = pPicMetaObjUnqPtr.get();
+	std::cout << "Received " << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	m_distributor->distribute(pPicMetaObj);
 	int picOffset = 0;
 	bool bShoulUpload = dataStore.storePicMetaData(pPicMetaObj, &picOffset);
 	const std::vector<std::string>&  shareIds = pPicMetaObj->getFrndLst();
@@ -301,9 +293,9 @@ MessageProcessor::processPicMetaDataMsg(const std::unique_ptr<MsgObj, MsgObjDelt
 }
 
 void
-MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processPicDoneMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	PicDoneObj *pPicDoneObj = dynamic_cast<PicDoneObj*>(pMsg.get());
+	auto pPicDoneObj = std::dynamic_pointer_cast<PicDoneObj>(pMsg);
 	if (!pPicDoneObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processPicDoneMsg " << std::endl;
@@ -324,7 +316,7 @@ MessageProcessor::processPicDoneMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 }
 
 void
-MessageProcessor::sendUpdatedMaxShareIdIfRequd(GetItemObj *pGetItemObj)
+MessageProcessor::sendUpdatedMaxShareIdIfRequd(std::shared_ptr<GetItemObj> pGetItemObj)
 {
     long maxAppShareId = pGetItemObj->getMaxShareId();
     long maxShareId = ShareIdMgr::Instance().readShareId();
@@ -361,9 +353,9 @@ MessageProcessor::sendUpdatedMaxShareIdIfRequd(GetItemObj *pGetItemObj)
 }
 
 void
-MessageProcessor::processGetItemMsgFromDB(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processGetItemMsgFromDB(std::shared_ptr<MsgObj> pMsg)
 {
-	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
+	auto pGetItemObj = std::dynamic_pointer_cast<GetItemObj>(pMsg);
 	if (!pGetItemObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processGetItemMsg " << std::endl;
@@ -425,63 +417,10 @@ MessageProcessor::sendFrndLst(int appId, long shareId, int fd, bool bDontCheckUp
     }
 }
 
-void
-MessageProcessor::processGetItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
-{
-	GetItemObj *pGetItemObj = dynamic_cast<GetItemObj*>(pMsg.get());
-	if (!pGetItemObj)
-	{
-		std::cout << "Invalid message received in MessageProcessor::processGetItemMsg " << std::endl;
-		return;
-	}
 
-	std::cout << Util::now() << "Received GetItem Msg=" << *pGetItemObj << " " << __FILE__ << ":" << __LINE__ << std::endl;
-
-	std::map<shrIdLstName, std::string> lstNameMp;
-	dataStore.getShareLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), lstNameMp);
-	char archbuf[32768];
-	int archlen = 0;
-	for (auto pItr = lstNameMp.begin(); pItr != lstNameMp.end(); ++pItr)
-	{
-		std::cout << " Send item details " << pItr->first << " " << pItr->second << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first.lstName, pItr->second, SHARE_ITEM_MSG, pItr->first.shareId))
-		{
-			if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
-			{
-				std::cout << "Sent Item=" << pItr->first.lstName << " from shareId=" << pItr->first.shareId <<" to shareId=" << pGetItemObj->getShrId() << " length=" << archlen << " " << __FILE__ << ":" << __LINE__ << std::endl;
-				dataStore.updateLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName);
-				if (ArchiveMsgCreator::createShareLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName, 32768))
-					sendArchiveMsg(archbuf, archlen, 10);	
-			}
-		}
-	}
-    
-    std::map<shrIdLstName, std::string> templLstNameMp;
-    dataStore.getShareTemplLists(pGetItemObj->getAppId(), pGetItemObj->getShrId(), templLstNameMp);
-    
-    archlen = 0;
-    
-    for(auto pItr = templLstNameMp.begin(); pItr != templLstNameMp.end(); ++pItr)
-    {
-        std::string itemName = std::to_string(pItr->first.shareId);
-        itemName += ":::";
-        itemName += pItr->first.lstName;
-        if (m_pTrnsl->getListMsg(archbuf, &archlen, 32768, pItr->first.lstName, pItr->second, SHARE_TEMPL_ITEM_MSG, pItr->first.shareId))
-        {
-            if (sendMsg(archbuf, archlen, pGetItemObj->getFd()))
-            {
-                dataStore.updateTemplLstShareInfo(pGetItemObj->getAppId(), pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName);
-                if (ArchiveMsgCreator::createShareTemplLstMsg(archbuf, archlen, pGetItemObj->getAppId(), true, pGetItemObj->getShrId(), pItr->first.shareId, pItr->first.lstName, 32768))
-                    sendArchiveMsg(archbuf, archlen, 10);
-            }
-        }
-    }
-    processGetItemPics(pGetItemObj);
-    return;
-}
     
 void
-MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
+MessageProcessor::processGetItemPics(std::shared_ptr<GetItemObj> pGetItemObj)
 {
     std::vector<shrIdLstName> picNamesShIds;
     dataStore.getPictureNames(pGetItemObj->getAppId(), pGetItemObj->getShrId(), picNamesShIds);
@@ -531,9 +470,9 @@ MessageProcessor::processGetItemPics(GetItemObj *pGetItemObj)
 }
 
 void
-MessageProcessor::processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processItemMsgDBInsert(std::shared_ptr<MsgObj> pMsg)
 {
-	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
+	auto pLstObj = std::dynamic_pointer_cast<LstObj>(pMsg);
 	if (!pLstObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processItemMsg " << std::endl;
@@ -578,9 +517,9 @@ MessageProcessor::processItemMsgDBInsert(const std::unique_ptr<MsgObj, MsgObjDel
 
 
 void
-MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processItemMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	LstObj *pLstObj = dynamic_cast<LstObj*>(pMsg.get());
+	auto pLstObj = std::dynamic_pointer_cast<LstObj>(pMsg);
 	if (!pLstObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processItemMsg " << std::endl;
@@ -640,9 +579,9 @@ MessageProcessor::processItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 }
 
 void
-MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processArchvItemMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	TemplLstObj *pTmplObj = dynamic_cast<TemplLstObj*>(pMsg.get());
+	auto pTmplObj = std::dynamic_pointer_cast<TemplLstObj>(pMsg);
 	if (!pTmplObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processArchvItemMsg " << std::endl;
@@ -667,23 +606,16 @@ MessageProcessor::processArchvItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 }
 
 void
-MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processDeviceTknMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	DeviceTknObj *pDevTknObj = dynamic_cast<DeviceTknObj*>(pMsg.get());
+	auto pDevTknObj = std::dynamic_pointer_cast<DeviceTknObj>(pMsg);
 	if (!pDevTknObj)
 	{
 		std::cout << "Invalid message received in MessageProcessor::processDeviceTknMsg " << std::endl;
 		return;
 	}
 	dataStore.storeDeviceTkn(pDevTknObj->getAppId(), pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn(), pDevTknObj->getPlatform());
-    if (!Config::Instance().useDB())
-    {
-        std::unique_ptr<char> pArchMsg;
-        char archbuf[8192];
-        int archlen = 0;
-        if (ArchiveMsgCreator::createDevTknMsg(archbuf, archlen, pDevTknObj->getAppId(),  pDevTknObj->getShrId(), pDevTknObj->getDeviceTkn(), pDevTknObj->getPlatform()))
-            sendArchiveMsg(archbuf, archlen, 10);	
-    }
+    
 	char buf[1024];
 	int mlen=0;
 	if (m_pTrnsl->getReply(buf, &mlen, STORE_DEVICE_TKN_RPLY_MSG))
@@ -696,9 +628,9 @@ MessageProcessor::processDeviceTknMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>
 }
 
 void
-MessageProcessor::processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processShareIdLocal(std::shared_ptr<MsgObj> pMsg)
 {
-	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
+	auto pShObj = std::dynamic_pointer_cast<ShareIdObj>(pMsg);
 
 	long shareId = 0;
 	if (pShObj)
@@ -724,9 +656,9 @@ MessageProcessor::processShareIdLocal(const std::unique_ptr<MsgObj, MsgObjDeltr>
 }
 
 void
-MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processShareIdMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	ShareIdObj *pShObj = dynamic_cast<ShareIdObj*>(pMsg.get());
+	auto pShObj = std::dynamic_pointer_cast<ShareIdObj>(pMsg);
 	if (pShObj)
 	{
         auto [host, port] = DistribMgr::Instance().getNewShareIdHost(pShObj->getAppId()); 
@@ -753,15 +685,15 @@ MessageProcessor::processShareIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& 
 }
 
 void
-MessageProcessor::processStoreIdMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processStoreIdMsg(std::shared_ptr<MsgObj> pMsg)
 {
 		return;
 }
 
 void
-MessageProcessor::processFrndLstMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+MessageProcessor::processFrndLstMsg(std::shared_ptr<MsgObj> pMsg)
 {
-	FrndLstObj *pFrndObj = dynamic_cast<FrndLstObj*>(pMsg.get());
+	auto pFrndObj = std::dynamic_pointer_cast<FrndLstObj>(pMsg) ;
 	if (!pFrndObj)
 		return;
 	std::cout << "Received friend list message shareId=" << pFrndObj->getShrId() << " friend list=" << pFrndObj->getFrndLst() <<  " " << __FILE__ << ":" << __LINE__  << std::endl;
@@ -802,7 +734,7 @@ MessageProcessor::picDone(int fd)
 {
 	for (;;)
 	{
-		std::unique_ptr<MsgObj, MsgObjDeltr> pMsg{pMsgEnq->getNextMsg(fd)};
+		auto pMsg{pMsgEnq->getNextMsg(fd)};
 		if (!pMsg)
 			break;
 		int nMsgTyp = pMsg->getMsgTyp();
@@ -810,7 +742,7 @@ MessageProcessor::picDone(int fd)
 			continue;
 		if (m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
-			pMsgEnq->enqMsg(std::move(pMsg));	
+			pMsgEnq->enqMsg(pMsg);	
 			break;
 		}
 		processMsg(pMsg, nMsgTyp);						

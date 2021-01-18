@@ -34,7 +34,7 @@ EasyGrocDecoder::decodeMsg(char *buffer, ssize_t mlen, int fd)
 bool
 EasyGrocDecoder::createShareTemplLstObj(char *buffer,  ssize_t mlen, int fd)
 {
-    std::unique_ptr<TemplLstObj, MsgObjDeltr> pMsg{new TemplLstObj(), MsgObjDeltr()};
+	std::shared_ptr<TemplLstObj> pMsg = std::make_shared<TemplLstObj>();
     
     pMsg->setMsgTyp(SHARE_TEMPL_ITEM_MSG);
     pMsg->setFd(fd);
@@ -53,10 +53,14 @@ EasyGrocDecoder::createShareTemplLstObj(char *buffer,  ssize_t mlen, int fd)
     pMsg->setName(buffer + nameoffset, nameLen);
     int templlstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
     if (templLen)
+    {
         pMsg->setTemplList(buffer+templlstoffset, templLen);
+    }
     else
+    {
         return false;
-    addMsgObj(std::move(pMsg));
+    }
+	addMsgObj(pMsg);
     return true;
 }
 

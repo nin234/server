@@ -181,7 +181,7 @@ CommonDataMgr::getPicShareIds(int fd)
 }
 
 bool 
-CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset)
+CommonDataMgr::shouldUpload(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset)
 {
 	*picOffset = 0;
 	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
@@ -207,7 +207,7 @@ CommonDataMgr::shouldUpload(PicMetaDataObj *pPicMetaObj, int *picOffset)
 }
 
 int
-CommonDataMgr::openPicFile(long shareId, int appId, const std::string& picName, PicObj *pPicObj)
+CommonDataMgr::openPicFile(long shareId, int appId, const std::string& picName, std::shared_ptr<PicObj> pPicObj)
 {
 	int fd  = -1;
 	std::string file = Util::constructPicFile(shareId, appId, picName);
@@ -231,7 +231,7 @@ CommonDataMgr::openPicFile(long shareId, int appId, const std::string& picName, 
 }
 
 bool
-CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
+CommonDataMgr::storePic(std::shared_ptr<PicObj> pPicObj, bool& cleanUpNtwFd)
 {
     cleanUpNtwFd = false;
 	auto pItr = fdFdMp.find(pPicObj->getFd());
@@ -271,7 +271,7 @@ CommonDataMgr::storePic(PicObj *pPicObj, bool& cleanUpNtwFd)
 	if (totLenWritten >= pItr1->second->getPicLen())
 	{
 		std::cout << "Picture " << pItr1->second->getName() << " stored picLen=" << pItr1->second->getPicLen() << " totalWritten=" << totLenWritten << std::endl;
-		storePicMetaData(pItr1->second.get());
+		storePicMetaData(pItr1->second);
 		close(fd);
 		//signifies that the picture is completly stored , time to send push notification
 		return true;
@@ -290,7 +290,7 @@ CommonDataMgr::eraseFdMp(int fd)
 }
 
 void 
-CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
+CommonDataMgr::storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
 	int appId = pPicMetaObj->getAppId();
 	long shareIdLst = pPicMetaObj->getShrId();
@@ -303,13 +303,12 @@ CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj)
 }
 
 bool 
-CommonDataMgr::storePicMetaData(PicMetaDataObj *pPicMetaObj, int *picOffset)
+CommonDataMgr::storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset)
 {
 	if (shouldUpload(pPicMetaObj, picOffset))
 	{
 		std::cout << " fd=" << pPicMetaObj->getFd() << " " << __FILE__ << ":" << __LINE__ << std::endl;
-		std::unique_ptr<PicMetaDataObj> pPicMetaUPtr(pPicMetaObj);
-		fdPicMetaMp[pPicMetaObj->getFd()] = std::move(pPicMetaUPtr);
+		fdPicMetaMp[pPicMetaObj->getFd()] = pPicMetaObj;
 		return true;
 	}
 	else
@@ -556,7 +555,7 @@ CommonDataMgr::getShareTemplLists(int appId, long shareId, std::map<shrIdLstName
 }
 
 void
-CommonDataMgr::storeFrndLst(const FrndLstObj *pFrndObj)
+CommonDataMgr::storeFrndLst(std::shared_ptr<FrndLstObj> pFrndObj)
 {
     m_frndLstMgr.storeFrndLst(pFrndObj);
 }

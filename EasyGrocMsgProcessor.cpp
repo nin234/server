@@ -22,7 +22,7 @@ EasyGrocMsgProcessor::~EasyGrocMsgProcessor()
 }
 
 void
-EasyGrocMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+EasyGrocMsgProcessor::processMsg(std::shared_ptr<MsgObj> pMsg)
 {
 	int msgTyp = pMsg->getMsgTyp();
 	switch(msgTyp)
@@ -37,9 +37,9 @@ EasyGrocMsgProcessor::processMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMs
 }
 
 void
-EasyGrocMsgProcessor::processTemplItemMsg(const std::unique_ptr<MsgObj, MsgObjDeltr>& pMsg)
+EasyGrocMsgProcessor::processTemplItemMsg(std::shared_ptr<MsgObj> pMsg)
 {
-    TemplLstObj *pTmplObj = dynamic_cast<TemplLstObj*>(pMsg.get());
+    auto pTmplObj = std::dynamic_pointer_cast<TemplLstObj>(pMsg);
     if (!pTmplObj)
     {
         std::cout << "Invalid message received in  EasyGrocMsgProcessor::processTemplItemMsg" << std::endl;

@@ -10,14 +10,14 @@
 class FrndLstMgr
 {
     FrndLstDAO m_frndLstDAO;
-    void populateDAO(const FrndLstObj *pFrndObj, FrndLst& frndLst);
+    void populateDAO(std::shared_ptr<FrndLstObj> pFrndObj, FrndLst& frndLst);
 
     bool returnEmptyFrndLst(const FrndLst& frndLst, int appId);
 	
   public:
 	FrndLstMgr();
 	~FrndLstMgr();
-	void storeFrndLst(const FrndLstObj *pFrndObj);
+	void storeFrndLst(std::shared_ptr<FrndLstObj> pFrndObj);
 	void storeFrndLst(long shareId, const std::string& frndLst);
 
 

@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <Constants.h>
 
 using namespace std::chrono_literals;
@@ -20,8 +21,8 @@ Distributor::~Distributor()
 }
 
 
-std::unique_ptr<PicMetaDataObj> 
-Distributor::distribute(PicMetaDataObj *pPicMetaObj)
+void
+Distributor::processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
 
     std::vector<std::string> lclShareIds;
@@ -46,14 +47,12 @@ Distributor::distribute(PicMetaDataObj *pPicMetaObj)
     createAndSendMsgs(hostPortShareIds, pPicMetaObj);
     storePicDistribInfo(hostPortShareIds, pPicMetaObj);
 
-    std::unique_ptr<PicMetaDataObj> lclPicMeta(new PicMetaDataObj(*pPicMetaObj));
-    lclPicMeta->setFrndLst(lclShareIds);
-    return lclPicMeta;
+    return;
 
 }
 
 std::vector<std::string>
-Distributor::distribute(LstObj *pLstObj)
+Distributor::distribute(std::shared_ptr<LstObj> pLstObj)
 {
 
     std::vector<std::string> shareIds;
@@ -83,6 +82,14 @@ Distributor::distribute(LstObj *pLstObj)
 }
 
 void
+Distributor::distribute(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+        std::lock_guard<std::mutex> lock(m_shareItemsMutex);
+        m_picMetaDatas.push_back(pPicMetaObj);
+        m_shareItemsCV.notify_all();
+}
+
+void
 Distributor::distributePicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
         std::lock_guard<std::mutex> lock(m_shareItemsMutex);
@@ -92,7 +99,7 @@ Distributor::distributePicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 
 void 
 Distributor::storePicDistribInfo(std::map<std::pair<std::string, int>, 
-                std::vector<std::string>>& hostPortShareIds, PicMetaDataObj *pPicMetaObj)
+                std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
 
     for (auto [hostPort, shareIds] : hostPortShareIds)
@@ -111,7 +118,7 @@ Distributor::storePicDistribInfo(std::map<std::pair<std::string, int>,
 
 void 
 Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
-                std::vector<std::string>>& hostPortShareIds, PicMetaDataObj *pPicMetaObj)
+                std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
     for (auto [hostPort, shareIds] : hostPortShareIds)
     {
@@ -132,7 +139,8 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
 
 void 
 Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
-                std::vector<std::string>>& hostPortShareIds, LstObj *pLstObj)
+                std::vector<std::string>>& hostPortShareIds, 
+                std::shared_ptr<LstObj> pLstObj)
 {
     for (auto [hostPort, shareIds] : hostPortShareIds)
     {

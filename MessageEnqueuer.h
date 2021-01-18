@@ -8,12 +8,12 @@
 
 	class MessageEnqueuer
 	{
-			std::map<int, std::list<std::unique_ptr<MsgObj, MsgObjDeltr>>> pMsgsFdMp;
+			std::map<int, std::list<std::shared_ptr<MsgObj>>> pMsgsFdMp;
 
 		public:
 			MessageEnqueuer();
 			~MessageEnqueuer();
-			void enqMsg(std::unique_ptr<MsgObj, MsgObjDeltr> pMsg);
-			std::unique_ptr<MsgObj, MsgObjDeltr> getNextMsg(int fd);
+			void enqMsg(std::shared_ptr<MsgObj> pMsg);
+			std::shared_ptr<MsgObj> getNextMsg(int fd);
 	};
 #endif

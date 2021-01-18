@@ -161,7 +161,7 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 	return true;
 }
 bool 
-MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, const PicMetaDataObj *pPicMetaObj, const std::vector<std::string>& shareIds)
+MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds)
 {
 
 	constexpr int msgId = PIC_METADATA_MSG;
@@ -197,7 +197,7 @@ MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, const PicMetaD
 
 
 bool 
-MessageTranslator::createShareItemMsg(std::vector<char>& msg, LstObj *pLstObj, const std::vector<std::string>& shareIds)
+MessageTranslator::createShareItemMsg(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
 {
 
 	std::string::size_type xpos = pLstObj->getList().find(":::");
@@ -266,7 +266,7 @@ MessageTranslator::getListMsg(char *pMsg, int *mlen, int buflen, const std::stri
 }
 
 bool
-MessageTranslator::getShouldUploadMsg(char *pMsg, int *mlen, const PicMetaDataObj *pPicMetaObj, bool shouldUpload, int picOffset)
+MessageTranslator::getShouldUploadMsg(char *pMsg, int *mlen, std::shared_ptr<PicMetaDataObj> pPicMetaObj, bool shouldUpload, int picOffset)
 {
 	int msglen = 5*sizeof(int) + sizeof(long) + pPicMetaObj->getName().size() + 1;
 	int msgId = SHOULD_UPLOAD_MSG;
