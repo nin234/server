@@ -7,6 +7,7 @@
 #include <MessageTranslator.h>
 #include <map>
 #include <DistributedDAO.h>
+#include <PicMetaDistribDAO.h>
 #include <NtwClientIntf.h>
 #include <pthread.h>
 #include <list>
@@ -28,12 +29,18 @@ class Distributor
         DistributedDAO m_distribDAO;
         NtwClientIntf m_ntwIntf;
         PicDistribDAO m_picDistribDAO;
-        std::list <DistribItem> m_shareItems;
+        PicMetaDistribDAO m_picMetaDistribDAO;
         std::mutex  m_shareItemsMutex;
         std::condition_variable m_shareItemsCV;        
+
+        std::list <DistribItem> m_shareItems;
         std::list<std::shared_ptr<PicMetaDataObj>> m_pictures;
         std::list<std::shared_ptr<PicMetaDataObj>> m_picMetaDatas;
         
+        std::list <DistribItem> m_shareItemsLcl;
+        std::list<std::shared_ptr<PicMetaDataObj>> m_picturesLcl;
+        std::list<std::shared_ptr<PicMetaDataObj>> m_picMetaDatasLcl;
+
         void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::shared_ptr<LstObj> pLsObj);
 
@@ -43,7 +50,10 @@ class Distributor
         
         void sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj);        
         void processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
-
+        void waitAndCopyItems();
+        void processShareItems();
+        void processPictures();
+        
     public:
         Distributor();
         virtual ~Distributor();

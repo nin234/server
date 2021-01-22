@@ -187,22 +187,43 @@ Distributor::entry(void *context)
     return reinterpret_cast<Distributor*>(context)->main();    
 }
 
+void
+Distributor::waitAndCopyItems()
+{
+    std::unique_lock<std::mutex> lock(m_shareItemsMutex);
+    m_shareItemsCV.wait_for(lock, 5s);
+    m_shareItemsLcl.splice(m_shareItemsLcl.end(),m_shareItems);
+    m_picturesLcl.splice(m_picturesLcl.end(),  m_pictures);
+    m_picMetaDatasLcl.splice(m_picMetaDatasLcl.end() , m_picMetaDatas);
+}
+
+void
+Distributor::processShareItems()
+{
+        if (m_shareItemsLcl.size())
+        {
+            for (auto shareItem  = m_shareItemsLcl.begin(); shareItem != m_shareItemsLcl.end();)
+            {
+                if (m_ntwIntf.sendMsg(shareItem->msg.data(), shareItem->msg.size(), shareItem->host, shareItem->port))
+                {
+                    shareItem = m_shareItemsLcl.erase(shareItem);
+                }
+                else
+                {
+                    ++shareItem;
+                }
+            }
+        }
+}
+
 void*
 Distributor::main()
 {
 
     for (;;)
     {
-        std::unique_lock<std::mutex> lock(m_shareItemsMutex);
-        m_shareItemsCV.wait_for(lock, 5s);
-        if (m_shareItems.size())
-        {
-            for (auto& shareItem : m_shareItems)
-            {
-                m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port);
-            }
-            m_shareItems.clear();
-        }
+        waitAndCopyItems();
+        processShareItems(); 
 
         if (m_pictures.size())
         {

@@ -18,3 +18,10 @@ PicMetaDistribDAO::~PicMetaDistribDAO()
 {
     delete m_db;
 }
+
+bool
+PicMetaDistribDAO::store(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+
+    return true;
+}

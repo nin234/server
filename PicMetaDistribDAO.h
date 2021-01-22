@@ -15,6 +15,7 @@ class PicMetaDistribDAO
 
     virtual ~PicMetaDistribDAO();
 
+    bool store(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
 };
 
 #endif
