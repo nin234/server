@@ -154,6 +154,7 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
         {
             std::lock_guard<std::mutex> lock(m_shareItemsMutex);
             m_shareItems.push_back(shareItem);
+            m_shareItemsDAO.store(host, port, pLstObj);
             m_shareItemsCV.notify_all();
         }
     }
@@ -193,9 +194,11 @@ Distributor::waitAndCopyItems()
 {
     std::unique_lock<std::mutex> lock(m_shareItemsMutex);
     m_shareItemsCV.wait_for(lock, 5s);
-    m_shareItemsLcl.splice(m_shareItemsLcl.end(),m_shareItems);
+    m_shareItemsLcl = m_shareItems;
     m_picturesLcl.splice(m_picturesLcl.end(),  m_pictures);
-    m_picMetaDatasLcl.splice(m_picMetaDatasLcl.end() , m_picMetaDatas);
+    m_picMetaDatasLcl = m_picMetaDatas;
+    m_shareItems.clear();
+    m_picMetaDatas.clear();
 }
 
 void
@@ -203,15 +206,11 @@ Distributor::processShareItems()
 {
         if (m_shareItemsLcl.size())
         {
-            for (auto shareItem  = m_shareItemsLcl.begin(); shareItem != m_shareItemsLcl.end();)
+            for (auto& shareItem : m_shareItemsLcl)
             {
-                if (m_ntwIntf.sendMsg(shareItem->msg.data(), shareItem->msg.size(), shareItem->host, shareItem->port))
+                if (m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
                 {
-                    shareItem = m_shareItemsLcl.erase(shareItem);
-                }
-                else
-                {
-                    ++shareItem;
+                    m_shareItemsDAO.del(shareItem.host, shareItem.port, shareItem.pLstObj);
                 }
             }
         }

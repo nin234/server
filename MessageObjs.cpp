@@ -26,6 +26,13 @@ operator << (std::ostream& os, const PicMetaDataObj& picMetaData)
 	return os;
 }
 
+std::ostream& operator << (std::ostream& os, const LstObj& lstObj)
+{
+    os << " LstObj appId=" << lstObj.getAppId() << " name=" << lstObj.getName() << 
+    " shareId=" << lstObj.getShrId() << " list=" << lstObj.getList() << " ";
+    return os;
+}
+
 void
 PicMetaDataObj::setName(const char *pName, int len)
 {

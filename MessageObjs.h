@@ -213,10 +213,12 @@ class LstObj : public MsgObj
 		void setShrId(long sid) {shrId = sid;}
 		const std::string& getName() const {return name;}
 		void setName(const char *pName, int len);
-		const std::string& getList(){return list;}
+		const std::string& getList() const {return list;}
 		void setList(const char *pList, int len);
 
 };
+
+std::ostream& operator << (std::ostream& os, const LstObj& lstObj);
 
 class GetItemObj;
 

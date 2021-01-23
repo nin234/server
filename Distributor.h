@@ -14,6 +14,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <PicDistribDAO.h>
+#include <ShareItemsDistribDAO.h>
 
 struct DistribItem
 {
@@ -33,6 +34,7 @@ class Distributor
         PicMetaDistribDAO m_picMetaDistribDAO;
         std::mutex  m_shareItemsMutex;
         std::condition_variable m_shareItemsCV;        
+        ShareItemsDistribDAO m_shareItemsDAO;
 
         std::list <DistribItem> m_shareItems;
         std::list<std::shared_ptr<PicMetaDataObj>> m_pictures;
