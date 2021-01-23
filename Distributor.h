@@ -20,6 +20,7 @@ struct DistribItem
     std::string host;
     int port;
     std::vector<char> msg;
+    std::shared_ptr<LstObj> pLstObj;
 };
 
 class Distributor

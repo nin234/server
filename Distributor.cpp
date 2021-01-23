@@ -148,7 +148,8 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
         DistribItem shareItem;
         shareItem.host = host;
         shareItem.port = port;
-    
+        shareItem.pLstObj = pLstObj; 
+
         if (m_pTrnsl->createShareItemMsg(shareItem.msg, pLstObj, shareIds))
         {
             std::lock_guard<std::mutex> lock(m_shareItemsMutex);

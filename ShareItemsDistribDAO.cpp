@@ -1,4 +1,5 @@
 #include <ShareItemsDistribDAO.h>
+#include <iostream>
 
 ShareItemsDistribDAO::ShareItemsDistribDAO()
 {
