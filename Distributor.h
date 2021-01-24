@@ -56,6 +56,8 @@ class Distributor
         void processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
         
         void checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
+        void getRemoteShareIds(std::shared_ptr<PicMetaDataObj> pPicMetaObj, 
+                                std::vector<std::string>& remoteShareIds);
 
     
         void waitAndCopyItems();

@@ -21,6 +21,24 @@ Distributor::~Distributor()
 }
 
 
+void 
+Distributor::getRemoteShareIds(std::shared_ptr<PicMetaDataObj> pPicMetaObj, 
+                                std::vector<std::string>& remoteShareIds)
+{
+    std::vector<std::string> lclShareIds;
+
+    auto& shareIds = pPicMetaObj->getFrndLst(); 
+    for (auto shareIdStr : shareIds)
+    {
+        long nShareid = std::stol(shareIdStr);
+        if (nShareid < Config::Instance().getStartShareId() || nShareid > Config::Instance().getEndShareId())
+        {
+            remoteShareIds.push_back(shareIdStr);
+        }
+    }
+ 
+}
+
 void
 Distributor::processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
@@ -244,7 +262,57 @@ Distributor::processPicMetaDatas()
 void
 Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
+    std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
+    if (!file.size())
+	{
+		std::cout << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return;
+	}
+	struct stat buf;
+    if (stat(file.c_str(), &buf) == 0)
+	{
+		if (pPicMetaObj->getPicLen() > buf.st_size)
+		{
+			return;
+		}
+	}
+    else
+    {
+        std::cout << "Invalid file=" << file << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return;
+    }
 
+    std::vector<std::string> remoteShareIds;
+    getRemoteShareIds(pPicMetaObj, remoteShareIds);    
+    std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
+    populateShareIdHostMap(pPicMetaObj->getAppId(), hostPortShareIds, remoteShareIds);
+
+    for (auto [hostPort, shareIds] : hostPortShareIds)
+    {
+        auto [host, port] = hostPort;
+        bool bSend;
+        if (!m_picDistribDAO.get(file, host, port, bSend))
+        {
+            bSend = false;
+            m_picDistribDAO.store(file, host, port, bSend);
+            //Send PicMetaData
+            //Send Picture
+        }
+        else
+        {
+            if(bSend)
+            {
+                //Send PicMetaData
+                continue;
+            }
+            else
+            {
+                //Send PicMetaData
+                //Send Picture
+            }
+        }
+        
+    }
 }
 
 void*
