@@ -216,6 +216,37 @@ Distributor::processShareItems()
         }
 }
 
+void
+Distributor::processPictures()
+{
+        if (m_pictures.size())
+        {
+            for (auto picture : m_pictures)
+            {
+                sendPicture(picture);
+            }
+        }
+}
+
+void
+Distributor::processPicMetaDatas()
+{
+    if (m_picMetaDatasLcl.size())
+    {
+        for (auto pPicMetaObj : m_picMetaDatasLcl)
+        {
+            m_picMetaDistribDAO.store(pPicMetaObj);
+            checkPictureAndProcess(pPicMetaObj);
+        }
+    }
+}
+
+void
+Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+
+}
+
 void*
 Distributor::main()
 {
@@ -224,14 +255,8 @@ Distributor::main()
     {
         waitAndCopyItems();
         processShareItems(); 
-
-        if (m_pictures.size())
-        {
-            for (auto picture : m_pictures)
-            {
-                sendPicture(picture);
-            }
-        }
+        processPicMetaDatas();
+        processPictures();
     }       
     return this;
 }

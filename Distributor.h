@@ -45,6 +45,7 @@ class Distributor
         std::list<std::shared_ptr<PicMetaDataObj>> m_picMetaDatasLcl;
 
         void populateShareIdHostMap(int appId, std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::vector<std::string>& remoteShareIds);
+
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::shared_ptr<LstObj> pLsObj);
 
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj);
@@ -53,9 +54,17 @@ class Distributor
         
         void sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj);        
         void processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
+        
+        void checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
+
+    
         void waitAndCopyItems();
+
         void processShareItems();
+
         void processPictures();
+
+        void processPicMetaDatas();
         
     public:
         Distributor();
