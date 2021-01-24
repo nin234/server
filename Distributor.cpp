@@ -273,12 +273,13 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 	{
 		if (pPicMetaObj->getPicLen() > buf.st_size)
 		{
+            std::cout << "Waiting for picture to be uploaded " << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;  
 			return;
 		}
 	}
     else
     {
-        std::cout << "Invalid file=" << file << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << "File not uploaded " << file << " error=" << errno << " for picmetadata" << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;    
         return;
     }
 
@@ -297,6 +298,14 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
             m_picDistribDAO.store(file, host, port, bSend);
             //Send PicMetaData
             //Send Picture
+            if (sendPicMetaData(pPicMetaObj, shareIds, host, port))
+            {
+                std::cout << "Sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+            }
+            else
+            {
+                std::cout << "Failed to sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+            }
         }
         else
         {
@@ -313,6 +322,20 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
         }
         
     }
+}
+
+bool 
+Distributor::sendPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port)
+{
+    std::vector<char> msg;
+    if (m_pTrnsl->createServerPicMetaMsg(msg, pPicMetaObj, shareIds))
+    {
+        if (m_ntwIntf.sendMsg(msg.data(), msg.size(), host, port))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void*
