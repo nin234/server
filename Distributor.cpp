@@ -297,12 +297,12 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
             bSend = false;
             m_picDistribDAO.store(file, host, port, bSend);
         }
-        sendPicAndOrMetaData(file, pPicMetaObj, shareIds, host, port, !bSend);
+        sendMetaDataAndIfReqdPic(file, pPicMetaObj, shareIds, host, port, !bSend);
     }
 }
 
 bool 
-Distributor::sendPicAndOrMetaData(std::string file, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port, bool both)
+Distributor::sendMetaDataAndIfReqdPic(std::string file, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port, bool both)
 {
     if (sendPicMetaData(pPicMetaObj, shareIds, host, port))
     {
