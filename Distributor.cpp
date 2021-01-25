@@ -213,10 +213,11 @@ Distributor::waitAndCopyItems()
     std::unique_lock<std::mutex> lock(m_shareItemsMutex);
     m_shareItemsCV.wait_for(lock, 5s);
     m_shareItemsLcl = m_shareItems;
-    m_picturesLcl.splice(m_picturesLcl.end(),  m_pictures);
+    m_picturesLcl = m_pictures;
     m_picMetaDatasLcl = m_picMetaDatas;
     m_shareItems.clear();
     m_picMetaDatas.clear();
+    m_pictures.clear();
 }
 
 void
@@ -237,11 +238,11 @@ Distributor::processShareItems()
 void
 Distributor::processPictures()
 {
-        if (m_pictures.size())
+        if (m_picturesLcl.size())
         {
-            for (auto picture : m_pictures)
+            for (auto picture : m_picturesLcl)
             {
-                sendPicture(picture);
+                checkPictureAndProcess(picture);
             }
         }
 }
