@@ -265,7 +265,7 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
     std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
     if (!file.size())
 	{
-		std::cout << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		std::cout << Util::now() << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return;
 	}
 	struct stat buf;
@@ -273,13 +273,13 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 	{
 		if (pPicMetaObj->getPicLen() > buf.st_size)
 		{
-            std::cout << "Waiting for picture to be uploaded " << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+            std::cout  << Util::now()<< "Waiting for picture to be uploaded " << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;  
 			return;
 		}
 	}
     else
     {
-        std::cout << "File not uploaded " << file << " error=" << errno << " for picmetadata" << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        std::cout << Util::now() << "File not uploaded " << file << " error=" << errno << " for picmetadata" << *pPicMetaObj << " " << __FILE__ << ":" << __LINE__ << std::endl;    
         return;
     }
 
@@ -296,32 +296,43 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
         {
             bSend = false;
             m_picDistribDAO.store(file, host, port, bSend);
-            //Send PicMetaData
-            //Send Picture
-            if (sendPicMetaData(pPicMetaObj, shareIds, host, port))
+        }
+        sendPicAndOrMetaData(file, pPicMetaObj, shareIds, host, port, !bSend);
+    }
+}
+
+bool 
+Distributor::sendPicAndOrMetaData(std::string file, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port, bool both)
+{
+    if (sendPicMetaData(pPicMetaObj, shareIds, host, port))
+    {
+        std::cout << Util::now() << "Sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        if (both)
+        {
+            if (sendPicture(pPicMetaObj, host, port))
             {
-                std::cout << "Sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+                std::cout << Util::now() << "Sent picture=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+                m_picMetaDistribDAO.del(pPicMetaObj);
+                m_picDistribDAO.store(file, host, port, true);
             }
             else
             {
-                std::cout << "Failed to sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+                std::cout << Util::now() << "Failed to Sent picture=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+                return false;
+
             }
         }
         else
         {
-            if(bSend)
-            {
-                //Send PicMetaData
-                continue;
-            }
-            else
-            {
-                //Send PicMetaData
-                //Send Picture
-            }
+            m_picMetaDistribDAO.del(pPicMetaObj);
         }
-        
     }
+    else
+    {
+        std::cout << Util::now() << "Failed to sent picture metadata=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        return false;
+    }
+    return true;
 }
 
 bool 
@@ -351,6 +362,54 @@ Distributor::main()
     }       
     return this;
 }
+
+bool
+Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::string& host, int port)
+{
+     
+	std::string file = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
+    if (!file.size())
+	{
+		std::cout << Util::now() << "Invalid picture file shareId=" << pPicMetaObj->getShrId() << " appId=" << pPicMetaObj->getAppId() << " name=" << pPicMetaObj->getName() << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;
+	}
+
+	int fd  = -1;
+	fd = open(file.c_str(), O_RDONLY);
+	
+	if (fd == -1)
+	{
+		std::cout  << Util::now()<< "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
+		return false;
+	}
+	std::cout  << Util::now()<< "Opened file=" << file << " to distribute picture " << __FILE__ << ":" << __LINE__ << std::endl;
+
+    for (;;)
+    {
+        char buf[MAX_BUF];
+		constexpr int msgId = PIC_MSG;
+		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+        
+		int numread = read(fd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
+		if (!numread ||  numread == -1)
+		{
+			std::cout << Util::now() << "Finished reading file " << file << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+		    close(fd);
+			break;
+		}
+		int msglen = numread + 2*sizeof(int);
+		memcpy(buf, &msglen, sizeof(int));
+        if (!m_ntwIntf.sendMsg(buf, msglen, host, port))
+        {
+            std::cout  << Util::now()<< "Failed to send PIC_MSG to host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+            return false;
+        }
+        
+    }
+
+    return true;
+}
+
 
 void
 Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)

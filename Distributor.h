@@ -51,10 +51,15 @@ class Distributor
         void createAndSendMsgs(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj);
 
         bool sendPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port);
+        
+        bool sendPicAndOrMetaData(std::string file, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds, const std::string& host, int port, bool both);
 
         void storePicDistribInfo(std::map<std::pair<std::string, int>, std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj);
         
         void sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj);        
+
+        bool sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::string& host, int port);        
+
         void processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj);
         
         void checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj);

@@ -23,6 +23,22 @@ PicMetaDistribDAO::~PicMetaDistribDAO()
 }
 
 bool
+PicMetaDistribDAO::del(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+    std::stringstream key;
+    key << pPicMetaObj->getAppId() << "|" << pPicMetaObj->getShrId() << "|" << pPicMetaObj->getName();
+    rocksdb::Status status;
+    status = m_db->Delete(rocksdb::WriteOptions(), key.str());
+    if (!status.ok())
+    {
+       std::cout << "Failed to delete from picMetaDistribRocks key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        return false; 
+    }
+       std::cout << "Deleted from picMetaDistribRocks key=" << key.str() << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+    return true;
+}
+
+bool
 PicMetaDistribDAO::store(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
     std::stringstream key;
