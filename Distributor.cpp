@@ -4,13 +4,14 @@
 #include <Util.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <Constants.h>
 
 using namespace std::chrono_literals;
 
-Distributor::Distributor()
+Distributor::Distributor() : m_lastCheckTime(0)
 {
 
 }
@@ -350,6 +351,21 @@ Distributor::sendPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, const 
     return false;
 }
 
+void
+Distributor::processArchivedItems()
+{
+    struct timeval tv;
+    if (gettimeofday(&tv, NULL) < 0)
+    {
+        std::cout << "gettimeofday failed=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return;
+    }
+
+    if (tv.tv_sec - m_lastCheckTime < Config::Instance().distribInterval())
+        return;
+    m_lastCheckTime = tv.tv_sec;
+}
+
 void*
 Distributor::main()
 {
@@ -360,6 +376,7 @@ Distributor::main()
         processShareItems(); 
         processPicMetaDatas();
         processPictures();
+        processArchivedItems();
     }       
     return this;
 }

@@ -15,6 +15,7 @@
 #include <condition_variable>
 #include <PicDistribDAO.h>
 #include <ShareItemsDistribDAO.h>
+#include <sys/time.h>
 
 struct DistribItem
 {
@@ -35,6 +36,7 @@ class Distributor
         std::mutex  m_shareItemsMutex;
         std::condition_variable m_shareItemsCV;        
         ShareItemsDistribDAO m_shareItemsDAO;
+        time_t m_lastCheckTime;
 
         std::list <DistribItem> m_shareItems;
         std::list<std::shared_ptr<PicMetaDataObj>> m_pictures;
@@ -74,6 +76,8 @@ class Distributor
         void processPictures();
 
         void processPicMetaDatas();
+
+        void processArchivedItems();
         
     public:
         Distributor();

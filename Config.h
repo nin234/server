@@ -22,6 +22,7 @@ class Config
     int m_nShareIdEnd;
     std::map<std::string, std::pair<std::string, int>> appConns;    
     void loadAppConns();
+    int m_nDistribIntvl;
 
 	public:
 		Config();
@@ -40,6 +41,8 @@ class Config
         int getStartShareId();
         int getEndShareId();
         std::map<std::string, std::pair<std::string, int>> getAppConns();
-        
+
+        long distribInterval();
+            
 };
 #endif

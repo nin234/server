@@ -1,4 +1,4 @@
-#include <Config.h>
+#include <Config.h> 
 #include <tinyxml2.h>
 #include <iostream>
 #include <stdexcept>
@@ -61,6 +61,11 @@ Config::Config()
 		int sb = std::stoi(pItr->second);
 		bSandbox = sb?true:false;
 	}	
+	pItr = keyvals.find("distrib_interval");
+	if (pItr != keyvals.end())
+	{
+		m_nDistribIntvl = std::stol(pItr->second);
+	}
     loadAppConns();    
 }
 
@@ -183,4 +188,10 @@ std::map<std::string, std::pair<std::string, int>>
 Config::getAppConns()
 {
     return appConns;
+}
+
+long
+Config::distribInterval()
+{
+    return m_nDistribIntvl;
 }
