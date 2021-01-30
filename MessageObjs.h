@@ -215,7 +215,8 @@ class LstObj : public MsgObj
 		void setName(const char *pName, int len);
 		const std::string& getList() const {return list;}
 		void setList(const char *pList, int len);
-
+        void setName(std::string nm) {name = nm;}
+        void setList(std::string lst) {list = lst;}
 };
 
 std::ostream& operator << (std::ostream& os, const LstObj& lstObj);

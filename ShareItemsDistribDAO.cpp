@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <Util.h>
+#include <memory>
 
 ShareItemsDistribDAO::ShareItemsDistribDAO()
 {
@@ -37,6 +38,31 @@ ShareItemsDistribDAO::del(std::shared_ptr<LstObj> pLstObj)
     std::cout << Util::now() << "Deleted distrib Item=" << *pLstObj  << " " << __FILE__ << ":" << __LINE__ << std::endl;    
 
     return true;
+}
+
+std::list<std::shared_ptr<LstObj>>
+ShareItemsDistribDAO::getAll()
+{
+    std::list<std::shared_ptr<LstObj>> shareItems;
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    for (pItr->SeekToFirst(); pItr->Valid(); pItr->Next()) 
+    {
+        std::string keyStr = pItr->key().ToString();
+        auto keyVec = Util::split(keyStr, '|');
+        if (keyVec.size() != 3)
+        {
+            std::cout << Util::now() << "Invalid size for keyVec=" << keyVec.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            continue;
+        }
+        auto pLstObj = std::make_shared<LstObj>();
+        pLstObj->setAppId(std::stoi(keyVec[0]));  
+        pLstObj->setShrId(std::stol(keyVec[1]));  
+        pLstObj->setName(keyVec[2]);
+        pLstObj->setList(pItr->value().ToString());
+        shareItems.push_back(pLstObj); 
+    }
+
+    return shareItems;
 }
 
 bool
