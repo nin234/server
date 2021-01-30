@@ -323,6 +323,13 @@ Distributor::processArchivedItems()
     if (tv.tv_sec - m_lastCheckTime < Config::Instance().distribInterval())
         return;
     m_lastCheckTime = tv.tv_sec;
+
+    auto shareItems = m_shareItemsDAO.getAll();
+    
+    for (auto shareItem : shareItems)
+    {
+        processShareItem(shareItem);
+    }
 }
 
 void*

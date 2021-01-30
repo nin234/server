@@ -38,6 +38,20 @@ PicMetaDistribDAO::del(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
     return true;
 }
 
+std::list<std::shared_ptr<PicMetaDataObj>>
+PicMetaDistribDAO::getAll()
+{
+    std::list<std::shared_ptr<PicMetaDataObj>> picMetaDatas;
+    std::unique_ptr<rocksdb::Iterator> pItr(m_db->NewIterator(rocksdb::ReadOptions()));
+    for (pItr->SeekToFirst(); pItr->Valid(); pItr->Next()) 
+    {
+        std::string keyStr = pItr->key().ToString();
+
+    }
+
+    return picMetaDatas;
+}
+
 bool
 PicMetaDistribDAO::store(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 {
