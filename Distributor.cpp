@@ -26,7 +26,6 @@ void
 Distributor::getRemoteShareIds(std::shared_ptr<PicMetaDataObj> pPicMetaObj, 
                                 std::vector<std::string>& remoteShareIds)
 {
-    std::vector<std::string> lclShareIds;
 
     auto& shareIds = pPicMetaObj->getFrndLst(); 
     for (auto shareIdStr : shareIds)
@@ -40,35 +39,7 @@ Distributor::getRemoteShareIds(std::shared_ptr<PicMetaDataObj> pPicMetaObj,
  
 }
 
-void
-Distributor::processPicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
-{
 
-    std::vector<std::string> lclShareIds;
-    std::vector<std::string> remoteShareIds;
-
-    auto& shareIds = pPicMetaObj->getFrndLst(); 
-    for (auto shareIdStr : shareIds)
-    {
-        long nShareid = std::stol(shareIdStr);
-        if (nShareid >= Config::Instance().getStartShareId() && nShareid <= Config::Instance().getEndShareId())
-        {
-            lclShareIds.push_back(shareIdStr);
-        }
-        else
-        {
-            remoteShareIds.push_back(shareIdStr);
-        }
-    }
-    
-    std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
-    populateShareIdHostMap(pPicMetaObj->getAppId(), hostPortShareIds, remoteShareIds);
-    createAndSendMsgs(hostPortShareIds, pPicMetaObj);
-    storePicDistribInfo(hostPortShareIds, pPicMetaObj);
-
-    return;
-
-}
 
 std::vector<std::string>
 Distributor::distribute(std::shared_ptr<LstObj> pLstObj)
@@ -77,7 +48,6 @@ Distributor::distribute(std::shared_ptr<LstObj> pLstObj)
     std::vector<std::string> shareIds;
 
     std::vector<std::string> lclShareIds;
-    std::vector<std::string> remoteShareIds;
 
     if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
     {
@@ -88,15 +58,11 @@ Distributor::distribute(std::shared_ptr<LstObj> pLstObj)
             {
                 lclShareIds.push_back(shareIdStr);
             }
-            else
-            {
-                remoteShareIds.push_back(shareIdStr);
-            }
         }
+        std::lock_guard<std::mutex> lock(m_shareItemsMutex);
+        m_shareItems.push_back(pLstObj);
+        m_shareItemsCV.notify_all();
     }
-    std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
-    populateShareIdHostMap(pLstObj->getAppId(), hostPortShareIds, remoteShareIds);
-    createAndSendMsgs(hostPortShareIds, pLstObj);
     return lclShareIds;
 }
 
@@ -116,44 +82,7 @@ Distributor::distributePicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
         m_shareItemsCV.notify_all();
 }
 
-void 
-Distributor::storePicDistribInfo(std::map<std::pair<std::string, int>, 
-                std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj)
-{
 
-    for (auto [hostPort, shareIds] : hostPortShareIds)
-    {
-        auto [host, port] = hostPort;
-        std::string picUrl = Util::constructPicFile(pPicMetaObj->getShrId(), pPicMetaObj->getAppId(), pPicMetaObj->getName());
-        bool bSend;
-        if (!m_picDistribDAO.get(picUrl, host, port, bSend))
-        {
-            bSend = false;
-            m_picDistribDAO.store(picUrl, host, port, bSend);
-        }
-        
-    }
-}
-
-void 
-Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>, 
-                std::vector<std::string>>& hostPortShareIds, std::shared_ptr<PicMetaDataObj> pPicMetaObj)
-{
-    for (auto [hostPort, shareIds] : hostPortShareIds)
-    {
-        auto [host, port] = hostPort;
-        DistribItem shareItem;
-        shareItem.host = host;
-        shareItem.port = port;
-    
-        if (m_pTrnsl->createServerPicMetaMsg(shareItem.msg, pPicMetaObj, shareIds))
-        {
-            std::lock_guard<std::mutex> lock(m_shareItemsMutex);
-            m_shareItems.push_back(shareItem);
-            m_shareItemsCV.notify_all();
-        }
-    }
-}
 
 
 void 
@@ -171,10 +100,12 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
 
         if (m_pTrnsl->createShareItemMsg(shareItem.msg, pLstObj, shareIds))
         {
-            std::lock_guard<std::mutex> lock(m_shareItemsMutex);
-            m_shareItems.push_back(shareItem);
-            m_shareItemsDAO.store(host, port, pLstObj);
-            m_shareItemsCV.notify_all();
+
+            if (m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
+            {
+                m_shareItemsDAO.del(pLstObj);
+
+            }
         }
     }
 }
@@ -221,6 +152,37 @@ Distributor::waitAndCopyItems()
     m_pictures.clear();
 }
 
+
+void 
+Distributor::getRemoteShareIds(std::shared_ptr<LstObj> pLstObj, 
+                                std::vector<std::string>& remoteShareIds)
+{
+    std::vector<std::string> shareIds;
+    if (m_pTrnsl->getShareIds(pLstObj->getList(), shareIds))
+    {
+        for (auto shareIdStr : shareIds)
+        {
+            long nShareid = std::stol(shareIdStr);
+            if (nShareid < Config::Instance().getStartShareId() || nShareid > Config::Instance().getEndShareId())
+            {
+                remoteShareIds.push_back(shareIdStr);
+            }
+        }
+    }
+}
+
+void
+Distributor::processShareItem(std::shared_ptr<LstObj> pLstObj)
+{
+    m_shareItemsDAO.store(pLstObj);
+    std::vector<std::string> remoteShareIds;
+    getRemoteShareIds(pLstObj, remoteShareIds);    
+    
+    std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
+    populateShareIdHostMap(pLstObj->getAppId(), hostPortShareIds, remoteShareIds);
+    createAndSendMsgs(hostPortShareIds, pLstObj);
+}
+
 void
 Distributor::processShareItems()
 {
@@ -228,10 +190,7 @@ Distributor::processShareItems()
         {
             for (auto& shareItem : m_shareItemsLcl)
             {
-                if (m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
-                {
-                    m_shareItemsDAO.del(shareItem.host, shareItem.port, shareItem.pLstObj);
-                }
+                processShareItem(shareItem);
             }
         }
 }

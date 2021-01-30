@@ -16,8 +16,8 @@ class ShareItemsDistribDAO
             
         virtual ~ShareItemsDistribDAO();
 
-        bool store(const std::string& host, int port, std::shared_ptr<LstObj> pLstObj);
-        bool del(const std::string& host, int port, std::shared_ptr<LstObj> pLstObj);
+        bool store(std::shared_ptr<LstObj> pLstObj);
+        bool del(std::shared_ptr<LstObj> pLstObj);
 
 };
 
