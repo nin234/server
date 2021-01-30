@@ -46,7 +46,27 @@ PicMetaDistribDAO::getAll()
     for (pItr->SeekToFirst(); pItr->Valid(); pItr->Next()) 
     {
         std::string keyStr = pItr->key().ToString();
-
+        auto keyVec = Util::split(keyStr, '|');
+        if (keyVec.size() != 3)
+        {
+            std::cout << Util::now() << "Invalid size for keyVec=" << keyVec.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            continue;
+        }
+        std::string valStr = pItr->value().ToString();
+        auto valVec = Util::split(valStr, '|');
+        if (valVec.size() != 3)
+        {
+            std::cout << Util::now() << "Invalid size for valVec=" << valVec.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            continue;
+        }
+        auto pPicMetaObj = std::make_shared<PicMetaDataObj>();
+        pPicMetaObj->setAppId(std::stoi(keyVec[0]));  
+        pPicMetaObj->setShrId(std::stol(keyVec[1]));  
+        pPicMetaObj->setName(keyVec[2]);
+        pPicMetaObj->setFrndLstStr(valVec[0]);
+        pPicMetaObj->setPicLen(std::stoi(valVec[1]));
+        pPicMetaObj->setWrittenLen(std::stoi(valVec[2]));
+        picMetaDatas.push_back(pPicMetaObj);
     }
 
     return picMetaDatas;
@@ -58,7 +78,8 @@ PicMetaDistribDAO::store(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
     std::stringstream key;
     key << pPicMetaObj->getAppId() << "|" << pPicMetaObj->getShrId() << "|" << pPicMetaObj->getName();
     std::stringstream value;
-    value << pPicMetaObj->getFrnLstStr() << "|" << pPicMetaObj->getPicLen();
+    value << pPicMetaObj->getFrnLstStr() << "|" << pPicMetaObj->getPicLen() << "|"
+           << pPicMetaObj->getWrittenLen();
     rocksdb::Status status;
     status  = m_db->Put(rocksdb::WriteOptions(), key.str(), value.str());
     if (status.ok())

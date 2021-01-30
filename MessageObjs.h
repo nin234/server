@@ -65,6 +65,7 @@ class PicMetaDataObj : public MsgObj
 		void setShrId(long sid) {shrId = sid;}
 		std::string getName() const {return name;}
 		void setName(const char *pName, int len);
+        void setName(const std::string& nm){name = nm;}
 		const std::vector<std::string>& getFrndLst(){return frndLst;}
 		std::vector<std::string> getLocalFrndLst() const;
 		void setFrndLst(const std::vector<std::string>& fl);
@@ -74,6 +75,8 @@ class PicMetaDataObj : public MsgObj
 		void setWrittenLen(int len) {writtenLen = len;}
 		std::string getFrnLstStr() const {return frndLstStr;}
 		void setFrndLstStr(const char *pFlist, int len); 
+		void setFrndLstStr(const std::string& flist);
+        
 };
 
 class ShareIdObj : public MsgObj

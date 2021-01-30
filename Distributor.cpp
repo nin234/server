@@ -330,6 +330,13 @@ Distributor::processArchivedItems()
     {
         processShareItem(shareItem);
     }
+
+    auto picMetaDatas = m_picMetaDistribDAO.getAll();
+
+    for (auto picMetaData : picMetaDatas)
+    {
+        checkPictureAndProcess(picMetaData);
+    }
 }
 
 void*
