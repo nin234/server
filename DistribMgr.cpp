@@ -3,6 +3,8 @@
 #include <DistributedDAO.h>
 #include <iostream>
 #include <Constants.h>
+#include <tinyxml2.h>
+#include <stdexcept>
 
 DistribMgr::DistribMgr()
 {
@@ -51,26 +53,42 @@ DistribMgr::getNewShareIdHost(int appId)
 bool
 DistribMgr::storeNodeInfo()
 {
-    int startShareId = Config::Instance().getStartShareId();
-    if (m_distribDAO.isNode(startShareId))
-    {
-        std::cout << "startShareId=" << startShareId << " already in distributed DB " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
-        return true;
-    }
-    int endShareId = Config::Instance().getEndShareId();
-    auto appConns = Config::Instance().getAppConns();
-    std::map<int, std::pair<std::string, int>> appHostPortMp;
-    for (auto [appName, hostPort] : appConns)
-    {
-        int appId = getAppId(appName); 
-        if (appId == -1)
+   	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile("/home/ninan/config/config.xml") != tinyxml2::XML_SUCCESS)
+	{
+		std::cout << "Failed to parse xml file " << std::endl;
+		throw std::runtime_error("Failed to parse xml file /home/ninan/config/config.xml");
+	}
+	for (auto oh = doc.FirstChildElement()->FirstChildElement();oh != NULL; oh = oh->NextSiblingElement())
+	{
+        auto apps = oh->FirstChildElement("Apps");
+        std::map<int, std::pair<std::string, int>> appHostPortMp;
+
+        for (auto app = apps->FirstChildElement(); app != NULL; app = app->NextSiblingElement())
         {
-            std::cout << "Failed to find appId for appName=" << appName << " exiting" << " " << __FILE__ << ":" << __LINE__ << std::endl;   
-            exit(0);
+            auto name = app->FirstChildElement("name");
+            auto host = app->FirstChildElement("host");
+            auto port = app->FirstChildElement("port");
+            std::string nameStr = name->GetText();
+            std::string hostStr = host->GetText();
+            int portVal = std::stoi(port->GetText());
+            std::cout << "Adding host details name=" << nameStr << " port=" << portVal << " host=" << hostStr << " " << __FILE__ << ":" << __LINE__ << std::endl;          
+            int appId = getAppId(nameStr); 
+            if (appId == -1)
+            {
+                std::cout << "Failed to find appId for appName=" << nameStr << " exiting" << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+                exit(0);
+            }
+            appHostPortMp[appId] = std::make_pair(hostStr, portVal); 
         }
-        appHostPortMp[appId] = hostPort;
+        auto shareIds = doc.FirstChildElement()->FirstChildElement("ShareIds");
+
+        auto start = shareIds->FirstChildElement("start");
+        auto startShareId = std::stoi(start->GetText());
+        auto end = shareIds->FirstChildElement("end");
+        auto endShareId = std::stoi(end->GetText());
+        m_distribDAO.setNode(startShareId, endShareId, appHostPortMp);
     }
-    m_distribDAO.setNode(startShareId, endShareId, appHostPortMp);
     return true;
 }
 

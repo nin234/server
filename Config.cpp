@@ -90,7 +90,8 @@ Config::loadAppConns()
         std::string nameStr = name->GetText();
         std::string hostStr = host->GetText();
         int portVal = std::stoi(port->GetText());
-        std::cout << "Adding host details name=" << nameStr << " port=" << portVal << " host=" << hostStr << " " << __FILE__ << ":" << __LINE__ << std::endl;          appConns[nameStr] = std::make_pair(hostStr, portVal); 
+        std::cout << "Adding host details name=" << nameStr << " port=" << portVal << " host=" << hostStr << " " << __FILE__ << ":" << __LINE__ << std::endl;          
+        appConns[nameStr] = std::make_pair(hostStr, portVal); 
     }
     auto shareIds = doc.FirstChildElement()->FirstChildElement("ShareIds");
 
