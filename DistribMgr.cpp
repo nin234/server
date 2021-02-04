@@ -35,10 +35,67 @@ DistribMgr::Instance()
     return instance;
 }
 
+bool 
+DistribMgr::store(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+    return m_picMetaDistribDAO.store(pPicMetaObj);
+}
+
+bool 
+DistribMgr::del(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
+{
+    return m_picMetaDistribDAO.del(pPicMetaObj);
+}
+
+std::list<std::shared_ptr<PicMetaDataObj>> 
+DistribMgr::getAll()
+{
+    return m_picMetaDistribDAO.getAll();
+}
+
 bool
 DistribMgr::getNode(int shareId, int appId, std::pair<std::string, int>& hostPort)
 {
     return m_distribDAO.getNode(shareId, appId, hostPort);
+}
+
+bool 
+DistribMgr::store(const std::string& picUrl, const std::string& host, int port,
+           bool bSend)
+{
+    return m_picDistribDAO.store(picUrl, host, port, bSend);
+}
+
+bool 
+DistribMgr::get(const std::string& picUrl, const std::string& host, int port,
+           bool& bSend)
+{
+    return m_picDistribDAO.get(picUrl, host, port, bSend);
+}
+
+
+bool 
+DistribMgr::getAll(const std::string& picUrl, std::vector<PicNode>& picNodes)
+{
+    return m_picDistribDAO.getAll(picUrl, picNodes);
+}
+
+bool 
+DistribMgr::store(std::shared_ptr<LstObj> pLstObj)
+{
+    return m_shareItemsDAO.store(pLstObj);
+}
+
+bool 
+DistribMgr::del(std::shared_ptr<LstObj> pLstObj)
+{
+    return m_shareItemsDAO.del(pLstObj);
+}
+
+std::list<std::shared_ptr<LstObj>> 
+DistribMgr::getAllShareItems()
+{
+    return m_shareItemsDAO.getAll();
 }
 
 std::pair<std::string, int>

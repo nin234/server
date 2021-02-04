@@ -104,7 +104,7 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
 
             if (m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
             {
-                m_shareItemsDAO.del(pLstObj);
+                DistribMgr::Instance().del(pLstObj);
 
             }
         }
@@ -175,7 +175,7 @@ Distributor::getRemoteShareIds(std::shared_ptr<LstObj> pLstObj,
 void
 Distributor::processShareItem(std::shared_ptr<LstObj> pLstObj)
 {
-    m_shareItemsDAO.store(pLstObj);
+    DistribMgr::Instance().store(pLstObj);
     std::vector<std::string> remoteShareIds;
     getRemoteShareIds(pLstObj, remoteShareIds);    
     
@@ -215,7 +215,7 @@ Distributor::processPicMetaDatas()
     {
         for (auto pPicMetaObj : m_picMetaDatasLcl)
         {
-            m_picMetaDistribDAO.store(pPicMetaObj);
+            DistribMgr::Instance().store(pPicMetaObj);
             checkPictureAndProcess(pPicMetaObj);
         }
     }
@@ -254,10 +254,10 @@ Distributor::checkPictureAndProcess(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
     {
         auto [host, port] = hostPort;
         bool bSend;
-        if (!m_picDistribDAO.get(file, host, port, bSend))
+        if (!DistribMgr::Instance().get(file, host, port, bSend))
         {
             bSend = false;
-            m_picDistribDAO.store(file, host, port, bSend);
+            DistribMgr::Instance().store(file, host, port, bSend);
         }
         sendMetaDataAndIfReqdPic(file, pPicMetaObj, shareIds, host, port, !bSend);
     }
@@ -274,8 +274,8 @@ Distributor::sendMetaDataAndIfReqdPic(std::string file, std::shared_ptr<PicMetaD
             if (sendPicture(pPicMetaObj, host, port))
             {
                 std::cout << Util::now() << "Sent picture=" << *pPicMetaObj << " host=" << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;   
-                m_picMetaDistribDAO.del(pPicMetaObj);
-                m_picDistribDAO.store(file, host, port, true);
+                DistribMgr::Instance().del(pPicMetaObj);
+                DistribMgr::Instance().store(file, host, port, true);
             }
             else
             {
@@ -286,7 +286,7 @@ Distributor::sendMetaDataAndIfReqdPic(std::string file, std::shared_ptr<PicMetaD
         }
         else
         {
-            m_picMetaDistribDAO.del(pPicMetaObj);
+            DistribMgr::Instance().del(pPicMetaObj);
         }
     }
     else
@@ -325,14 +325,14 @@ Distributor::processArchivedItems()
         return;
     m_lastCheckTime = tv.tv_sec;
 
-    auto shareItems = m_shareItemsDAO.getAll();
+    auto shareItems = DistribMgr::Instance().getAllShareItems();
     
     for (auto shareItem : shareItems)
     {
         processShareItem(shareItem);
     }
 
-    auto picMetaDatas = m_picMetaDistribDAO.getAll();
+    auto picMetaDatas = DistribMgr::Instance().getAll();
 
     for (auto picMetaData : picMetaDatas)
     {
@@ -415,7 +415,7 @@ Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 	}
 
     std::vector<PicNode> picNodes;
-    m_picDistribDAO.getAll(file, picNodes);
+    DistribMgr::Instance().getAll(file, picNodes);
 	int fd  = -1;
 	fd = open(file.c_str(), O_RDONLY);
 	

@@ -6,15 +6,12 @@
 #include <MessageObjs.h>
 #include <MessageTranslator.h>
 #include <map>
-#include <DistributedDAO.h>
-#include <PicMetaDistribDAO.h>
 #include <NtwClientIntf.h>
 #include <pthread.h>
 #include <list>
 #include <mutex>
 #include <condition_variable>
 #include <PicDistribDAO.h>
-#include <ShareItemsDistribDAO.h>
 #include <sys/time.h>
 
 struct DistribItem
@@ -30,11 +27,8 @@ class Distributor
 
         std::shared_ptr<MessageTranslator> m_pTrnsl;
         NtwClientIntf m_ntwIntf;
-        PicDistribDAO m_picDistribDAO;
-        PicMetaDistribDAO m_picMetaDistribDAO;
         std::mutex  m_shareItemsMutex;
         std::condition_variable m_shareItemsCV;        
-        ShareItemsDistribDAO m_shareItemsDAO;
         time_t m_lastCheckTime;
 
         std::list <std::shared_ptr<LstObj>> m_shareItems;
