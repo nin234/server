@@ -35,6 +35,12 @@ DistribMgr::Instance()
     return instance;
 }
 
+bool
+DistribMgr::getNode(int shareId, int appId, std::pair<std::string, int>& hostPort)
+{
+    return m_distribDAO.getNode(shareId, appId, hostPort);
+}
+
 std::pair<std::string, int>
 DistribMgr::getNewShareIdHost(int appId)
 {
@@ -54,7 +60,7 @@ bool
 DistribMgr::storeNodeInfo()
 {
    	tinyxml2::XMLDocument doc;
-	if (doc.LoadFile("/home/ninan/config/config.xml") != tinyxml2::XML_SUCCESS)
+	if (doc.LoadFile("/home/ninan/config/nodes.xml") != tinyxml2::XML_SUCCESS)
 	{
 		std::cout << "Failed to parse xml file " << std::endl;
 		throw std::runtime_error("Failed to parse xml file /home/ninan/config/config.xml");
@@ -81,7 +87,7 @@ DistribMgr::storeNodeInfo()
             }
             appHostPortMp[appId] = std::make_pair(hostStr, portVal); 
         }
-        auto shareIds = doc.FirstChildElement()->FirstChildElement("ShareIds");
+        auto shareIds = oh->FirstChildElement("ShareIds");
 
         auto start = shareIds->FirstChildElement("start");
         auto startShareId = std::stoi(start->GetText());

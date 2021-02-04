@@ -18,6 +18,8 @@ class DistribMgr
         bool storeNodeInfo();
         std::pair<std::string, int> getNewShareIdHost(int appId);
         long getEndShareId();
+        bool getNode(int shareId, int appId, std::pair<std::string, int>& hostPort);
+        
 };
 
 #endif

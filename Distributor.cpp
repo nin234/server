@@ -1,4 +1,5 @@
 #include <Distributor.h>
+#include <DistribMgr.h>
 #include <Config.h>
 #include <chrono>
 #include <Util.h>
@@ -125,7 +126,7 @@ Distributor::populateShareIdHostMap(int appId, std::map<std::pair<std::string, i
     {
         long shareId = std::stol(rShareIdStr); 
         std::pair<std::string, int> hostPort;
-        if (m_distribDAO.getNode(shareId, appId, hostPort))
+        if (DistribMgr::Instance().getNode(shareId, appId, hostPort))
         {
             hostPortShareIds[hostPort].push_back(rShareIdStr);
         }

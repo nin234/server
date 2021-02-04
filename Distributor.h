@@ -29,7 +29,6 @@ class Distributor
 {
 
         std::shared_ptr<MessageTranslator> m_pTrnsl;
-        DistributedDAO m_distribDAO;
         NtwClientIntf m_ntwIntf;
         PicDistribDAO m_picDistribDAO;
         PicMetaDistribDAO m_picMetaDistribDAO;

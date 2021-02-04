@@ -15,6 +15,7 @@
 
 AppMgr::AppMgr()
 {
+    std::cout << "storing distributed node info " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
     DistribMgr::Instance().storeNodeInfo();
 
 	FirebaseConnHdlr::initialize();
