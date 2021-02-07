@@ -66,6 +66,12 @@ Config::Config()
 	{
 		m_nDistribIntvl = std::stol(pItr->second);
 	}
+    
+    pItr = keyvals.find("ssl_startport");
+	if (pItr != keyvals.end())
+	{
+		m_nStartSSLPort = std::stol(pItr->second);
+	}
     loadAppConns();    
 }
 
