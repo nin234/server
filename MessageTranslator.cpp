@@ -221,22 +221,22 @@ MessageTranslator::createShareItemMsg(std::vector<char>& msg, std::shared_ptr<Ls
     int msglen = 4*sizeof(int) + nameLen + listLen + sizeof(long);
     
     msg.reserve(msglen);    
-    char* pMsg = msg.data();
+    auto pMsg = std::make_unique<char[]>(msglen);
 
-	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg.get(), &msglen, sizeof(int));
     int msgId = SHARE_ITEM_MSG;
-	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+	memcpy(pMsg.get()+sizeof(int), &msgId, sizeof(int));
     long shareId = pLstObj->getShrId();
-    memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long)); 
+    memcpy(pMsg.get() + 2*sizeof(int), &shareId, sizeof(long)); 
     constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
-    memcpy(pMsg + namelenoffset, &nameLen, sizeof(int));
+    memcpy(pMsg.get() + namelenoffset, &nameLen, sizeof(int));
      constexpr int lstlenoffset = 3*sizeof(int) + sizeof(long);
-    memcpy(pMsg + lstlenoffset, &listLen, sizeof(int));
+    memcpy(pMsg.get() + lstlenoffset, &listLen, sizeof(int));
     constexpr int nameoffset = 4*sizeof(int) + sizeof(long);
-    memcpy(pMsg + nameoffset, pLstObj->getName().c_str(), nameLen);    
+    memcpy(pMsg.get() + nameoffset, pLstObj->getName().c_str(), nameLen);    
     int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
-	memcpy(pMsg+lstoffset, lstShare.c_str(), listLen);
-     
+	memcpy(pMsg.get()+lstoffset, lstShare.c_str(), listLen);
+    msg.assign(pMsg.get(), pMsg.get()+msglen); 
     return true;
 }
 

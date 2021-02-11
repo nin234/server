@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sstream>
+#include <string.h>
 
 
 thread_local SSL_CTX* SSLClntSocket::pCtx = NULL;
@@ -29,6 +30,12 @@ SSLClntSocket::SSLClntSocket() : m_ssl(NULL), m_bConnected(false)
 			std::cout <<Util::now() << "Failed to initialize ssl client context , exiting .... " << std::endl;
 			exit(0);
 		}
+		if (SSL_CTX_use_certificate_file(pCtx, "/home/ninan/certs/client.crt", SSL_FILETYPE_PEM) <= 0) 
+		{
+			std::cout  <<Util::now()<< "Failed to read ssl client certficate file , exiting .... " << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+			exit(0);
+    	}
+
 
 
     }
@@ -108,6 +115,21 @@ SSLClntSocket::connect(std::string host, int port)
     }
     std::cout << Util::now() << "SSL connection established to host="
                << host << " port=" << port << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+/*
+    X509* cert = SSL_get_peer_certificate(m_ssl);
+    if (cert == NULL)
+    {
+        std::cout << Util::now() << "Failed to get peer certificate " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        return false;
+    }
+
+    long res = SSL_get_verify_result(m_ssl);
+    if(!(X509_V_OK == res)) 
+    {
+        std::cout << Util::now() << "Failed to verify certificate " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        return false;
+    }
+*/
     return true;
 }
 
@@ -125,7 +147,8 @@ SSLClntSocket::sendMsg(const char *buf, int mlen, const std::string& host, int p
         }
         m_bConnected = true;
     }   
-    
+   
+    std::cout << "Sending message of len=" << mlen << " buf=" << buf << " " << __FILE__ << ":" << __LINE__ << std::endl;     
      int ret = SSL_write(m_ssl, buf, mlen);
      if (ret <= 0)
      {
@@ -144,6 +167,12 @@ SSLClntSocket::sendMsg(const char *buf, int mlen, const std::string& host, int p
             
             default:
 		        std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+                if (sslErr == 5)
+                {
+                    char buf[1024];
+                    strerror_r(errno, buf, 1024);
+                    std::cout << Util::now() << "error=" << buf << " errno=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+                }
                 *tryAgain = false;
             break;
         }
