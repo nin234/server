@@ -176,22 +176,23 @@ MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, std::shared_pt
     int metaStrLen = metaStr.size() + 1;
     int msglen = 5*sizeof(int) + nameLen  + sizeof(long) + metaStrLen;
     msg.reserve(msglen);    
-    char* pMsg = msg.data();
-	memcpy(pMsg, &msglen, sizeof(int));
-	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    auto pMsg = std::make_unique<char[]>(msglen);
+	memcpy(pMsg.get(), &msglen, sizeof(int));
+	memcpy(pMsg.get()+sizeof(int), &msgId, sizeof(int));
     long shareId = pPicMetaObj->getShrId();
-    memcpy(pMsg + 2*sizeof(int), &shareId, sizeof(long));
+    memcpy(pMsg.get() + 2*sizeof(int), &shareId, sizeof(long));
     constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
-    memcpy(pMsg + namelenoffset, &nameLen, sizeof(int));
+    memcpy(pMsg.get() + namelenoffset, &nameLen, sizeof(int));
     int nameoffset = namelenoffset + sizeof(int);
-    memcpy(pMsg + nameoffset, name.c_str(), nameLen);
+    memcpy(pMsg.get() + nameoffset, name.c_str(), nameLen);
     int piclenoffset = nameoffset + nameLen;
     int picLen = pPicMetaObj->getPicLen();
-    memcpy(pMsg + piclenoffset, &picLen, sizeof(int)); 
+    memcpy(pMsg.get() + piclenoffset, &picLen, sizeof(int)); 
     int metastrlenoffset = piclenoffset + sizeof(int);
-    memcpy(pMsg + metastrlenoffset, &metaStrLen, sizeof(int));
+    memcpy(pMsg.get() + metastrlenoffset, &metaStrLen, sizeof(int));
     int metastroffset = metastrlenoffset + sizeof(int);
-    memcpy(pMsg + metastroffset, metaStr.c_str(), metaStrLen);
+    memcpy(pMsg.get() + metastroffset, metaStr.c_str(), metaStrLen);
+    msg.assign(pMsg.get(), pMsg.get()+msglen); 
     return true;
 }
 
