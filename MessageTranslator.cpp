@@ -197,6 +197,29 @@ MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, std::shared_pt
 
 
 bool 
+MessageTranslator::changeShareIds(std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
+{
+	std::string::size_type xpos = pLstObj->getList().find(":::");
+	if (xpos == std::string::npos)
+    {
+        std::cout << "Invalid list format for list=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+		return false;
+    }
+    std::string lst = pLstObj->getList();
+    lst.erase(0, xpos);
+    std::stringstream ss;
+    for (const auto& shareId : shareIds)
+    {
+        ss << shareId << ";"; 
+    }
+    std::string pre = ss.str();
+    std::string prefix = pre.substr(0, pre.size()-1);
+    std::string lstShare = prefix + lst;
+    pLstObj->setList(lstShare);
+    return true;
+}
+
+bool 
 MessageTranslator::createShareItemMsg(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
 {
 

@@ -91,6 +91,7 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
                 std::vector<std::string>>& hostPortShareIds, 
                 std::shared_ptr<LstObj> pLstObj)
 {
+    std::vector<std::string> failedToSendShareIds;    
     for (auto [hostPort, shareIds] : hostPortShareIds)
     {
         auto [host, port] = hostPort;
@@ -102,12 +103,20 @@ Distributor::createAndSendMsgs(std::map<std::pair<std::string, int>,
         if (m_pTrnsl->createShareItemMsg(shareItem.msg, pLstObj, shareIds))
         {
 
-            if (m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
+            if (!m_ntwIntf.sendMsg(shareItem.msg.data(), shareItem.msg.size(), shareItem.host, shareItem.port))
             {
-                DistribMgr::Instance().del(pLstObj);
-
+                failedToSendShareIds.insert(failedToSendShareIds.end(), shareIds.begin(), shareIds.end()); 
             }
         }
+    }
+    DistribMgr::Instance().del(pLstObj);
+    if (!failedToSendShareIds.size())
+    {
+        return;
+    }
+    if (m_pTrnsl->changeShareIds(pLstObj, failedToSendShareIds))
+    {
+        DistribMgr::Instance().store(pLstObj);
     }
 }
 
@@ -175,9 +184,15 @@ Distributor::getRemoteShareIds(std::shared_ptr<LstObj> pLstObj,
 void
 Distributor::processShareItem(std::shared_ptr<LstObj> pLstObj)
 {
-    DistribMgr::Instance().store(pLstObj);
     std::vector<std::string> remoteShareIds;
+    
     getRemoteShareIds(pLstObj, remoteShareIds);    
+
+    if (!remoteShareIds.size())
+    {
+        return;
+    }
+    DistribMgr::Instance().store(pLstObj);
     
     std::map<std::pair<std::string, int>, std::vector<std::string>> hostPortShareIds;
     populateShareIdHostMap(pLstObj->getAppId(), hostPortShareIds, remoteShareIds);

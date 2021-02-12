@@ -27,6 +27,8 @@ class MessageTranslator
         
         bool createShareItemMsg(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds);
         bool createServerPicMetaMsg(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds);
+
+        bool changeShareIds(std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds);
         
 };
 #endif
