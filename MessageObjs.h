@@ -30,6 +30,19 @@ class MsgObjDeltr
 };
 
 
+class GetRemoteHostObj : public MsgObj
+{
+        long shareId;
+
+    public:
+
+        virtual ~GetRemoteHostObj(){}
+        long getShareId() const {return shareId;}
+        void setShareId(long shId){shareId = shId;}
+};
+
+std::ostream& operator << (std::ostream& os, const GetRemoteHostObj& getRemoteHost);
+
 class PicObj : public MsgObj
 {
 		char buf[MAX_BUF];

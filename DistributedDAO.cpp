@@ -92,6 +92,8 @@ DistributedDAO::getLastNode(int appId, long& startShareId, std::pair<std::string
     }
     return false;
 }
+
+
 bool
 DistributedDAO::isNode(int shareId)
 {

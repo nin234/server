@@ -45,6 +45,14 @@ PicMetaDataObj::setName(const char *pName, int len)
 }
 
 std::ostream&
+operator << (std::ostream& os, const GetRemoteHostObj& getRemoteHost)
+{
+    os << "GetRemoteHostObj appId=" << getRemoteHost.getAppId() << " shareId="
+        << getRemoteHost.getShareId() << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+	return os;
+}
+
+std::ostream&
 operator << (std::ostream& os, const devTknArchv& devTkInfo)
 {
 	os << " appId=" << devTkInfo.appId << " shareId=" << devTkInfo.shareId << " tkn_len=" << devTkInfo.tkn_len << " platform=" << devTkInfo.platform ;

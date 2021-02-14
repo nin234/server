@@ -24,7 +24,10 @@ class MessageDecoder
 	bool createPicDoneObj(char *buffer, ssize_t mlen, int fd);
 	bool createPicMetaDataObj(char *buffer, ssize_t mlen, int fd);
 	bool createPicObj(char *buffer, ssize_t mlen, int fd);
+
     bool createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd);
+
+    bool createGetRemoteHost(char *buffer, ssize_t mlen, int fd);
 
 	protected:
 		void addMsgObj(std::shared_ptr<MsgObj> pMsg);

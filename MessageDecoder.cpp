@@ -23,38 +23,67 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 {
     	int msgTyp;
     	memcpy(&msgTyp, buffer+sizeof(int), sizeof(int));
-	if (msgTyp > NO_COMMON_MSGS)
-		return decodeMsg(buffer, mlen, fd);
+		decodeMsg(buffer, mlen, fd);
 	
 	switch(msgTyp)
 	{
 		case GET_SHARE_ID_MSG:
 		 	return createShareIdObj(buffer, mlen, fd);
+
 		case STORE_TRNSCTN_ID_MSG:
 			return createStoreIdObj(buffer, mlen, fd);
+
 		case STORE_FRIEND_LIST_MSG:
 			return createFrndLstObj(buffer, mlen, fd);
+
 		case ARCHIVE_ITEM_MSG:
 			return createTemplLstObj(buffer, mlen, fd);
+
 		case SHARE_ITEM_MSG:
 			return createLstObj(buffer, mlen, fd);
+
 		case STORE_DEVICE_TKN_MSG:
 			return createDeviceTknObj(buffer, mlen, fd);
+
 		case GET_ITEMS:
 			return createGetItemObj(buffer, mlen, fd);
+
 		case PIC_METADATA_MSG:
 			return createPicMetaDataObj(buffer, mlen, fd);
+
 		case PIC_MSG:
 			return createPicObj(buffer, mlen, fd);
+
 		case PIC_DONE_MSG:
 			return createPicDoneObj(buffer, mlen, fd);
+
 		case SHOULD_DOWNLOAD_MSG:
 			return createShouldDownLoadObj(buffer, mlen, fd);
+
+        case GET_REMOTE_HOST_MSG:
+			return createGetRemoteHost(buffer, mlen, fd);
+ 
 		default:
-			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+//			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 		break;
 	}	
    	return false; 
+}
+
+bool
+MessageDecoder::createGetRemoteHost(char *buffer,  ssize_t mlen, int fd)
+{
+    std::shared_ptr<GetRemoteHostObj> pMsg = std::make_shared<GetRemoteHostObj>();
+	pMsg->setMsgTyp(GET_REMOTE_HOST_MSG);	
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer + 2*sizeof(int), sizeof(int)); 
+	pMsg->setAppId(appId);
+    long shareId;
+    memcpy(&shareId, buffer + 3*sizeof(int), sizeof(long));
+    pMsg->setShareId(shareId);
+	pMsgs.push_back(pMsg);
+    return true;
 }
 
 bool
