@@ -30,7 +30,7 @@ EasyGrocMsgProcessor::processMsg(std::shared_ptr<MsgObj> pMsg)
 		case SHARE_TEMPL_ITEM_MSG:
 			return processTemplItemMsg(pMsg);
 		default:
-			std::cout << "Unhandled message type=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+//			std::cout << "Unhandled message type=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 		break;
 	}
 	return;

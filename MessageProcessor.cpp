@@ -118,10 +118,6 @@ MessageProcessor::onCloseFd(int fd)
 void
 MessageProcessor::processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp)
 {
-    if (nMsgTyp >= NO_COMMON_MSGS)
-    {
-        return;
-    }
 	switch(nMsgTyp)
 	{
 		case GET_SHARE_ID_MSG:
@@ -158,6 +154,9 @@ MessageProcessor::processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp)
 			return processPicDoneMsg(pMsg);
 		case SHOULD_DOWNLOAD_MSG:
 			return processShouldDownLoadMsg(pMsg);
+
+        case GET_REMOTE_HOST_MSG:
+            return processGetRemoteHostMsg(pMsg);
 	
 		default:
 			std::cout << "Unhandled message type=" << nMsgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
@@ -178,11 +177,7 @@ MessageProcessor::processRequests()
 		int nMsgTyp = pMsg->getMsgTyp();
 		if (nMsgTyp < 0)
 			continue;
-		if (nMsgTyp > NO_COMMON_MSGS)
-		{
-			processMsg(pMsg);
-			continue;
-		}	
+		processMsg(pMsg);
 		if (nMsgTyp != SHOULD_DOWNLOAD_MSG && m_pPicSndr->shouldEnqueMsg(pMsg->getFd()))
 		{
 			pMsgEnq->enqMsg(pMsg);	
@@ -194,6 +189,32 @@ MessageProcessor::processRequests()
 }
 
     
+    void
+    MessageProcessor::processGetRemoteHostMsg(std::shared_ptr<MsgObj> pMsg)
+    {
+        auto pGetRemoteHostObj = std::dynamic_pointer_cast<GetRemoteHostObj>(pMsg);
+        if (!pGetRemoteHostObj)
+        {
+            std::cout << Util::now() <<  "Invalid message received in MessageProcessor::processGetRemoteHostMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+            return;
+        }
+
+        std::pair<std::string, int> hostPort;
+        if (DistribMgr::Instance().getNode(pGetRemoteHostObj->getShareId(), pGetRemoteHostObj->getAppId(), hostPort))
+        {
+            char buf[32768];
+            int mlen=0;
+            if (m_pTrnsl->getShareIdRemoteHostMsg(buf, &mlen, hostPort.first, hostPort.second))
+            {
+                if (!pNtwIntf->sendMsg(buf, mlen, pGetRemoteHostObj->getFd()))
+                    std::cout << "Failed to send message for fd=" << pGetRemoteHostObj->getFd() << std::endl;
+                else
+                    std::cout << Util::now() << "Replying with host=" << hostPort.first 
+                    << " port=" << hostPort.second << " " << __FILE__ << " " << __LINE__ << std::endl;
+            }
+        }
+    }
+
     void
     MessageProcessor::processShouldDownLoadMsg(std::shared_ptr<MsgObj> pMsg)
     {
