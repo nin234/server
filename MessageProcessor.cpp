@@ -199,6 +199,7 @@ MessageProcessor::processRequests()
             return;
         }
 
+        std::cout << "GET_REMOTE_HOST_MSG with shareId=" << pGetRemoteHostObj->getShareId() << " appId=" << pGetRemoteHostObj->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;   
         std::pair<std::string, int> hostPort;
         if (DistribMgr::Instance().getNode(pGetRemoteHostObj->getShareId(), pGetRemoteHostObj->getAppId(), hostPort))
         {
