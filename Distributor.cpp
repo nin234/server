@@ -218,6 +218,12 @@ Distributor::processPictures()
         {
             for (auto picture : m_picturesLcl)
             {
+                std::vector<std::string> remoteShareIds;
+                getRemoteShareIds(picture, remoteShareIds);    
+                if (!remoteShareIds.size())
+                {
+                    continue;
+                }
                 checkPictureAndProcess(picture);
             }
         }
@@ -230,6 +236,12 @@ Distributor::processPicMetaDatas()
     {
         for (auto pPicMetaObj : m_picMetaDatasLcl)
         {
+            std::vector<std::string> remoteShareIds;
+            getRemoteShareIds(pPicMetaObj, remoteShareIds);    
+            if (!remoteShareIds.size())
+            {
+                continue;
+            }
             DistribMgr::Instance().store(pPicMetaObj);
             checkPictureAndProcess(pPicMetaObj);
         }
