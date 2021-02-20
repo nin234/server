@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 
-ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NULL)
+ApplePush::ApplePush(const std::string& file, bool bSbox, std::string passwd): payload(NULL), ctx(NULL)
 {
 	certfile = file;
 	bSandBox = bSbox;
@@ -23,7 +23,7 @@ ApplePush::ApplePush(const std::string& file, bool bSbox): payload(NULL), ctx(NU
 		throw std::runtime_error("Failed to initialize APNS library");
 	}
 
-	apn_set_pkcs12_file(ctx, certfile.c_str(), "Kiev94'MICR");
+	apn_set_pkcs12_file(ctx, certfile.c_str(), passwd.c_str());
 	if (bSandBox)
 	{
 		std::cout << "Setting sandbox mode in apns " << __FILE__ << ":" << __LINE__ << std::endl;

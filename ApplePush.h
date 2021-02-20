@@ -17,7 +17,7 @@ class ApplePush
 		bool bSandBox;
 
 	public:
-		ApplePush(const std::string& file , bool bSbox);
+		ApplePush(const std::string& file , bool bSbox, std::string passwd);
 		~ApplePush();
 		static void logCallback(apn_log_levels level, const char * const message, uint32_t len);
 		static void invalidTknCallback(const char * const token, uint32_t index);

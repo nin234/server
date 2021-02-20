@@ -72,7 +72,44 @@ Config::Config()
 	{
 		m_nStartSSLPort = std::stol(pItr->second);
 	}
+
+    pItr = keyvals.find("openhouses_passwd");
+	if (pItr != keyvals.end())
+	{
+		m_OpenHousesPasswd = pItr->second;
+	}
+    pItr = keyvals.find("autospree_passwd");
+	if (pItr != keyvals.end())
+	{
+		m_AutoSpreePasswd = pItr->second;
+	}
+
+    pItr = keyvals.find("easygroc_passwd");
+	if (pItr != keyvals.end())
+	{
+		m_EasyGrocPasswd = pItr->second;
+	}
+
+
     loadAppConns();    
+}
+
+std::string
+Config::oHousesPasswd()
+{
+    return m_OpenHousesPasswd;
+}
+
+std::string
+Config::aSpreePasswd()
+{
+    return m_AutoSpreePasswd;
+}
+
+std::string
+Config::eGrocPasswd()
+{
+    return m_EasyGrocPasswd;
 }
 
 void

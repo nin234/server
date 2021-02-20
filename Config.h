@@ -23,6 +23,9 @@ class Config
     std::map<std::string, std::pair<std::string, int>> appConns;    
     void loadAppConns();
     int m_nDistribIntvl;
+    std::string m_OpenHousesPasswd;
+    std::string m_EasyGrocPasswd;
+    std::string m_AutoSpreePasswd;
 
 	public:
 		Config();
@@ -43,6 +46,10 @@ class Config
         std::map<std::string, std::pair<std::string, int>> getAppConns();
 
         long distribInterval();
+
+        std::string oHousesPasswd();
+        std::string aSpreePasswd();
+        std::string eGrocPasswd();
             
 };
 #endif
