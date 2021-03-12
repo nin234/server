@@ -24,7 +24,6 @@ EasyGrocDecoder::decodeMsg(char *buffer, ssize_t mlen, int fd)
 	case SHARE_TEMPL_ITEM_MSG:
 		return createShareTemplLstObj(buffer, mlen, fd);
 	default:
-		std::cout << "Unhandled MsgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	break;
     }
     return false;

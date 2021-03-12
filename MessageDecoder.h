@@ -15,6 +15,7 @@ class MessageDecoder
 	std::list<std::shared_ptr<MsgObj>> pMsgs;
 
 	bool createShareIdObj(char *buffer,  ssize_t mlen, int fd);
+	bool createShareIdObjAppIdInMsg(char *buffer,  ssize_t mlen, int fd);
 	bool createStoreIdObj(char *buffer,  ssize_t mlen, int fd);
 	bool createFrndLstObj(char *buffer, ssize_t mlen, int fd);
 	bool createTemplLstObj(char *buffer,  ssize_t mlen, int fd);

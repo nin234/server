@@ -8,13 +8,15 @@
 #define AUTOSPREE_ID 1
 #define EASYGROCLIST_ID 2
 #define SMARTMSG_ID 3
+#define NSHARELIST_ID 4
 
 enum class AppName
 {
         OPENHOUSES,
         AUTOSPREE,
         EASYGROCLIST,
-	SMARTMSG
+	    SMARTMSG,
+        NSHARELIST
 };
 
 #define NO_OF_THREADS 4
@@ -114,5 +116,7 @@ enum class AppName
 
 #define LCKFREE_LST_TDIFF 10.0
 
+#define GET_SHARE_ID_1_MSG 101
+#define GET_SHARE_ID_RPLY_1_MSG 102
 
 #endif

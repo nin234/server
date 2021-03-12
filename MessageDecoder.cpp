@@ -30,6 +30,9 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 		case GET_SHARE_ID_MSG:
 		 	return createShareIdObj(buffer, mlen, fd);
 
+        case GET_SHARE_ID_1_MSG:
+		 	return createShareIdObjAppIdInMsg(buffer, mlen, fd);
+
 		case STORE_TRNSCTN_ID_MSG:
 			return createStoreIdObj(buffer, mlen, fd);
 
@@ -64,7 +67,7 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 			return createGetRemoteHost(buffer, mlen, fd);
  
 		default:
-//			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 		break;
 	}	
    	return false; 
@@ -161,6 +164,33 @@ MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 	addMsgObj(pMsg);
 
 	return true;
+}
+
+bool
+MessageDecoder::createShareIdObjAppIdInMsg(char *buffer,  ssize_t mlen, int fd)
+{
+	std::shared_ptr<ShareIdObj> pMsg = std::make_shared<ShareIdObj>();
+      pMsg->setMsgTyp(GET_SHARE_ID_MSG);
+    int msgLen;
+    memcpy(&msgLen, buffer, sizeof(int));
+	constexpr int offset = 3*sizeof(int);
+
+    constexpr int lenWithOutId = 3*sizeof(int) + sizeof(long);
+	long tid;
+	memcpy(&tid, buffer+offset, sizeof(long));
+	pMsg->setTrnId(tid);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+4, sizeof(int));
+	pMsg->setAppId(appId);
+    if (msgLen > lenWithOutId)
+    {
+        pMsg->setDeviceId(buffer+lenWithOutId);
+    }
+	std::cout << "Creating shareId Obj fd=" << fd << " tid=" << tid << " appId=" << getAppId() << " deviceId=" << pMsg->getDeviceId()
+     << " " << __FILE__ << " " << __LINE__ << std::endl;
+	pMsgs.push_back(pMsg);
+    return true;
 }
 
 bool
