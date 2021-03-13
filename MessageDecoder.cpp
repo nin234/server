@@ -38,6 +38,9 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 
 		case STORE_FRIEND_LIST_MSG:
 			return createFrndLstObj(buffer, mlen, fd);
+		
+        case STORE_FRIEND_LIST_1_MSG:
+			return createFrndLstObjAppIdInMsg(buffer, mlen, fd);
 
 		case ARCHIVE_ITEM_MSG:
 			return createTemplLstObj(buffer, mlen, fd);
@@ -255,6 +258,24 @@ MessageDecoder::getNextMsg()
 	return std::shared_ptr<MsgObj>();
 }
 
+bool
+MessageDecoder::createFrndLstObjAppIdInMsg(char *buffer, ssize_t mlen, int fd)
+{
+	std::shared_ptr<FrndLstObj> pMsg = std::make_shared<FrndLstObj>();
+	pMsg->setMsgTyp(STORE_FRIEND_LIST_MSG);
+	constexpr int offset = 3*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+	constexpr int frndLstOffset = offset + sizeof(long);
+	pMsg->setFrndLst(buffer + frndLstOffset);
+	pMsgs.push_back(pMsg);
+	return true;
+}
 bool
 MessageDecoder::createFrndLstObj(char *buffer, ssize_t mlen, int fd)
 {

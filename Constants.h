@@ -122,5 +122,7 @@ enum class AppName
 #define STORE_DEVICE_TKN_RPLY_1_MSG 112
 #define GET_ITEMS_1 113
 #define GET_ITEMS_1_RPLY_MSG 114
+#define STORE_FRIEND_LIST_1_MSG 105
+#define STORE_FRIEND_LIST_RPLY_1_MSG 106
 
 #endif
