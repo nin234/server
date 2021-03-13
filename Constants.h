@@ -118,5 +118,9 @@ enum class AppName
 
 #define GET_SHARE_ID_1_MSG 101
 #define GET_SHARE_ID_RPLY_1_MSG 102
+#define STORE_DEVICE_TKN_1_MSG 111
+#define STORE_DEVICE_TKN_RPLY_1_MSG 112
+#define GET_ITEMS_1 113
+#define GET_ITEMS_1_RPLY_MSG 114
 
 #endif

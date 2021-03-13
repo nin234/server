@@ -47,9 +47,15 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 
 		case STORE_DEVICE_TKN_MSG:
 			return createDeviceTknObj(buffer, mlen, fd);
+		
+        case STORE_DEVICE_TKN_1_MSG:
+			return createDeviceTknObjAppIdInMsg(buffer, mlen, fd);
 
 		case GET_ITEMS:
 			return createGetItemObj(buffer, mlen, fd);
+
+		case GET_ITEMS_1:
+			return createGetItemObjAppIdInMsg(buffer, mlen, fd);
 
 		case PIC_METADATA_MSG:
 			return createPicMetaDataObj(buffer, mlen, fd);
@@ -181,7 +187,7 @@ MessageDecoder::createShareIdObjAppIdInMsg(char *buffer,  ssize_t mlen, int fd)
 	pMsg->setTrnId(tid);
 	pMsg->setFd(fd);
     int appId;
-    memcpy(&appId, buffer+4, sizeof(int));
+    memcpy(&appId, buffer+8, sizeof(int));
 	pMsg->setAppId(appId);
     if (msgLen > lenWithOutId)
     {
@@ -320,6 +326,26 @@ MessageDecoder::createDeviceTknObj(char *buffer, ssize_t mlen, int fd)
 }
 
 bool
+MessageDecoder::createDeviceTknObjAppIdInMsg(char *buffer, ssize_t mlen, int fd)
+{
+	std::shared_ptr<DeviceTknObj> pMsg = std::make_shared<DeviceTknObj>();
+	pMsg->setMsgTyp(STORE_DEVICE_TKN_MSG);
+	constexpr int offset = 3*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+	constexpr int devTknOffset = offset + sizeof(long);
+	pMsg->setDeviceTkn(buffer + devTknOffset);
+	int devIdOffset = devTknOffset + pMsg->getDeviceTkn().size() + 1;
+	pMsg->setPlatform(buffer + devIdOffset);
+	pMsgs.push_back(pMsg);
+	return true;
+}
+bool
 MessageDecoder::createPicDoneObj(char *buffer, ssize_t mlen, int fd)
 {
 	std::shared_ptr<PicDoneObj> pMsg = std::make_shared<PicDoneObj>();
@@ -404,4 +430,41 @@ MessageDecoder::createGetItemObj(char *buffer, ssize_t mlen, int fd)
 	return true;
 }
 
+bool
+MessageDecoder::createGetItemObjAppIdInMsg(char *buffer, ssize_t mlen, int fd)
+{
+	std::shared_ptr<GetItemObj> pMsg = std::make_shared<GetItemObj>();
+	pMsg->setMsgTyp(GET_ITEMS);
+	constexpr int offset = 3*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+	constexpr int devIdOffset = offset + sizeof(long);
+	pMsg->setDeviceId(buffer + devIdOffset);
+	int picrmngoffset = devIdOffset + pMsg->getDeviceId().size() +1;
+	int picRemaining=0;
+	memcpy(&picRemaining, buffer+picrmngoffset, sizeof(int));
+	pMsg->setPicRemaining(picRemaining);
+	pMsg->setPicName(buffer+picrmngoffset+sizeof(int));
+	int picshidoffset = picrmngoffset + sizeof(int) + pMsg->getPicName().size() + 1;
+	long picShareId = 0;
+	memcpy(&picShareId, buffer+picshidoffset, sizeof(long));
+	pMsg->setPicShareId(picShareId);
+    long maxShareId = 0;
+    int maxShIdOffset = picshidoffset + sizeof(long);
+    ssize_t len = maxShIdOffset + sizeof(long);
+    if (mlen >= len)
+    {
+        memcpy(&maxShareId, buffer+maxShIdOffset, sizeof(long));
+        pMsg->setMaxShareId(maxShareId);
+    }
+	std::cout << Util::now() << "Create getItemObj " << *pMsg << " appId=" << getAppId() << __FILE__ << ":" << __LINE__ << std::endl;	
+	
+	pMsgs.push_back(pMsg);
+	return true;
+}
 
