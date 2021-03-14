@@ -125,4 +125,7 @@ enum class AppName
 #define STORE_FRIEND_LIST_1_MSG 105
 #define STORE_FRIEND_LIST_RPLY_1_MSG 106
 
+#define SHARE_ITEM_1_MSG 109
+#define SHARE_ITEM_RPLY_1_MSG 110
+
 #endif

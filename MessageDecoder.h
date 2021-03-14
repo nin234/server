@@ -21,6 +21,7 @@ class MessageDecoder
 	bool createFrndLstObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 	bool createTemplLstObj(char *buffer,  ssize_t mlen, int fd);
 	bool createLstObj(char *buffer,  ssize_t mlen, int fd);
+	bool createLstObjAppId(char *buffer,  ssize_t mlen, int fd);
 	bool createDeviceTknObj(char *buffer, ssize_t mlen, int fd);
 	bool createDeviceTknObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 	bool createGetItemObj(char *buffer, ssize_t mlen, int fd);

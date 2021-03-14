@@ -48,6 +48,9 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 		case SHARE_ITEM_MSG:
 			return createLstObj(buffer, mlen, fd);
 
+		case SHARE_ITEM_1_MSG:
+			return createLstObjAppId(buffer, mlen, fd);
+
 		case STORE_DEVICE_TKN_MSG:
 			return createDeviceTknObj(buffer, mlen, fd);
 		
@@ -153,6 +156,41 @@ MessageDecoder::createLstObj(char *buffer,  ssize_t mlen, int fd)
 	int msgLen;
 	memcpy(&msgLen, buffer, sizeof(int));
 	constexpr int offset = 2*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	int nameLen;
+	constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+	memcpy(&nameLen, buffer + namelenoffset, sizeof(int));
+	int lstLen;
+	constexpr int lstlenoffset = 3*sizeof(int) + sizeof(long);
+	memcpy(&lstLen, buffer + lstlenoffset, sizeof(int));
+	constexpr int nameoffset = 4*sizeof(int) + sizeof(long);
+	pMsg->setName(buffer + nameoffset, nameLen);	
+	int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
+	std::cout << "Creating list item lstoffset=" << lstoffset << " nameoffset=" << nameoffset << " nameLen=" << nameLen << " lstLen=" << lstLen << " msgLen=" << msgLen  << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	if (lstLen)
+		pMsg->setList(buffer+lstoffset, lstLen);	
+	else
+		return false;
+	addMsgObj(pMsg);
+
+	return true;
+}
+
+bool
+MessageDecoder::createLstObjAppId(char *buffer,  ssize_t mlen, int fd)
+{
+
+	std::shared_ptr<LstObj> pMsg = std::make_shared<LstObj>();
+	pMsg->setMsgTyp(SHARE_ITEM_MSG);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+	int msgLen;
+	memcpy(&msgLen, buffer, sizeof(int));
+	constexpr int offset = 3*sizeof(int);
 	long shareId;
 	memcpy(&shareId, buffer+offset, sizeof(long));
 	pMsg->setShrId(shareId);
