@@ -28,9 +28,12 @@ class MessageDecoder
 	bool createGetItemObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 	bool createPicDoneObj(char *buffer, ssize_t mlen, int fd);
 	bool createPicMetaDataObj(char *buffer, ssize_t mlen, int fd);
+	bool createPicMetaDataObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 	bool createPicObj(char *buffer, ssize_t mlen, int fd);
+	bool createPicObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 
     bool createShouldDownLoadObj(char *buffer, ssize_t mlen, int fd);
+    bool createShouldDownLoadObjAppIdInMsg(char *buffer, ssize_t mlen, int fd);
 
     bool createGetRemoteHost(char *buffer, ssize_t mlen, int fd);
 

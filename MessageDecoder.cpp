@@ -66,14 +66,23 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 		case PIC_METADATA_MSG:
 			return createPicMetaDataObj(buffer, mlen, fd);
 
+		case PIC_METADATA_1_MSG:
+			return createPicMetaDataObjAppIdInMsg(buffer, mlen, fd);
+
 		case PIC_MSG:
 			return createPicObj(buffer, mlen, fd);
+
+		case PIC_1_MSG:
+			return createPicObjAppIdInMsg(buffer, mlen, fd);
 
 		case PIC_DONE_MSG:
 			return createPicDoneObj(buffer, mlen, fd);
 
 		case SHOULD_DOWNLOAD_MSG:
 			return createShouldDownLoadObj(buffer, mlen, fd);
+
+		case SHOULD_DOWNLOAD_1_MSG:
+			return createShouldDownLoadObjAppIdInMsg(buffer, mlen, fd);
 
         case GET_REMOTE_HOST_MSG:
 			return createGetRemoteHost(buffer, mlen, fd);
@@ -117,6 +126,23 @@ MessageDecoder::createPicObj(char *buffer,  ssize_t mlen, int fd)
 }
 
 bool
+MessageDecoder::createPicObjAppIdInMsg(char *buffer,  ssize_t mlen, int fd)
+{
+	std::shared_ptr<PicObj> pMsg = std::make_shared<PicObj>();
+	pMsg->setMsgTyp(PIC_MSG);	
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(getAppId());
+	pMsg->setBuf(buffer+3*sizeof(int), mlen-3*sizeof(int));
+	int len;
+	memcpy(&len, buffer, sizeof(int));
+	pMsg->setLen(len);
+	pMsgs.push_back(pMsg);
+	return true;
+}
+
+bool
 MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 {
 	std::shared_ptr<PicMetaDataObj> pMsg = std::make_shared<PicMetaDataObj>();
@@ -129,6 +155,38 @@ MessageDecoder::createPicMetaDataObj(char *buffer,  ssize_t mlen, int fd)
 	pMsg->setShrId(shareId);
 	int nameLen;
 	constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+	memcpy(&nameLen, buffer + namelenoffset, sizeof(int));
+	int nameoffset = namelenoffset + sizeof(int);
+	pMsg->setName(buffer + nameoffset, nameLen);	
+	int piclenoffset = nameoffset + nameLen;
+	int picLen;
+	memcpy(&picLen, buffer + piclenoffset, sizeof(int));
+	pMsg->setPicLen(picLen);
+	int metastrlenoffset = piclenoffset + sizeof(int);
+	int metaStrLen;
+	memcpy(&metaStrLen, buffer + metastrlenoffset, sizeof(int));
+	int metastroffset = metastrlenoffset + sizeof(int);
+	pMsg->setFrndLstStr(buffer+metastroffset, metaStrLen);
+	pMsgs.push_back(pMsg);
+	return true;
+}
+
+
+bool
+MessageDecoder::createPicMetaDataObjAppIdInMsg(char *buffer,  ssize_t mlen, int fd)
+{
+	std::shared_ptr<PicMetaDataObj> pMsg = std::make_shared<PicMetaDataObj>();
+	pMsg->setMsgTyp(PIC_METADATA_MSG);
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+	constexpr int offset = 3*sizeof(int);
+	long shareId;
+	memcpy(&shareId, buffer+offset, sizeof(long));
+	pMsg->setShrId(shareId);
+	int nameLen;
+	constexpr int namelenoffset = offset + sizeof(long);
 	memcpy(&nameLen, buffer + namelenoffset, sizeof(int));
 	int nameoffset = namelenoffset + sizeof(int);
 	pMsg->setName(buffer + nameoffset, nameLen);	
@@ -423,6 +481,36 @@ MessageDecoder::createPicDoneObj(char *buffer, ssize_t mlen, int fd)
 	pMsg->setPicName(buffer + picnameoffset);	
 	pMsgs.push_back(pMsg);
 	return true;
+}
+
+bool
+MessageDecoder::createShouldDownLoadObjAppIdInMsg(char *buffer, ssize_t mlen, int fd)
+{
+	std::cout << "Decoding createShouldDownLoadObjAppIdInMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
+	std::shared_ptr<ShouldDownLoad> pMsg = std::make_shared<ShouldDownLoad>();
+    constexpr int offset = 3*sizeof(int);
+    long shareId;
+    memcpy(&shareId, buffer+offset, sizeof(long));
+    pMsg->setShrId(shareId);
+    pMsg->setMsgTyp(SHOULD_DOWNLOAD_MSG);
+    pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer+8, sizeof(int));
+	pMsg->setAppId(appId);
+    int download;
+    memcpy(&download, buffer+offset+sizeof(long), sizeof(int));
+    if (download)
+    {
+        pMsg->setDownLoad(true);
+    }
+    else
+    {
+        pMsg->setDownLoad(false);
+    }
+    int nameoffset = offset + sizeof(long) + sizeof(int);
+    pMsg->setName(buffer + nameoffset);
+    pMsgs.push_back(pMsg);
+    return true;
 }
 
 bool

@@ -128,4 +128,10 @@ enum class AppName
 #define SHARE_ITEM_1_MSG 109
 #define SHARE_ITEM_RPLY_1_MSG 110
 
+#define PIC_METADATA_1_MSG 115
+#define PIC_METADATA_RPLY_1_MSG 116
+#define PIC_1_MSG 117
+#define PIC_RPLY_1_MSG 118
+#define SHOULD_DOWNLOAD_1_MSG 121
+
 #endif
