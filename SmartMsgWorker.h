@@ -10,6 +10,6 @@ class SmartMsgWorker : public Worker
 		SmartMsgWorker();
 		~SmartMsgWorker();
 		void setMaxFd();
-		void setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
+		void setMsgProcessors();
 };
 #endif

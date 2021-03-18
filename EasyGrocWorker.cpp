@@ -21,11 +21,9 @@ EasyGrocWorker::setMaxFd()
 
 
 void
-EasyGrocWorker::setMsgProcessors(std::shared_ptr<ApplePush> pAppleNotify , std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)
+EasyGrocWorker::setMsgProcessors()
 {
 	EasyGrocMsgProcessor *pMsgPr = new EasyGrocMsgProcessor();
-	pMsgPr->setAppleNotify(pAppleNotify);
-    pMsgPr->setFirebaseNotify(pFirebaseNotify);
 	Worker::setMsgProcessor(pMsgPr);
 	return;
 }

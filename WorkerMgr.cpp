@@ -23,7 +23,7 @@ WorkerMgr::initialize(int nThrds)
 	for (int i=0; i < no_of_threads; ++i)
 	{
 		Worker *pWrkr = getWorker();
-		pWrkr->setMsgProcessors(getApplePushPtr(), getFirebaseConnPtr());
+		pWrkr->setMsgProcessors();
 		std::cout << "Initializing Worker number " << i << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		pWrkr->setMaxFd();
 		workers.push_back(pWrkr);

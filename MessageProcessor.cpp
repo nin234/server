@@ -38,7 +38,7 @@ MessageProcessor::process()
 	std::cout << "Start processing of events " << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	for (;;)
 	{
-        	pFirebaseNotify->getSendEvents();
+        getSendEvents();
 		if (pNtwIntf->waitAndGetMsg())	
 		{
 			processRequests();
@@ -274,7 +274,7 @@ MessageProcessor::sendPicNotifications(const std::vector<std::string>& shareIds,
 	std::cout << "Sending push notification to receive picture name=" << picName << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (tokens.size())
 	{
-		sendApplePush(tokens, picName, 1);
+		sendApplePush(appId, tokens, picName, 1);
 	}
 	std::vector<std::string> regIds;
 	dataStore.getAndroidDeviceTkns(appId, shareIds, regIds);
@@ -516,7 +516,7 @@ MessageProcessor::processItemMsgDBInsert(std::shared_ptr<MsgObj> pMsg)
 		std::vector<std::string> tokens;
 		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
 		if (tokens.size())
-			sendApplePush(tokens, pLstObj->getName(), 1);
+			sendApplePush(pLstObj->getAppId(), tokens, pLstObj->getName(), 1);
         std::vector<std::string> regIds;
         dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
 	std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -579,7 +579,7 @@ MessageProcessor::processItemMsg(std::shared_ptr<MsgObj> pMsg)
 		std::vector<std::string> tokens;
 		dataStore.getDeviceTkns(pLstObj->getAppId(), shareIds, tokens);	
 		if (tokens.size())
-			sendApplePush(tokens, pLstObj->getName(), 1);
+			sendApplePush(pLstObj->getAppId(), tokens, pLstObj->getName(), 1);
         std::vector<std::string> regIds;
         dataStore.getAndroidDeviceTkns(pLstObj->getAppId(), shareIds, regIds);
 	std::cout << "Sending push notifications no of tokens=" << tokens.size() << " no of regIds=" << regIds.size() << " " << __FILE__ << ":" << __LINE__ << std::endl;
@@ -797,25 +797,15 @@ MessageProcessor::sendMsg(char *buf, int mlen, int fd, bool *tryAgain)
 	return true;
 }
 
-void
-MessageProcessor::setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy)
-{
-	pAppleNotfy = pAppleNtfy;
-	return;
-}
 
-void
-MessageProcessor::setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNtfy)
-{
-    pFirebaseNotify = pFirebaseNtfy;
-}
-
+/*
 bool
 MessageProcessor::sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge)
 {
 
 	return pAppleNotfy->send(tokens, msg, badge);
 }
+*/
 
 bool
 MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& shareIds)
@@ -824,6 +814,7 @@ MessageProcessor::getShareIds(const std::string& lst, std::vector<std::string>& 
 	return m_pTrnsl->getShareIds(lst, shareIds);
 }
 
+/*
 bool
 MessageProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg)
 {
@@ -848,6 +839,7 @@ MessageProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>& tok
 	fbmsg += msg; 
 	return pFirebaseNotify->send(tokens, fbmsg);
 }
+*/
 
 bool
 MessageProcessor::getReply(char *buf, int *mlen, int msgTyp)

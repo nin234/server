@@ -29,8 +29,6 @@ class MessageProcessor : public Observer, public NtwIntfObserver
     std::unique_ptr<Distributor> m_distributor;
 	int maxFd;
 	int nFds;
-	std::shared_ptr<ApplePush> pAppleNotfy;
-    std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     
     void processGetItemPics(std::shared_ptr<GetItemObj> pGetItemObj);
     void sendUpdatedMaxShareIdIfRequd(std::shared_ptr<GetItemObj> pGetItemObj);
@@ -58,7 +56,7 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getReply(char *buf, int *mlen, int msgTyp);
 		CommonDataMgr& dataStore;
-
+        virtual void getSendEvents()=0;
 		
 	public:
 		MessageProcessor();
@@ -73,10 +71,8 @@ class MessageProcessor : public Observer, public NtwIntfObserver
 		void processStoreIdMsg(std::shared_ptr<MsgObj> pMsg);
 		void processFrndLstMsg(std::shared_ptr<MsgObj> pMsg);
 		virtual void processMsg(std::shared_ptr<MsgObj> pMsg)=0;
-		void setAppleNotify(std::shared_ptr<ApplePush> pAppleNtfy);
-        void setFirebaseNotify(std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
-		bool sendApplePush(const std::vector<std::string>& tokens, const std::string& msg, int badge);
-        bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg);
+		virtual bool sendApplePush(int appId, const std::vector<std::string>& tokens, const std::string& msg, int badge)=0;
+        virtual bool sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg)=0;
 		bool notify (char *buf, int mlen, int fd, bool *tryAgain);
 
 		bool picDone(int fd);

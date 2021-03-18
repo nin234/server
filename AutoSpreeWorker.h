@@ -11,6 +11,6 @@ class AutoSpreeWorker : public Worker
 		AutoSpreeWorker();
 		~AutoSpreeWorker();
 		void setMaxFd();
-		void setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
+		void setMsgProcessors();
 };
 #endif

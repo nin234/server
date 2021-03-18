@@ -5,8 +5,6 @@
 
 class AutoSpreeMgr : public WorkerMgr
 {
-	std::shared_ptr<ApplePush> pAppleNotify;
-    std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify;
     
 	public:
 
@@ -14,8 +12,6 @@ class AutoSpreeMgr : public WorkerMgr
 	virtual ~AutoSpreeMgr();
 	void setNoOfThreads(int nThrds);
 	Worker* getWorker();
-	std::shared_ptr<ApplePush> getApplePushPtr();
-    std::shared_ptr<FirebaseConnHdlr> getFirebaseConnPtr();
 };
 
 #endif

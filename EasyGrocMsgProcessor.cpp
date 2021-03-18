@@ -7,12 +7,17 @@
 #include <ArchiveMsgCreator.h>
 #include <vector>
 #include <sstream>
+#include <Config.h>
 
 using namespace std::placeholders;
 
 EasyGrocMsgProcessor::EasyGrocMsgProcessor()
 {
+    std::cout << "Setting EasyGrocDecoder and EasyGrocTranslator and Apple Push and Firebase" << " " << __FILE__ << ":" << __LINE__ << std::endl;   
 	MessageProcessor::setDcdTransl(new EasyGrocDecoder(), new EasyGrocTranslator());
+	pAppleNotifys[AppName::EASYGROCLIST] = std::make_shared<ApplePush>("/home/ninan/certs/EasyGrocList.p12", Config::Instance().sandBox(), Config::Instance().eGrocPasswd());
+	pAppleNotifys[AppName::NSHARELIST] = std::make_shared<ApplePush>("/home/ninan/certs/nsharelist.p12", Config::Instance().sandBox(), Config::Instance().eGrocPasswd());
+    pFirebaseNotifys[AppName::EASYGROCLIST] = std::make_shared<FirebaseConnHdlr> ("977230809988@gcm.googleapis.com", "AAAA44d-y4Q:APA91bHzCm1pxTgFjsQValZwOKmNejF4xd5ImJrEsSPe5VTgAFXN5BBPXG9BCS6Tj2zVnJtotfycf2vrM1n7GRd3-AwACd7-A1HkxOTjGhxHEKnN7w2zzgCcewJQylHqL3GGJElYAjoa");
     
 }
 
@@ -72,7 +77,7 @@ EasyGrocMsgProcessor::processTemplItemMsg(std::shared_ptr<MsgObj> pMsg)
             std::vector<std::string> tokens;
             dataStore.getDeviceTkns(pTmplObj->getAppId(), shareIds, tokens);
 	    if (tokens.size())
-            	sendApplePush(tokens, pTmplObj->getName(), 1);
+            	sendApplePush(pTmplObj->getAppId(), tokens, pTmplObj->getName(), 1);
             std::vector<std::string> regIds;
             dataStore.getAndroidDeviceTkns(pTmplObj->getAppId(), shareIds, regIds);
 	    if (regIds.size())
@@ -91,3 +96,55 @@ EasyGrocMsgProcessor::processTemplItemMsg(std::shared_ptr<MsgObj> pMsg)
     
     return;
 }
+
+
+bool 
+EasyGrocMsgProcessor::sendApplePush(int appId, const std::vector<std::string>& tokens, const std::string& msg, int badge)
+{
+
+    auto pItr = pAppleNotifys.find(static_cast<AppName>(appId));
+    if (pItr != pAppleNotifys.end())
+    {
+        return pItr->second->send(tokens, msg, badge);
+    }
+    return true;
+}
+
+void 
+EasyGrocMsgProcessor::getSendEvents()
+{
+    for (const auto& [key, pFirebaseNotify] : pFirebaseNotifys)
+    {
+        pFirebaseNotify->getSendEvents();
+    }
+}
+
+bool 
+EasyGrocMsgProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg)
+{
+
+    std::string fbmsg;
+    
+    switch(appId)
+	{
+		case NSHARELIST_ID:
+			fbmsg = "nsharelist- ";
+		break;
+
+		case EASYGROCLIST_ID:
+			fbmsg = "EasyGrocList- ";
+		break;
+
+		default:
+		break;
+	}
+
+    fbmsg += msg;
+    auto pItr = pFirebaseNotifys.find(static_cast<AppName>(appId));
+    if (pItr != pFirebaseNotifys.end())
+    {
+        return pItr->second->send(tokens, fbmsg);
+    }
+    return true;
+}
+

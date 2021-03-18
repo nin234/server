@@ -22,13 +22,10 @@ SmartMsgWorker::setMaxFd()
 
 
 void
-SmartMsgWorker::setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)
+SmartMsgWorker::setMsgProcessors()
 {
 	std::cout << "Creating SmartMsgMsgProcessor " << __FILE__ << ":" << __LINE__ << std::endl;
 	SmartMsgMsgProcessor *pMsgPr = new SmartMsgMsgProcessor();
-	std::cout << "Setting SmartMsgMsgProcessor notification mechanisms " << __FILE__ << ":" << __LINE__ << std::endl;
-	pMsgPr->setAppleNotify(pAppleNtfy);
-    pMsgPr->setFirebaseNotify(pFirebaseNotify);
 	Worker::setMsgProcessor(pMsgPr);
 	return;
 }

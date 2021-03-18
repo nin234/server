@@ -19,11 +19,9 @@ AutoSpreeWorker::setMaxFd()
 }
 
 void
-AutoSpreeWorker::setMsgProcessors(std::shared_ptr<ApplePush> pAppleNtfy , std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)
+AutoSpreeWorker::setMsgProcessors()
 {
 	AutoSpreeMsgProcessor *pMsgPr = new AutoSpreeMsgProcessor();
-	pMsgPr->setAppleNotify(pAppleNtfy);
-    pMsgPr->setFirebaseNotify(pFirebaseNotify);
 	Worker::setMsgProcessor(pMsgPr);
 	return;
 }

@@ -25,7 +25,7 @@ class Worker
 	bool addSSLFd(int fd);
 	void setMaxFd(int mfd);
 	virtual void setMaxFd()=0;
-    virtual void setMsgProcessors(std::shared_ptr<ApplePush> pApplPushNotfy, std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify)=0;
+    virtual void setMsgProcessors()=0;
 	void setMsgProcessor(MessageProcessor *pMsgProcessor);
 };
 #endif

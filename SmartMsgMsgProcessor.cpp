@@ -22,3 +22,22 @@ SmartMsgMsgProcessor::processMsg(std::shared_ptr<MsgObj> pMsg)
 }
 
 
+bool 
+SmartMsgMsgProcessor::sendApplePush(int appId, const std::vector<std::string>& tokens, const std::string& msg, int badge)
+{
+
+    return true;
+}
+
+bool 
+SmartMsgMsgProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>& tokens, const std::string& msg)
+{
+
+    return true;
+}
+
+void 
+SmartMsgMsgProcessor::getSendEvents()
+{
+
+}

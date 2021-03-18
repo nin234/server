@@ -11,6 +11,6 @@ class EasyGrocWorker : public Worker
 		EasyGrocWorker();
 		~EasyGrocWorker();
 		void setMaxFd();
-		void setMsgProcessors(std::shared_ptr<ApplePush> pAppleNotify , std::shared_ptr<FirebaseConnHdlr> pFirebaseNotify);
+		void setMsgProcessors();
 };
 #endif
