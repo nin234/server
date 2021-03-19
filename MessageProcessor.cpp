@@ -214,6 +214,10 @@ MessageProcessor::processRequests()
                     << " port=" << hostPort.second << " " << __FILE__ << " " << __LINE__ << std::endl;
             }
         }
+        else
+        {
+            std::cout << Util::now() << "Failed to getNode for shareId=" << pGetRemoteHostObj->getShareId() << " appId=" << pGetRemoteHostObj->getAppId() << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        }
     }
 
     void

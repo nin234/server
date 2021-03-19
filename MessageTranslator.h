@@ -8,6 +8,12 @@
 
 class MessageTranslator
 {
+        bool createServerPicMetaMsgAppId(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds);
+        bool createServerPicMetaMsgNoAppId(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds);
+        bool createShareItemMsgAppId(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds);
+        bool createShareItemMsgNoAppId(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds);
+        bool getPicMsgAppId(int fd, int appId, char* buf, int *mlen);
+        bool getPicMsgNoAppId(int fd, int appId,  char* buf, int *mlen);
 	public:
 		MessageTranslator();
 		virtual ~MessageTranslator();
@@ -29,6 +35,7 @@ class MessageTranslator
         bool createServerPicMetaMsg(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds);
 
         bool changeShareIds(std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds);
+        bool getPicMsg(int fd, int appId, char* buf, int *mlen);
         
 };
 #endif

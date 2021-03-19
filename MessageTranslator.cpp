@@ -3,6 +3,7 @@
 #include <Constants.h>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 MessageTranslator::MessageTranslator()
 {
@@ -160,8 +161,62 @@ MessageTranslator::getPicMetaMsg(char *pMsg, int *mlen, int buflen, const shrIdL
 	*mlen = msglen;
 	return true;
 }
+
 bool 
 MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds)
+{
+    if (pPicMetaObj->getAppId() > SMARTMSG_ID)
+    {
+        createServerPicMetaMsgAppId(msg, pPicMetaObj, shareIds);
+    }
+    else
+    {
+        createServerPicMetaMsgNoAppId(msg, pPicMetaObj, shareIds);
+    }
+    return true;
+}
+
+bool 
+MessageTranslator::createServerPicMetaMsgAppId(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds)
+{
+
+	constexpr int msgId = PIC_METADATA_1_MSG;
+    std::string name = pPicMetaObj->getName();
+    int nameLen = name.size() + 1;
+    std::stringstream ss;
+    for (auto& shareId : shareIds)
+    {
+        ss << shareId << ";";
+    }
+    std::string metaStr = ss.str();
+    int metaStrLen = metaStr.size() + 1;
+    int msglen = 6*sizeof(int) + nameLen  + sizeof(long) + metaStrLen;
+    msg.reserve(msglen);    
+    auto pMsg = std::make_unique<char[]>(msglen);
+	memcpy(pMsg.get(), &msglen, sizeof(int));
+	memcpy(pMsg.get()+sizeof(int), &msgId, sizeof(int));
+    int appId = pPicMetaObj->getAppId();
+    constexpr int appIdOffset = 2*sizeof(int);
+	memcpy(pMsg.get()+appIdOffset, &appId, sizeof(int));
+    long shareId = pPicMetaObj->getShrId();
+    constexpr int shareIdOffset = appIdOffset + sizeof(int);
+    memcpy(pMsg.get() + shareIdOffset, &shareId, sizeof(long));
+    constexpr int namelenoffset = shareIdOffset + sizeof(long);
+    memcpy(pMsg.get() + namelenoffset, &nameLen, sizeof(int));
+    int nameoffset = namelenoffset + sizeof(int);
+    memcpy(pMsg.get() + nameoffset, name.c_str(), nameLen);
+    int piclenoffset = nameoffset + nameLen;
+    int picLen = pPicMetaObj->getPicLen();
+    memcpy(pMsg.get() + piclenoffset, &picLen, sizeof(int)); 
+    int metastrlenoffset = piclenoffset + sizeof(int);
+    memcpy(pMsg.get() + metastrlenoffset, &metaStrLen, sizeof(int));
+    int metastroffset = metastrlenoffset + sizeof(int);
+    memcpy(pMsg.get() + metastroffset, metaStr.c_str(), metaStrLen);
+    msg.assign(pMsg.get(), pMsg.get()+msglen); 
+    return true;
+}
+bool 
+MessageTranslator::createServerPicMetaMsgNoAppId(std::vector<char>& msg, std::shared_ptr<PicMetaDataObj> pPicMetaObj, const std::vector<std::string>& shareIds)
 {
 
 	constexpr int msgId = PIC_METADATA_MSG;
@@ -198,6 +253,59 @@ MessageTranslator::createServerPicMetaMsg(std::vector<char>& msg, std::shared_pt
 
 
 bool 
+MessageTranslator::getPicMsg(int fd, int appId, char* buf, int *mlen)
+{
+
+    if (appId > SMARTMSG_ID)
+    {
+        return getPicMsgAppId(fd, appId, buf, mlen);
+    }
+    else
+    {
+        return getPicMsgNoAppId(fd, appId, buf, mlen);
+    }
+    return true;
+}
+ 
+bool 
+MessageTranslator::getPicMsgNoAppId(int fd, int appId, char* buf, int *mlen)
+{
+    constexpr int msgId = PIC_MSG;
+    memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+    
+    int numread = read(fd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
+    if (!numread ||  numread == -1)
+    {
+        std::cout << "Finished reading file " << fd << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+        return false;
+    }
+    *mlen = numread + 2*sizeof(int);
+    memcpy(buf, mlen, sizeof(int));
+
+    return true;
+}
+
+bool 
+MessageTranslator::getPicMsgAppId(int fd, int appId, char* buf, int *mlen)
+{
+    constexpr int msgId = PIC_MSG;
+    memcpy(buf+sizeof(int), &msgId, sizeof(int));		
+    
+    int numread = read(fd, buf+3*sizeof(int), MAX_BUF-3*sizeof(int));
+    if (!numread ||  numread == -1)
+    {
+        std::cout << "Finished reading file " << fd << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
+        return false;
+    }
+    *mlen = numread + 3*sizeof(int);
+    memcpy(buf, mlen, sizeof(int));
+    memcpy(buf + 2*sizeof(int), &appId, sizeof(int));
+
+
+    return true;
+}
+
+bool 
 MessageTranslator::changeShareIds(std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
 {
 	std::string::size_type xpos = pLstObj->getList().find(":::");
@@ -222,6 +330,69 @@ MessageTranslator::changeShareIds(std::shared_ptr<LstObj> pLstObj, const std::ve
 
 bool 
 MessageTranslator::createShareItemMsg(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
+{
+
+    if (pLstObj->getAppId() > SMARTMSG_ID)
+    {
+        createShareItemMsgAppId(msg, pLstObj, shareIds);
+    }
+    else
+    {
+        createShareItemMsgNoAppId(msg, pLstObj, shareIds);
+    }
+    return true;
+}
+
+bool 
+MessageTranslator::createShareItemMsgAppId(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
+{
+
+	std::string::size_type xpos = pLstObj->getList().find(":::");
+	if (xpos == std::string::npos)
+    {
+        std::cout << "Invalid list format for list=" << pLstObj->getList() << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+		return false;
+    }
+    std::string lst = pLstObj->getList();
+    lst.erase(0, xpos);
+    std::stringstream ss;
+    for (const auto& shareId : shareIds)
+    {
+        ss << shareId << ";"; 
+    }
+    std::string pre = ss.str();
+    std::string prefix = pre.substr(0, pre.size()-1);
+    std::string lstShare = prefix + lst;
+    int listLen = lstShare.size()+1;
+     int nameLen =  pLstObj->getName().size() + 1;
+    int msglen = 5*sizeof(int) + nameLen + listLen + sizeof(long);
+    
+    msg.reserve(msglen);    
+    auto pMsg = std::make_unique<char[]>(msglen);
+
+	memcpy(pMsg.get(), &msglen, sizeof(int));
+    int msgId = SHARE_ITEM_MSG;
+	memcpy(pMsg.get()+sizeof(int), &msgId, sizeof(int));
+    int appId = pLstObj->getAppId();
+    constexpr int appIdOffset = 2*sizeof(int);
+	memcpy(pMsg.get()+appIdOffset, &appId, sizeof(int));
+    long shareId = pLstObj->getShrId();
+    constexpr int shareIdOffset = appIdOffset + sizeof(int);
+    memcpy(pMsg.get() + shareIdOffset, &shareId, sizeof(long)); 
+    constexpr int namelenoffset = shareIdOffset + sizeof(long);
+    memcpy(pMsg.get() + namelenoffset, &nameLen, sizeof(int));
+     constexpr int lstlenoffset = sizeof(int) + namelenoffset;
+    memcpy(pMsg.get() + lstlenoffset, &listLen, sizeof(int));
+    constexpr int nameoffset = sizeof(int) + lstlenoffset;
+    memcpy(pMsg.get() + nameoffset, pLstObj->getName().c_str(), nameLen);    
+    int lstoffset = nameoffset+nameLen;
+	memcpy(pMsg.get()+lstoffset, lstShare.c_str(), listLen);
+    msg.assign(pMsg.get(), pMsg.get()+msglen); 
+    return true;
+}
+
+bool 
+MessageTranslator::createShareItemMsgNoAppId(std::vector<char>& msg, std::shared_ptr<LstObj> pLstObj, const std::vector<std::string>& shareIds)
 {
 
 	std::string::size_type xpos = pLstObj->getList().find(":::");

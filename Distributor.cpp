@@ -451,24 +451,18 @@ Distributor::sendPicture(std::shared_ptr<PicMetaDataObj> pPicMetaObj)
 		std::cout << "Failed to open file " << file  << " " << strerror(errno) << " " << __FILE__ << ":" << __LINE__ << std::endl;
 		return;
 	}
-	std::cout << "Opened file=" << file << " to distribute picture " << __FILE__ << ":" << __LINE__ << std::endl;
+	std::cout << "Opened file=" << file << " fd=" << fd << " to distribute picture " << __FILE__ << ":" << __LINE__ << std::endl;
 
     for (;;)
     {
         char buf[MAX_BUF];
-		constexpr int msgId = PIC_MSG;
-		memcpy(buf+sizeof(int), &msgId, sizeof(int));		
-        
-		int numread = read(fd, buf+2*sizeof(int), MAX_BUF-2*sizeof(int));
-		if (!numread ||  numread == -1)
-		{
-			std::cout << "Finished reading file " << file << " numread=" << numread << " "  << __FILE__ << ":" << __LINE__ << std::endl;
-		    close(fd);
-			break;
-		}
-		int msglen = numread + 2*sizeof(int);
-		memcpy(buf, &msglen, sizeof(int));
-        
+	    int msglen; 
+        if (!m_pTrnsl->getPicMsg(fd, pPicMetaObj->getAppId(), buf, &msglen))
+        {
+            close(fd);
+            break;
+        }
+ 
         for (const auto& picNode : picNodes)
         {
             if (!picNode.send)
