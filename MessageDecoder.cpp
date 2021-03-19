@@ -253,15 +253,17 @@ MessageDecoder::createLstObjAppId(char *buffer,  ssize_t mlen, int fd)
 	memcpy(&shareId, buffer+offset, sizeof(long));
 	pMsg->setShrId(shareId);
 	int nameLen;
-	constexpr int namelenoffset = 2*sizeof(int) + sizeof(long);
+	constexpr int namelenoffset = offset + sizeof(long);
 	memcpy(&nameLen, buffer + namelenoffset, sizeof(int));
 	int lstLen;
-	constexpr int lstlenoffset = 3*sizeof(int) + sizeof(long);
+	constexpr int lstlenoffset = sizeof(int) + namelenoffset;
 	memcpy(&lstLen, buffer + lstlenoffset, sizeof(int));
-	constexpr int nameoffset = 4*sizeof(int) + sizeof(long);
+	constexpr int nameoffset = sizeof(int) + lstlenoffset;
 	pMsg->setName(buffer + nameoffset, nameLen);	
-	int lstoffset = 4*sizeof(int) + sizeof(long)+nameLen;
-	std::cout << "Creating list item lstoffset=" << lstoffset << " nameoffset=" << nameoffset << " nameLen=" << nameLen << " lstLen=" << lstLen << " msgLen=" << msgLen  << " " << __FILE__ << ":" << __LINE__ << std::endl;
+	int lstoffset = nameoffset+nameLen;
+	std::cout << "Creating list item appId=" << appId << " lstoffset=" << lstoffset 
+              << " nameoffset=" << nameoffset << " nameLen=" << nameLen 
+              << " lstLen=" << lstLen << " msgLen=" << msgLen  << " " << __FILE__ << ":" << __LINE__ << std::endl;
 	if (lstLen)
 		pMsg->setList(buffer+lstoffset, lstLen);	
 	else

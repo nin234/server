@@ -11,6 +11,8 @@ DistribMgr::DistribMgr()
     m_appIdMp["AutoSpree"] = AUTOSPREE_ID;
     m_appIdMp["OpenHouses"] = OPENHOUSES_ID;
     m_appIdMp["EasyGrocList"] = EASYGROCLIST_ID;
+    m_appIdMp["SmartMsg"] = SMARTMSG_ID;
+    m_appIdMp["nsharelist"] = NSHARELIST_ID;
 }
 
 
