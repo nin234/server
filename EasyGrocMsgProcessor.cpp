@@ -18,6 +18,7 @@ EasyGrocMsgProcessor::EasyGrocMsgProcessor()
 	pAppleNotifys[AppName::EASYGROCLIST] = std::make_shared<ApplePush>("/home/ninan/certs/EasyGrocList.p12", Config::Instance().sandBox(), Config::Instance().eGrocPasswd());
 	pAppleNotifys[AppName::NSHARELIST] = std::make_shared<ApplePush>("/home/ninan/certs/nsharelist.p12", Config::Instance().sandBox(), Config::Instance().eGrocPasswd());
     pFirebaseNotifys[AppName::EASYGROCLIST] = std::make_shared<FirebaseConnHdlr> ("977230809988@gcm.googleapis.com", "AAAA44d-y4Q:APA91bHzCm1pxTgFjsQValZwOKmNejF4xd5ImJrEsSPe5VTgAFXN5BBPXG9BCS6Tj2zVnJtotfycf2vrM1n7GRd3-AwACd7-A1HkxOTjGhxHEKnN7w2zzgCcewJQylHqL3GGJElYAjoa");
+    pFirebaseNotifys[AppName::NSHARELIST] = std::make_shared<FirebaseConnHdlr> ("629527144642@gcm.googleapis.com", "AAAAkpK96MI:APA91bHw239pOKFgL_p9AuJhlvTdaBVOrFWNE5x050_V48cpYhZ14LzMeVTOXXQIDV7a5k-eH4TBqMCr6SPoqOw0S8TpZlWJ-DMQo3xWtOPr1cUwLQiZfuVQMgl-CXV3Gj_x6cG9w-qb");
     
 }
 
@@ -144,6 +145,11 @@ EasyGrocMsgProcessor::sendFirebaseMsg(int appId, const std::vector<std::string>&
     if (pItr != pFirebaseNotifys.end())
     {
         return pItr->second->send(tokens, fbmsg);
+    }
+    else
+    {
+        std::cout << "Failed to send firebase message, No firebase handler for appId=" << appId << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        return false;
     }
     return true;
 }
