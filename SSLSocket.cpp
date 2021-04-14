@@ -51,7 +51,7 @@ SSLSocket::passwd_cb(char *buf,int size,
   
 }
 
-SSLSocket::SSLSocket() : m_ssl(NULL), m_bAccepted(false)
+SSLSocket::SSLSocket() : m_ssl(NULL), m_bAccepted(false), m_bNoShutDown(false)
 {
 	if (!pCtx)
 	{
@@ -112,7 +112,9 @@ SSLSocket::accept()
 	 std::cout << Util::now() << "Done setting fd now about to SSL_accept ssl fd=" << m_fd << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 	if (int ret = SSL_accept(m_ssl); ret <=0)
 	{
-		if (SSL_get_error(m_ssl, ret) == SSL_ERROR_WANT_READ)
+        int err = SSL_get_error(m_ssl, ret); 
+        setNoShutDownFlag(err);
+		if (err == SSL_ERROR_WANT_READ)
 		{
 			std::cout << Util::now() << "SSL accept failed for want of DAta , will try again"<< " " << __FILE__ << ":" << __LINE__ << std::endl;
 			return true;	
@@ -128,6 +130,13 @@ SSLSocket::accept()
 
 }
 
+void
+SSLSocket::setNoShutDownFlag(int err)
+{
+    if (err == SSL_ERROR_SSL || err == SSL_ERROR_SYSCALL)
+        m_bNoShutDown = true;
+}
+
 int
 SSLSocket::read(char *buf, int len, bool& readAgain)
 {
@@ -137,6 +146,7 @@ SSLSocket::read(char *buf, int len, bool& readAgain)
 	{
         char lbuf[4096];
         int err = SSL_get_error(m_ssl, numRead);
+        setNoShutDownFlag(err);
 		if (err == SSL_ERROR_WANT_READ)
         {
             struct timespec ts;
@@ -173,6 +183,7 @@ SSLSocket::write(char *buf, int mlen, bool *tryAgain)
 	if (ret <= 0)
 	{
         int sslErr = SSL_get_error(m_ssl, ret);
+        setNoShutDownFlag(sslErr);
         switch(sslErr)
         {
             case SSL_ERROR_WANT_WRITE:
@@ -201,7 +212,9 @@ SSLSocket::write(char *buf, int mlen)
 	int ret = SSL_write(m_ssl, buf, mlen);
 	if (ret <= 0)
 	{
-		std::cout << Util::now() << "Failed to send SSL message error code=" << SSL_get_error(m_ssl, ret) << " " << __FILE__ << ":" << __LINE__ << std::endl;		
+        int sslErr = SSL_get_error(m_ssl, ret); 
+        setNoShutDownFlag(sslErr);
+		std::cout << Util::now() << "Failed to send SSL message error code=" << sslErr << " " << __FILE__ << ":" << __LINE__ << std::endl;		
 		return false;
 	}
 	return true;
@@ -210,6 +223,12 @@ SSLSocket::write(char *buf, int mlen)
 bool
 SSLSocket::shutdown()
 {
+    if (m_bNoShutDown)
+    {
+        std::cout << "No shut down flag set not shutting down SSL" << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+        return false; 
+    }
+    std::cout << Util::now() << "About to shut down SSL" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
 	int ret = SSL_shutdown(m_ssl);
 	if (ret == 1 || ret == 0)
 	{

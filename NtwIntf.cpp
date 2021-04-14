@@ -81,10 +81,7 @@ template<typename Decoder>
 void
 NtwIntf<Decoder>::closeAndCleanUpFd(int fd)
 {
-	struct epoll_event event;
-	event.data.fd = fd;
-	event.events = EPOLLIN ;
-	int ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, &event);
+	int ret = epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	if (ret)
 	{
 		std::cout << "epoll_ctl EPOLL_CTL_DEL failed with error=" << errno << " " << __FILE__ << ":" << __LINE__ << std::endl;	

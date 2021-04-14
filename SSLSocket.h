@@ -11,6 +11,9 @@ class SSLSocket
 	int m_fd;
 	SSL *m_ssl;
 	bool m_bAccepted;
+    bool m_bNoShutDown;
+    void setNoShutDownFlag(int err);
+
 	public:
 		SSLSocket();
 		~SSLSocket();
