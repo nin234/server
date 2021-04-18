@@ -16,6 +16,7 @@ struct FrndLst
     bool m_bUpdAutoSpree;
     bool m_bUpdOpenHouses;
     bool m_bUpdEasyList; 
+    bool m_bUpdNShareList; 
 
     std::vector<Frnd> m_bFrndLst;
     

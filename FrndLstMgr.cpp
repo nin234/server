@@ -34,6 +34,11 @@ FrndLstMgr::returnEmptyFrndLst(const FrndLst& frndLst, int appId)
                 return true;
         break;
 
+        case NSHARELIST_ID:
+            if (frndLst.m_bUpdNShareList)
+                return true;
+        break;
+
         default:
             return true;
         break;
@@ -85,6 +90,12 @@ FrndLstMgr::updateStatus(long shareId, int appId)
             case EASYGROCLIST_ID:
             {
                 frndLst.m_bUpdEasyList = true;
+            }
+            break;
+
+            case NSHARELIST_ID:
+            {
+                frndLst.m_bUpdNShareList = true;
             }
             break;
 

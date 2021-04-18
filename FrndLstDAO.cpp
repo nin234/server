@@ -4,7 +4,7 @@
 #include <Util.h>
 #include <Constants.h>
 
-FrndLst::FrndLst():m_bUpdAutoSpree(false), m_bUpdOpenHouses(false), m_bUpdEasyList(false)
+FrndLst::FrndLst():m_bUpdAutoSpree(false), m_bUpdOpenHouses(false), m_bUpdEasyList(false), m_bUpdNShareList(false)
 {
 
 }
@@ -43,7 +43,13 @@ FrndLstDAO::store(long shareId, const FrndLst& frndLst)
         value << "YES|";
     else 
         value << "NO|";
+    
     if (frndLst.m_bUpdEasyList)
+        value << "YES|";
+    else 
+        value << "NO|";
+
+    if (frndLst.m_bUpdNShareList)
         value << "YES}";
     else 
         value << "NO}";
@@ -91,6 +97,11 @@ FrndLstDAO::get(long shareId, FrndLst& frndLst)
     }
 
     auto valVec = Util::split(frndLstStr, '}');
+    if (!valVec.size())
+    {
+        std::cout << Util::now() << "Invalid format for frndLst" << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+        return false;
+    }
 
     auto updateVec = Util::split(valVec[0], '|');
    
@@ -108,6 +119,19 @@ FrndLstDAO::get(long shareId, FrndLst& frndLst)
         frndLst.m_bUpdEasyList = false;
     else
         frndLst.m_bUpdEasyList = true;
+    if (updateVec.size() > 3)
+    {
+        if (updateVec[3] == "NO")
+            frndLst.m_bUpdNShareList = false;
+        else
+            frndLst.m_bUpdNShareList = true;
+    }
+
+    if (valVec.size() < 2)
+    {
+        std::cout << Util::now() << "Empty friend list" << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+        return false;
+    }
     
     auto frndLstVec = Util::split(valVec[1], '|');
 
