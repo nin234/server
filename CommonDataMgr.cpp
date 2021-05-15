@@ -571,3 +571,11 @@ CommonDataMgr::updateFrndLstStatus(long shareId, int appId)
 {
     m_frndLstMgr.updateStatus(shareId, appId);
 }
+
+void
+CommonDataMgr::storeStorePurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg)
+{
+    m_purchaseDAO.store(pStorePurchaseMsg->getAppId(), pStorePurchaseMsg->getShareId(), pStorePurchaseMsg->getDeviceId(), pStorePurchaseMsg->getPurchaseId());
+}
+
+

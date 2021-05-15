@@ -157,6 +157,9 @@ MessageProcessor::processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp)
 
         case GET_REMOTE_HOST_MSG:
             return processGetRemoteHostMsg(pMsg);
+        
+        case STORE_PURCHASED_MSG:
+            return processStorePurchaseMsg(pMsg);
 	
 		default:
 			std::cout << "Unhandled message type=" << nMsgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
@@ -188,7 +191,20 @@ MessageProcessor::processRequests()
 	return;
 }
 
-    
+   
+    void
+    MessageProcessor::processStorePurchaseMsg(std::shared_ptr<MsgObj> pMsg)
+    {
+        auto pStorePurchaseMsg = std::dynamic_pointer_cast<StorePurchasedObj>(pMsg);
+        if (!pStorePurchaseMsg)
+        {
+            std::cout << Util::now() <<  "Invalid message received in MessageProcessor::processStorePurchaseMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+            return;
+        }
+
+        dataStore.storeStorePurchase(pStorePurchaseMsg);
+    } 
+
     void
     MessageProcessor::processGetRemoteHostMsg(std::shared_ptr<MsgObj> pMsg)
     {

@@ -16,6 +16,7 @@
 #include <ShareItemsDAO.h>
 #include <PicMetaRocksDAO.h>
 #include <FrndLstMgr.h>
+#include <PurchaseDAO.h>
   
   
     
@@ -27,6 +28,7 @@
     ShareItemsDAO  m_shareItemDAO;
     PicMetaRocksDAO m_picMetaDAO;
     FrndLstMgr      m_frndLstMgr;
+    PurchaseDAO     m_purchaseDAO;
 	
 	  static thread_local std::unordered_map<int, std::shared_ptr<PicMetaDataObj>> fdPicMetaMp;
 	  static thread_local std::unordered_map<int, int> fdFdMp;
@@ -51,7 +53,10 @@
 
       		void storeItemAndLstShareInfo(int appId, long shareIdLst, const std::string& name, const std::string& list, const std::vector<std::string>& shareIds);
 
-                  bool storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset);
+             bool storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset);
+
+            void storeStorePurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg);
+
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);
 		  void eraseFdMp(int fd);
