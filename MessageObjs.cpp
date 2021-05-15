@@ -45,6 +45,15 @@ PicMetaDataObj::setName(const char *pName, int len)
 }
 
 std::ostream&
+operator << (std::ostream& os, const StorePurchasedObj& storePurchase)
+{
+
+    os << "StorePurchasedObj appId=" << storePurchase.getAppId() << " shareId="
+        << storePurchase.getShareId() << " productId=" << storePurchase.getPurchaseId() << " deviceId=" << storePurchase.getDeviceId();
+        
+    return os;
+}
+std::ostream&
 operator << (std::ostream& os, const GetRemoteHostObj& getRemoteHost)
 {
     os << "GetRemoteHostObj appId=" << getRemoteHost.getAppId() << " shareId="

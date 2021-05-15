@@ -86,6 +86,10 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
 
         case GET_REMOTE_HOST_MSG:
 			return createGetRemoteHost(buffer, mlen, fd);
+
+        case STORE_PURCHASED:
+			return createStorePurchasedObj(buffer, mlen, fd);
+        
  
 		default:
 			std::cout << "Unhandled message msgTyp=" << msgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;		
@@ -94,6 +98,34 @@ MessageDecoder::operator()(char* buffer, ssize_t mlen, int fd)
    	return false; 
 }
 
+bool
+MessageDecoder::createStorePurchasedObj(char *buffer,  ssize_t mlen, int fd)
+{
+
+    std::shared_ptr<StorePurchasedObj> pMsg = std::make_shared<StorePurchasedObj>();
+	pMsg->setMsgTyp(STORE_PURCHASED);	
+	pMsg->setFd(fd);
+    int appId;
+    memcpy(&appId, buffer + 2*sizeof(int), sizeof(int)); 
+	pMsg->setAppId(appId);
+    long shareId;
+    memcpy(&shareId, buffer + 3*sizeof(int), sizeof(long));
+    pMsg->setShareId(shareId);
+    int deviceIdLen;
+    int productIdLen;
+    int deviceIdLenOffset = 3*sizeof(int) + sizeof(long);
+    memcpy(&deviceIdLen, buffer + deviceIdLenOffset, sizeof(int));
+    int productIdLenOffset = deviceIdLenOffset + sizeof(int);
+    memcpy(&productIdLen, buffer + productIdLenOffset, sizeof(int));
+    int deviceIdOffset = productIdLenOffset + sizeof(int);
+    pMsg->setDeviceId(buffer + deviceIdOffset); 
+    int purchaseIdOffset = deviceIdOffset + deviceIdLen;
+	pMsg->setPurchaseId(buffer + purchaseIdOffset);
+    std::cout << "Create Store purchase obj=" << *pMsg << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+	pMsgs.push_back(pMsg);
+
+    return true;
+}
 bool
 MessageDecoder::createGetRemoteHost(char *buffer,  ssize_t mlen, int fd)
 {

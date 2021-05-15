@@ -134,4 +134,8 @@ enum class AppName
 #define PIC_RPLY_1_MSG 118
 #define SHOULD_DOWNLOAD_1_MSG 121
 
+#define STORE_PURCHASED 130
+#define GET_PURCHASES 131
+#define GET_PURCHASES_REPLY 132
+
 #endif

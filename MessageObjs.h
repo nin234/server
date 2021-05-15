@@ -43,6 +43,26 @@ class GetRemoteHostObj : public MsgObj
 
 std::ostream& operator << (std::ostream& os, const GetRemoteHostObj& getRemoteHost);
 
+class StorePurchasedObj : public MsgObj
+{
+        long shareId;
+        std::string purchaseId;
+        std::string deviceId;
+
+    public:
+
+        virtual ~StorePurchasedObj(){}
+        long getShareId() const {return shareId;}
+        void setShareId(long shId){shareId = shId;}
+		const std::string& getPurchaseId() const {return purchaseId;}
+		void setPurchaseId(const char *pPurId) {purchaseId = pPurId;}
+		const std::string& getDeviceId() const {return deviceId;}
+		void setDeviceId(const char *pDevId) {deviceId = pDevId;}
+};
+
+std::ostream& operator << (std::ostream& os, const StorePurchasedObj& storePurchase);
+
+
 class PicObj : public MsgObj
 {
 		char buf[MAX_BUF];
