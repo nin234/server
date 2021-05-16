@@ -67,8 +67,7 @@ PurchaseDAO::get(int appId, long shareId, const std::string& devId, std::string&
         }
     }
 
-    purchaseId = "INVALID";
-    std::cout << "Failed to find purchaseId=" << purchaseId << " for appId=" << appId << " shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+    std::cout << "Failed to find purchaseId for appId=" << appId << " shareId=" << shareId << " " << __FILE__ << ":" << __LINE__ << std::endl;   
     return false;
 }
 

@@ -585,7 +585,10 @@ CommonDataMgr::getPurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg)
     if (m_purchaseDAO.get(pStorePurchaseMsg->getAppId(), pStorePurchaseMsg->getShareId(), pStorePurchaseMsg->getDeviceId(), purchaseId))
     {
         pStorePurchaseMsg->setPurchaseId(purchaseId.c_str());
-        return true;
     }
-    return false;
+    else
+    {
+        pStorePurchaseMsg->setPurchaseId("INVALID");
+    }
+    return true;
 }
