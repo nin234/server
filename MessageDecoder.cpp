@@ -105,7 +105,7 @@ MessageDecoder::createGetStorePurchaseMsg(char *buffer,  ssize_t mlen, int fd)
 {
 
     std::shared_ptr<StorePurchasedObj> pMsg = std::make_shared<StorePurchasedObj>();
-	pMsg->setMsgTyp(STORE_PURCHASED_MSG);	
+	pMsg->setMsgTyp(GET_PURCHASES_MSG);	
 	pMsg->setFd(fd);
     int appId;
     memcpy(&appId, buffer + 2*sizeof(int), sizeof(int)); 
@@ -118,7 +118,7 @@ MessageDecoder::createGetStorePurchaseMsg(char *buffer,  ssize_t mlen, int fd)
     memcpy(&deviceIdLen, buffer + deviceIdLenOffset, sizeof(int));
     int deviceIdOffset = deviceIdLenOffset + sizeof(int);
     pMsg->setDeviceId(buffer + deviceIdOffset); 
-    std::cout << Util::now() << "Create Store purchase obj=" << *pMsg << " " << __FILE__ << ":" << __LINE__ << std::endl;  
+    std::cout << Util::now() << "Create get Store purchase obj=" << *pMsg << " " << __FILE__ << ":" << __LINE__ << std::endl;  
 	pMsgs.push_back(pMsg);
 
     return true;

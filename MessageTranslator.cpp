@@ -79,6 +79,32 @@ MessageTranslator::getReply(char *buf, int* mlen, int msgTyp)
 }
 
 
+bool
+MessageTranslator::getPurchasesReply(char *pMsg, int *mlen, int buflen, std::shared_ptr<StorePurchasedObj> pGetPurchaseMsg)
+{
+    int pIdLen = pGetPurchaseMsg->getPurchaseId().size() + 1;
+    int msglen = 4+4+4+8+4+pIdLen;
+    //msglen = msglen+msgId+appId+shareId+pIdLen+productId
+    if (buflen < msglen)
+	{
+		std::cout << "buflen=" << buflen << " less than msglen=" << msglen << " in MessageTranslator:getPurchasesReply " << std::endl;
+		return false;
+	}
+	constexpr int msgId = GET_PURCHASES_REPLY_MSG;
+	memcpy(pMsg, &msglen, sizeof(int));
+	memcpy(pMsg+sizeof(int), &msgId, sizeof(int));
+    int appId = pGetPurchaseMsg->getAppId();
+    constexpr int appIdOffset = 2*sizeof(int);
+	memcpy(pMsg+appIdOffset, &appId, sizeof(int));
+    long shareId = pGetPurchaseMsg->getShareId();
+    constexpr int shareIdOffset = appIdOffset + sizeof(int);
+    memcpy(pMsg + shareIdOffset, &shareId, sizeof(long));
+    constexpr int pIdLenOffset = shareIdOffset + sizeof(int);
+    memcpy(pMsg + pIdLenOffset, &pIdLen, sizeof(int));
+    constexpr int pIdOffset = pIdLenOffset + sizeof(int);
+    memcpy(pMsg + pIdOffset, pGetPurchaseMsg->getPurchaseId().c_str(), pIdLen);
+    return true;
+}
 
 bool 
 MessageTranslator::getShareIds(const std::string& lst, std::vector<std::string>& shareIds)

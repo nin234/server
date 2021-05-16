@@ -56,6 +56,7 @@
              bool storePicMetaData(std::shared_ptr<PicMetaDataObj> pPicMetaObj, int *picOffset);
 
             void storeStorePurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg);
+            bool getPurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg);
 
 		  std::vector<std::string> getPicShareIds(int fd);
 		  std::string getPicName(int fd);

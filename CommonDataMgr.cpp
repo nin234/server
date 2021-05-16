@@ -578,4 +578,14 @@ CommonDataMgr::storeStorePurchase(std::shared_ptr<StorePurchasedObj> pStorePurch
     m_purchaseDAO.store(pStorePurchaseMsg->getAppId(), pStorePurchaseMsg->getShareId(), pStorePurchaseMsg->getDeviceId(), pStorePurchaseMsg->getPurchaseId());
 }
 
-
+bool
+CommonDataMgr::getPurchase(std::shared_ptr<StorePurchasedObj> pStorePurchaseMsg)
+{
+    std::string purchaseId;
+    if (m_purchaseDAO.get(pStorePurchaseMsg->getAppId(), pStorePurchaseMsg->getShareId(), pStorePurchaseMsg->getDeviceId(), purchaseId))
+    {
+        pStorePurchaseMsg->setPurchaseId(purchaseId.c_str());
+        return true;
+    }
+    return false;
+}

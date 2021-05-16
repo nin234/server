@@ -53,6 +53,9 @@ class MessageProcessor : public Observer, public NtwIntfObserver
         void processShouldDownLoadMsg(std::shared_ptr<MsgObj> pMsg);
         void processGetRemoteHostMsg(std::shared_ptr<MsgObj> pMsg);
         void processStorePurchaseMsg(std::shared_ptr<MsgObj> pMsg);
+
+        void processGetPurchaseMsg(std::shared_ptr<MsgObj> pMsg);
+
 		void processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp);
 		bool getShareIds(const std::string& lst, std::vector<std::string>& shareIds);
 		bool getReply(char *buf, int *mlen, int msgTyp);

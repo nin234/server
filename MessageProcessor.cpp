@@ -161,6 +161,9 @@ MessageProcessor::processMsg(std::shared_ptr<MsgObj> pMsg, int nMsgTyp)
         case STORE_PURCHASED_MSG:
             return processStorePurchaseMsg(pMsg);
 	
+        case GET_PURCHASES_MSG:
+            return processGetPurchaseMsg(pMsg);
+	
 		default:
 			std::cout << "Unhandled message type=" << nMsgTyp << " " << __FILE__ << ":" << __LINE__ << std::endl;	
 		break;
@@ -191,7 +194,35 @@ MessageProcessor::processRequests()
 	return;
 }
 
-   
+void
+MessageProcessor::processGetPurchaseMsg(std::shared_ptr<MsgObj> pMsg)
+{
+    auto pGetPurchaseMsg = std::dynamic_pointer_cast<StorePurchasedObj>(pMsg);
+    if (!pGetPurchaseMsg)
+    {
+        std::cout << Util::now() <<  "Invalid message received in MessageProcessor::processGetPurchaseMsg " << " " << __FILE__ << ":" << __LINE__ << std::endl;   
+        return;
+    }
+
+    if (dataStore.getPurchase(pGetPurchaseMsg))
+    {
+        char buf[32768];
+        int mlen=0;
+        if (m_pTrnsl->getPurchasesReply(buf, &mlen, 32768, pGetPurchaseMsg))
+        {
+        
+            if (!pNtwIntf->sendMsg(buf, mlen, pGetPurchaseMsg->getFd()))
+            {
+                std::cout << Util::now() << "Failed to send GET_PURCHASES_REPLY_MSG message " << *pGetPurchaseMsg << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+            }
+            else
+            {
+                std::cout << Util::now() << "Send GET_PURCHASES_REPLY_MSG " << *pGetPurchaseMsg << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+            }
+        }
+    }
+}
+
     void
     MessageProcessor::processStorePurchaseMsg(std::shared_ptr<MsgObj> pMsg)
     {
