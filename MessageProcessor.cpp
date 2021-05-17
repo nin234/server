@@ -213,11 +213,11 @@ MessageProcessor::processGetPurchaseMsg(std::shared_ptr<MsgObj> pMsg)
         
             if (!pNtwIntf->sendMsg(buf, mlen, pGetPurchaseMsg->getFd()))
             {
-                std::cout << Util::now() << "Failed to send GET_PURCHASES_REPLY_MSG message " << *pGetPurchaseMsg << " " << __FILE__ << ":" << __LINE__ << std::endl;    
+                std::cout << Util::now() << "Failed to send GET_PURCHASES_REPLY_MSG message " << *pGetPurchaseMsg << " mlen="  << mlen << " " << __FILE__ << ":" << __LINE__ << std::endl;    
             }
             else
             {
-                std::cout << Util::now() << "Send GET_PURCHASES_REPLY_MSG " << *pGetPurchaseMsg << " " << __FILE__ << ":" << __LINE__ << std::endl; 
+                std::cout << Util::now() << "Send GET_PURCHASES_REPLY_MSG " << *pGetPurchaseMsg << " mlen="  << mlen << " " << __FILE__ << ":" << __LINE__ << std::endl; 
             }
         }
     }

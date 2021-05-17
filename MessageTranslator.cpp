@@ -99,10 +99,12 @@ MessageTranslator::getPurchasesReply(char *pMsg, int *mlen, int buflen, std::sha
     long shareId = pGetPurchaseMsg->getShareId();
     constexpr int shareIdOffset = appIdOffset + sizeof(int);
     memcpy(pMsg + shareIdOffset, &shareId, sizeof(long));
-    constexpr int pIdLenOffset = shareIdOffset + sizeof(int);
+    constexpr int pIdLenOffset = shareIdOffset + sizeof(long);
     memcpy(pMsg + pIdLenOffset, &pIdLen, sizeof(int));
+    std::cout << "pIdLen=" << pIdLen << " pIdLenOffset=" << pIdLenOffset << " " << __FILE__ << ":" << __LINE__ << std::endl;    
     constexpr int pIdOffset = pIdLenOffset + sizeof(int);
     memcpy(pMsg + pIdOffset, pGetPurchaseMsg->getPurchaseId().c_str(), pIdLen);
+    *mlen = msglen;
     return true;
 }
 

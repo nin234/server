@@ -49,7 +49,7 @@ operator << (std::ostream& os, const StorePurchasedObj& storePurchase)
 {
 
     os << "StorePurchasedObj appId=" << storePurchase.getAppId() << " shareId="
-        << storePurchase.getShareId() << " productId=" << storePurchase.getPurchaseId() << " deviceId=" << storePurchase.getDeviceId();
+        << storePurchase.getShareId() << " productId=" << storePurchase.getPurchaseId() << " deviceId=" << storePurchase.getDeviceId() << " fd=" << storePurchase.getFd();
         
     return os;
 }
